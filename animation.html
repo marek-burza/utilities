@@ -1,0 +1,70 @@
+<!--
+
+This is a simple code demonstrating how to run an animation in HTML5.
+
+This code is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This code is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with code. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Animation</title>
+<style>
+/* Make sure we span the full viewport within the browser window */
+*      { width:100%; height:100%; margin:0; padding:0; }
+/* Prevent the scrollbars from appearing */
+canvas { display:block; }
+</style>
+</head>
+<body>
+<canvas id="gfx" width="100%" height="100%"/>
+<script type="text/javascript" src="ua.js"></script>
+<script type="text/javascript">
+// This will draw a frame of the animation with a dot spinning along an ellipse.
+// The dot will make a full spin in one second.
+function frame(){
+  // Get the nadle on the HTML5 canvas element
+  var canvas = document.getElementById("gfx");
+  // Check if HTML5 2D graphics is supported
+  if(canvas.getContext){
+     // Get the 2D graphics context
+     var gfx = canvas.getContext("2d");
+     // Make sure we've got the same width for the window & HTML5 canvas
+     var width  = gfx.canvas.width  = window.innerWidth;
+     var height = gfx.canvas.height = window.innerHeight;
+     // Clear screen
+     gfx.clearRect(0, 0, width, height);
+     // Make the position depending on the moment within one second
+     var now = new Date().getTime() % 1000;
+     // Turn that time moment into an angle
+     var angle = 2 * Math.PI * now / 1000.0;
+     // Drow the dot
+     gfx.arc(
+       (1 + Math.sin(angle)) * width / 2,  // Calculate dot's X position
+       (1 + Math.cos(angle)) * height / 2, // Calculate dot's Y position
+       20,                                 // Radius of the dot
+       0,                                  // Start angle
+       2 * Math.PI,                        // Stop angle (full angle)
+       false                               // Clockwise
+     );
+     // Fill the dot
+     gfx.fill();
+  }
+}
+// Trigger the animation with help of the animating script included earlier
+uaAnimate(frame);
+</script>
+</body>
+</html>
