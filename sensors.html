@@ -1,0 +1,66 @@
+<!--
+
+Learning to access sensors in JavaScript.
+
+This code is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This code is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with code. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Sensors</title>
+<script type="text/javascript">
+function motion(event){
+  document.getElementById("accelerometer").innerHTML = "Accelerometer: "
+    + event.accelerationIncludingGravity.x + ", "
+    + event.accelerationIncludingGravity.y + ", "
+    + event.accelerationIncludingGravity.z;
+}
+
+function orientation(event){
+  document.getElementById("magnetometer").innerHTML = "Magnetometer: "
+    + event.alpha + ", "
+    + event.beta + ", "
+    + event.gamma;
+}
+
+function go(){
+  if(window.DeviceMotionEvent){
+    window.addEventListener("devicemotion", motion, false);
+  }else{
+    var status = document.getElementById("status");
+    status.innerHTML = status.innerHTML.replace(
+      "is supported", "is not supported"
+    );
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener("deviceorientation", orientation, false);
+  }else{
+    var status = document.getElementById("status");
+    status.innerHTML = status.innerHTML.replace(
+      "is supported", "is not supported"
+    );
+  }
+}
+</script>
+</head>
+<body onload="go();">
+<div id="status"><a href=\"http://www.w3.org/TR/orientation-event/">http://www.w3.org/TR/orientation-event/</a> is supported.</div>
+<br/><br/>
+<div id="accelerometer"></div>
+<br/><br/>
+<div id="magnetometer"></div>
+</body>
+</html>
