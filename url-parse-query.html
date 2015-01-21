@@ -1,0 +1,31 @@
+<!--
+
+This code demonstrates how to use the urlParseQuery function.
+
+This code is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This code is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with code. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Parse the query from a URL</title>
+</head>
+<body>
+<script type="text/javascript" src="url-parse-query.js"></script>
+<script type="text/javascript">
+alert(JSON.stringify(urlParseQuery(window.location.href)));
+</script>
+</body>
+</html>
