@@ -61,21 +61,21 @@ mapANSI2ASCII = {
     }
 
 # Processes a file byte-by-byte and converts polish characters from ANSI to UTF8
-def convert(file):
-    file = open(file, 'r+b')
+def convert(path):
+    srt = open(path, 'rb')
     text = '\xEF\xBB\xBF'
     while True:
-        byte = file.read(1)
+        byte = srt.read(1)
         if '' == byte:
             break
         if byte in mapANSI2UTF8:
             text += mapANSI2UTF8[byte]
         else:
             text += byte
-    file.seek(0)
-    file.truncate(0)
-    file.write(text)
-    file.close()
+    srt.close()
+    srt = open(path, 'wb')
+    srt.write(text)
+    srt.close()
 
 # Runs conversion for every file passed as input argument
 for file in sys.argv[1:]:
