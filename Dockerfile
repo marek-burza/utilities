@@ -23,6 +23,4 @@ RUN chmod +x /bin/simple-collector.py
 
 EXPOSE 5000
 
-VOLUME ["/root/.aws"]
-
-CMD ["/bin/simple-collector.py"]
+CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/bin/simple-collector.py"]
