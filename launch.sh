@@ -14,18 +14,24 @@
 # with code. If not, see http://www.gnu.org/licenses/.
 
 # Check input arguments
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 5 ]; then
     echo "Usage: ./launch.sh CREDENTIALS REGION"
     echo "Builds the service and launches it locally"
     echo "Arguments:"
-    echo "    CREDENTIALS - Path to a CSV file with the AWS credentials"
-    echo "    REGION      - AWS region to be used (e.g. eu-west-1)"
+    echo "    CREDENTIALS - Path to the AWS credentials (CSV) for the service"
+    echo "    REGION      - AWS region for the service (e.g. eu-west-1)"
+    echo "    PREFIX      - Prefix to be used for naming (task, service, etc.)"
+    echo "    IMAGE       - Image (URL) to be launched"
+    echo "    PORT        - Port number to expose the service at"
     echo "Example:"
-    echo "./launch.sh ../credentials.csv eu-west-1"
+    echo "./launch.sh ../credentials.csv eu-west-1 simple-collector altermarkive/simple-collector 80"
     exit 1
 else
     CREDENTIALS=$1
     REGION=$2
+    PREFIX=$3
+    IMAGE=$4
+    PORT=$5
 fi
 
 # Move to the base directory
@@ -38,8 +44,22 @@ USER=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $1}'`
 ID=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $2}'`
 SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 
-# Build docker image
-docker build --rm -t service .
+# Create container definition
+MAPPING={containerPort=5000,hostPort=$PORT,protocol=tcp}
+ENVIRONMENT_REGION={name=AWS_DEFAULT_REGION,value=$REGION}
+ENVIRONMENT_ID={name=AWS_ACCESS_KEY_ID,value=$ID}
+ENVIRONMENT_SECRET={name=AWS_SECRET_ACCESS_KEY,value=$SECRET}
+DEF=name=$PREFIX-container
+DEF=$DEF,image=$IMAGE
+DEF=$DEF,cpu=32,memory=128
+DEF=$DEF,portMappings=[$MAPPING]
+DEF=$DEF,essential=true
+DEF=$DEF,environment=[$ENVIRONMENT_REGION,$ENVIRONMENT_ID,$ENVIRONMENT_SECRET]
 
-# Launch docker image
-docker run -e AWS_ACCESS_KEY_ID=$ID -e AWS_SECRET_ACCESS_KEY=$SECRET -e AWS_DEFAULT_REGION=$REGION -dt -p 80:5000 service
+# Register task definition
+TASK=$PREFIX-task
+aws ecs register-task-definition --family $TASK --container-definitions $DEF
+
+# Create service
+SERVICE=$PREFIX-service
+aws ecs create-service --service-name $SERVICE --task-definition $TASK --desired-count 1
