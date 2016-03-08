@@ -23,4 +23,4 @@ RUN chmod +x /bin/simple-collector.py
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/bin/simple-collector.py"]
+CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/bin/simple-collector.py", "--logto", "/tmp/simple-collector.uwsgi.log", "--socket-timeout", "60", "--http-timeout", "60", "--harakiri", "60"]

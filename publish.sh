@@ -39,7 +39,7 @@ cd $BASE
 docker build --rm -t $NAME .
 
 # Tag the docker image
-docker tag -f $NAME:latest $URL/$NAME:latest
+docker tag $NAME:latest $URL/$NAME:latest
 
 # Login to Docker Hub
 `aws ecr get-login --region $REGION`
