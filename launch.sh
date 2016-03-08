@@ -55,6 +55,7 @@ DEF=$DEF,cpu=32,memory=128
 DEF=$DEF,portMappings=[$MAPPING]
 DEF=$DEF,essential=true
 DEF=$DEF,environment=[$ENVIRONMENT_REGION,$ENVIRONMENT_ID,$ENVIRONMENT_SECRET]
+DEF=$DEF,privileged=true
 
 # Register task definition
 TASK=$PREFIX-task

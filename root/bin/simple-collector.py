@@ -20,6 +20,7 @@ import logging.handlers
 import mimetypes
 import os
 import random
+import sys
 import time
 import traceback
 
@@ -36,6 +37,16 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(handler)
+# Store the S3 credentials
+try:
+    identity = os.environ['AWS_ACCESS_KEY_ID'].strip()
+    key = os.environ['AWS_SECRET_ACCESS_KEY'].strip()
+except:
+    logger.error('The application is not configured')
+    sys.exit()
+with open('/etc/s3fs.passwd' ,'wb') as passwd:
+    passwd.write('%s:%s\n' % (identity, key))
+os.system('chmod 600 /etc/s3fs.passwd')
 
 # Generate a successive file name
 def successive():
@@ -62,49 +73,40 @@ def locate(path):
         prefix = '%s/' % prefix
     return (name, prefix)
 
+def reply(start_response, code):
+    start_response(code, [('Content-Type','text/html')])
+    return [b'']
+
 # Handle HTTP requests
 def application(environ, start_response):
-    start_response('200 OK', [('Content-Type','text/html')])
     if 'POST' != environ.get('REQUEST_METHOD'):
-        return [b'']
+        return reply(start_response, '500 Internal Server Error')
     path = environ.get('PATH_INFO')[1:]
     try:
         (name, prefix) = locate(path)
         if None == name or 0 == len(name):
             logger.error('The requested path was invalid (%s)' % path)
-            return [b'']
+            return reply(start_response, '500 Internal Server Error')
     except:
         logger.error('Failed to parse the path (%s)' % path)
-        return [b'']
+        return reply(start_response, '500 Internal Server Error')
     mime = environ.get('CONTENT_TYPE', 'application/data')
     try:
         length = int(environ.get('CONTENT_LENGTH', 0))
     except:
         length = 0
     body = environ['wsgi.input'].read(length)
+    mount = '/mnt/s3/%s' % name
+    if not os.path.isdir(mount):
+        os.system('mkdir -p %s' % mount)
+        os.system('s3fs %s %s -o passwd_file=/etc/s3fs.passwd' % (name, mount))
+        os.system('mkdir -p %s/%s' % (mount, prefix))
+    path = '%s/%s%s%s' % (mount, prefix, successive(), extension(mime))
     try:
-        s3_id     = os.environ['AWS_ACCESS_KEY_ID'].strip()
-        s3_key    = os.environ['AWS_SECRET_ACCESS_KEY'].strip()
-        s3_region = os.environ['AWS_DEFAULT_REGION'].strip()
-    except:
-        logger.error('The application is not configured')
-        return [b'']
-    try:
-        session = boto3.session.Session(aws_access_key_id=s3_id, aws_secret_access_key=s3_key, region_name=s3_region)
-        s3 = session.resource('s3')
-        bucket = s3.Bucket(name)
-    except:
-        logger.error('Failed to establish S3 session:\n%s' % traceback.format_exc())
-        return [b'']
-    try:
-        s3.meta.client.head_bucket(Bucket=name)
-    except botocore.exceptions.ClientError as exception:
-        if 404 == int(exception.response['Error']['Code']):
-            logger.error('Failed to access the S3 bucket (%s):\n%s' % (name, traceback.format_exc()))
-            return [b'']
-    try:
-        bucket.put_object(Key='%s%s%s' % (prefix, successive(), extension(mime)), Body=body)
+        with open(path, 'wb') as handle:
+            handle.write(body)
         logger.info('Collected %d bytes' % length)
     except:
         logger.error('Failed to create an S3 object:\n%s' % traceback.format_exc())
-    return [b'']
+        return reply(start_response, '500 Internal Server Error')
+    return reply(start_response, '200 OK')
