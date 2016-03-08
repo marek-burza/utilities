@@ -15,12 +15,14 @@ FROM ubuntu:14.04
 
 ADD root /
 
-RUN apt-get update && apt-get install -y python python-dev python-pip
+RUN apt-get update && apt-get install -y python python-dev python-pip automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
 
 RUN pip install -r /etc/simple-collector.requirements.txt
 
 RUN chmod +x /bin/simple-collector.py
 
 EXPOSE 5000
+
+RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && cd s3fs-fuse && ./autogen.sh && ./configure && make && make install
 
 CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/bin/simple-collector.py", "--logto", "/tmp/simple-collector.uwsgi.log", "--socket-timeout", "60", "--http-timeout", "60", "--harakiri", "60"]
