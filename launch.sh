@@ -51,15 +51,17 @@ ENVIRONMENT_ID={name=AWS_ACCESS_KEY_ID,value=$ID}
 ENVIRONMENT_SECRET={name=AWS_SECRET_ACCESS_KEY,value=$SECRET}
 DEF=name=$PREFIX-container
 DEF=$DEF,image=$IMAGE
-DEF=$DEF,cpu=32,memory=128
+DEF=$DEF,cpu=32,memory=256
 DEF=$DEF,portMappings=[$MAPPING]
 DEF=$DEF,essential=true
 DEF=$DEF,environment=[$ENVIRONMENT_REGION,$ENVIRONMENT_ID,$ENVIRONMENT_SECRET]
+DEF=$DEF,mountPoints=[{sourceVolume=logs,containerPath=/mnt/logs,readOnly=false}]
 DEF=$DEF,privileged=true
 
 # Register task definition
 TASK=$PREFIX-task
-aws ecs register-task-definition --family $TASK --container-definitions $DEF
+VOLUMES=name=logs,host={sourcePath=/var/log}
+aws ecs register-task-definition --family $TASK --container-definitions $DEF --volumes $VOLUMES
 
 # Create service
 SERVICE=$PREFIX-service

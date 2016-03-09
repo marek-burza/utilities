@@ -14,20 +14,18 @@
 # with code. If not, see http://www.gnu.org/licenses/.
 
 # Check input arguments
-if [ "$#" -ne 3 ]; then
-    echo "Usage: ./publish.sh REGION NAME URL"
-    echo "Builds and publishes a Docker image to Amazon ECR"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./launch.sh CREDENTIALS REGION"
+    echo "Builds the service and launches it locally"
     echo "Arguments:"
-    echo "    REGION - AWS region to be used (e.g. us-west-1)"
-    echo "    NAME   - Repository name (tag) to be used"
-    echo "    URL    - Repository URL to publish the image to"
+    echo "    CREDENTIALS - Path to a CSV file with the AWS credentials"
+    echo "    REGION      - AWS region to be used (e.g. eu-west-1)"
     echo "Example:"
-    echo "./publish.sh us-west-1 altermarkive/simple-collector 012345678900.dkr.ecr.us-west-1.amazonaws.com"
+    echo "./launch.sh ../credentials.csv eu-west-1"
     exit 1
 else
-    REGION=$1
-    NAME=$2
-    URL=$3
+    CREDENTIALS=$1
+    REGION=$2
 fi
 
 # Move to the base directory
@@ -35,17 +33,16 @@ SELF=$0
 BASE=`dirname "$0"`
 cd $BASE
 
+# Parse credentials
+USER=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $1}'`
+ID=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $2}'`
+SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
+
 # Store region
 echo $REGION > root/etc/region.conf
 
 # Build docker image
-docker build --rm -t $NAME .
+docker build --rm -t simple-collector .
 
-# Tag the docker image
-docker tag $NAME:latest $URL/$NAME:latest
-
-# Login to Docker Hub
-`aws ecr get-login --region $REGION`
-
-# Publish the docker image
-docker push $URL/$NAME:latest
+# Launch docker image
+docker run -e AWS_ACCESS_KEY_ID=$ID -e AWS_SECRET_ACCESS_KEY=$SECRET -e AWS_DEFAULT_REGION=$REGION -dt --privileged -v /var/log:/mnt/logs -p 80:5000 simple-collector

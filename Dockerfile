@@ -15,7 +15,16 @@ FROM ubuntu:14.04
 
 ADD root /
 
-RUN apt-get update && apt-get install -y python python-dev python-pip automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq python python-dev python-pip automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config rsyslog python-setuptools curl
+
+RUN curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -s -o /tmp/awslogs-agent-setup.py
+
+RUN python /tmp/awslogs-agent-setup.py -n -r `cat /etc/region.conf` -c /etc/awslogs.conf
+
+RUN sed -i "s/#\$ModLoad imudp/\$ModLoad imudp/" /etc/rsyslog.conf && \
+    sed -i "s/#\$UDPServerRun 514/\$UDPServerRun 514/" /etc/rsyslog.conf && \
+    sed -i "s/#\$ModLoad imtcp/\$ModLoad imtcp/" /etc/rsyslog.conf && \
+    sed -i "s/#\$InputTCPServerRun 514/\$InputTCPServerRun 514/" /etc/rsyslog.conf
 
 RUN pip install -r /etc/simple-collector.requirements.txt
 
@@ -25,4 +34,4 @@ EXPOSE 5000
 
 RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && cd s3fs-fuse && ./autogen.sh && ./configure && make && make install
 
-CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/bin/simple-collector.py", "--logto", "/tmp/simple-collector.uwsgi.log", "--socket-timeout", "60", "--http-timeout", "60", "--harakiri", "60"]
+CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
