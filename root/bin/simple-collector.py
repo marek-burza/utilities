@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 # Create log handler
 LOG_FILE = '/tmp/simple-collector.log'
-handler = logging.handlers.SysLogHandler(address=('localhost', 514), facility='simple-collector')
+handler = logging.handlers.SysLogHandler(address=('localhost', 514))
 handler.setLevel(logging.INFO)
 # Create log formatter
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
