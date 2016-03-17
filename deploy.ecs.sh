@@ -24,27 +24,27 @@
 
 # Check input arguments
 if [ "$#" -ne 7 ]; then
-    echo "Usage: ./stator_deploy_ecs.sh CREDENTIALS REGION BUCKET QUEUE PREFIX IMAGE URL"
+    echo "Usage: ./deploy.ecs.sh CREDENTIALS REGION PREFIX IMAGE URL BUCKET QUEUE"
     echo "Builds the service and deploys it locally"
     echo "Arguments:"
-    echo "    CREDENTIALS  - Path to a CSV file with the AWS credentials"
-    echo "    REGION       - AWS region to be used (e.g. eu-west-1)"
-    echo "    BUCKET       - AWS S3 bucket to be used"
-    echo "    QUEUE        - AWS SQS queue to be used"
-    echo "    PREFIX       - Prefix to be used for naming (task, service, etc.)"
-    echo "    IMAGE        - Image name (tag) to be used"
-    echo "    URL          - Repository URL to publish the image to"
+    echo "    CREDENTIALS - Path to the AWS credentials (CSV) for the service"
+    echo "    REGION      - AWS region to be used (e.g. eu-west-1)"
+    echo "    PREFIX      - Prefix to be used for naming (task, service, etc.)"
+    echo "    IMAGE       - Image name (tag) to be used"
+    echo "    URL         - Repository URL to publish the image to"
+    echo "    BUCKET      - AWS S3 bucket to be used"
+    echo "    QUEUE       - AWS SQS queue to be used"
     echo "Example:"
-    echo "./stator_deploy_ecs.sh ../credentials.csv eu-west-1 bucket queue stator namespace/stator 012345678900.dkr.ecr.us-west-1.amazonaws.com"
+    echo "./deploy.ecs.sh ../credentials.csv eu-west-1 stator namespace/stator 012345678900.dkr.ecr.us-west-1.amazonaws.com bucket queue"
     exit 1
 else
     CREDENTIALS=$1
     REGION=$2
-    BUCKET=$3
-    QUEUE=$4
-    PREFIX=$5
-    IMAGE=$6
-    URL=$7
+    PREFIX=$3
+    IMAGE=$4
+    URL=$5
+    BUCKET=$6
+    QUEUE=$7
 fi
 
 # Move to the base directory
@@ -61,7 +61,7 @@ SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 rm root/tmp/region 2> /dev/null
 echo $REGION > root/tmp/region
 
-# Store the bucket, the queue and the credentials
+# Store the queue
 rm root/bin/stator_configuration.py 2> /dev/null
 echo aws_queue  = \'$QUEUE\'  >> root/bin/stator_configuration.py
 
