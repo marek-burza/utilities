@@ -24,7 +24,7 @@
 
 # Check input arguments
 if [ "$#" -ne 4 ]; then
-    echo "Usage: ./stator_deploy_local.sh CREDENTIALS REGION BUCKET QUEUE"
+    echo "Usage: ./deploy.local.sh CREDENTIALS REGION BUCKET QUEUE"
     echo "Builds the service and deploys it locally"
     echo "Arguments:"
     echo "    CREDENTIALS - Path to a CSV file with the AWS credentials"
@@ -32,7 +32,7 @@ if [ "$#" -ne 4 ]; then
     echo "    BUCKET      - AWS S3 bucket to be used"
     echo "    QUEUE       - AWS SQS queue to be used"
     echo "Example:"
-    echo "./stator_deploy_local.sh ../credentials.csv eu-west-1 bucket queue"
+    echo "./deploy.local.sh ../credentials.csv eu-west-1 bucket queue"
     exit 1
 else
     CREDENTIALS=$1
@@ -55,7 +55,7 @@ SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 rm root/tmp/region 2> /dev/null
 echo $REGION > root/tmp/region
 
-# Store the bucket, the queue and the credentials
+# Store the queue
 rm root/bin/stator_configuration.py 2> /dev/null
 echo aws_queue  = \'$QUEUE\'  >> root/bin/stator_configuration.py
 

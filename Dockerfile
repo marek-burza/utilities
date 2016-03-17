@@ -51,10 +51,10 @@ RUN pip install -r /tmp/requirements.txt
 
 RUN rm -rf /tmp/*
 
-RUN mkdir -p /mnt/s3
-
 RUN chmod +x /bin/stator.sh
 
 RUN chmod 400 /etc/*.s3fs
+
+RUN mkdir -p /mnt/s3
 
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
