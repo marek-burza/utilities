@@ -32,10 +32,9 @@ import time
 import traceback
 
 # Create logger
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 # Create log handler
-LOG_FILE = '/tmp/simple-collector.log'
 handler = logging.handlers.SysLogHandler(address=('localhost', 514))
 handler.setLevel(logging.INFO)
 # Create log formatter
@@ -44,16 +43,6 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(handler)
-# Store the S3 credentials
-try:
-    identity = os.environ['AWS_ACCESS_KEY_ID'].strip()
-    key = os.environ['AWS_SECRET_ACCESS_KEY'].strip()
-except:
-    logger.error('The application is not configured')
-    sys.exit()
-with open('/etc/s3fs.passwd' ,'wb') as passwd:
-    passwd.write('%s:%s\n' % (identity, key))
-os.system('chmod 600 /etc/s3fs.passwd')
 
 # Generate a successive file name
 def successive():
@@ -106,7 +95,7 @@ def application(environ, start_response):
     mount = '/mnt/s3/%s' % name
     if not os.path.isdir(mount):
         os.system('mkdir -p %s' % mount)
-        os.system('s3fs %s %s -o passwd_file=/etc/s3fs.passwd' % (name, mount))
+        os.system('s3fs %s %s -o passwd_file=/etc/passwd.s3fs' % (name, mount))
         os.system('mkdir -p %s/%s' % (mount, prefix))
     path = '%s/%s%s%s' % (mount, prefix, successive(), extension(mime))
     try:
