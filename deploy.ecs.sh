@@ -23,24 +23,26 @@
 # SOFTWARE.
 
 # Check input arguments
-if [ "$#" -ne 5 ]; then
-    echo "Usage: ./launch.sh CREDENTIALS REGION"
-    echo "Builds the service and launches it locally"
+if [ "$#" -ne 6 ]; then
+    echo "Usage: ./deploy.ecs.sh CREDENTIALS REGION PREFIX IMAGE URL PORT"
+    echo "Builds the service and deploys it locally"
     echo "Arguments:"
     echo "    CREDENTIALS - Path to the AWS credentials (CSV) for the service"
-    echo "    REGION      - AWS region for the service (e.g. eu-west-1)"
+    echo "    REGION      - AWS region to be used (e.g. eu-west-1)"
     echo "    PREFIX      - Prefix to be used for naming (task, service, etc.)"
-    echo "    IMAGE       - Image (URL) to be launched"
+    echo "    IMAGE       - Image name (tag) to be used"
+    echo "    URL         - Repository URL to publish the image to"
     echo "    PORT        - Port number to expose the service at"
     echo "Example:"
-    echo "./launch.sh ../credentials.csv eu-west-1 simple-collector altermarkive/simple-collector 80"
+    echo "./deploy.ecs.sh ../credentials.csv eu-west-1 collector namespace/collector 012345678900.dkr.ecr.us-west-1.amazonaws.com 80"
     exit 1
 else
     CREDENTIALS=$1
     REGION=$2
     PREFIX=$3
     IMAGE=$4
-    PORT=$5
+    URL=$5
+    PORT=$6
 fi
 
 # Move to the base directory
@@ -53,17 +55,42 @@ USER=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $1}'`
 ID=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $2}'`
 SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 
+# Store region
+rm root/tmp/region 2> /dev/null
+echo $REGION > root/tmp/region
+
+# Store the credentials for the S3FS
+rm root/etc/passwd.s3fs 2> /dev/null
+echo $ID:$SECRET >> root/etc/passwd.s3fs
+
+# Store the config & credentials for the AWS logs and the stator.py
+rm -r root/root 2> /dev/null
+mkdir -p root/root/.aws
+echo [default]                       >> root/root/.aws/config
+echo region = $REGION                >> root/root/.aws/config
+echo [default]                       >> root/root/.aws/credentials
+echo aws_access_key_id = $ID         >> root/root/.aws/credentials
+echo aws_secret_access_key = $SECRET >> root/root/.aws/credentials
+
+# Build docker image
+docker build --rm -t $IMAGE .
+
+# Tag the docker image
+docker tag $IMAGE:latest $URL/$IMAGE:latest
+
+# Login to Docker Hub
+`aws ecr get-login --region $REGION`
+
+# Publish the docker image
+docker push $URL/$IMAGE:latest
+
 # Create container definition
 MAPPING={containerPort=5000,hostPort=$PORT,protocol=tcp}
-ENVIRONMENT_REGION={name=AWS_DEFAULT_REGION,value=$REGION}
-ENVIRONMENT_ID={name=AWS_ACCESS_KEY_ID,value=$ID}
-ENVIRONMENT_SECRET={name=AWS_SECRET_ACCESS_KEY,value=$SECRET}
 DEF=name=$PREFIX-container
 DEF=$DEF,image=$IMAGE
 DEF=$DEF,cpu=32,memory=256
 DEF=$DEF,portMappings=[$MAPPING]
 DEF=$DEF,essential=true
-DEF=$DEF,environment=[$ENVIRONMENT_REGION,$ENVIRONMENT_ID,$ENVIRONMENT_SECRET]
 DEF=$DEF,mountPoints=[{sourceVolume=logs,containerPath=/mnt/logs,readOnly=false}]
 DEF=$DEF,privileged=true
 
@@ -75,3 +102,8 @@ aws ecs register-task-definition --family $TASK --container-definitions $DEF --v
 # Create service
 SERVICE=$PREFIX-service
 aws ecs create-service --service-name $SERVICE --task-definition $TASK --desired-count 1
+
+# Clean-up
+rm root/tmp/region 2> /dev/null
+rm root/etc/passwd.s3fs 2> /dev/null
+rm -rf root/root

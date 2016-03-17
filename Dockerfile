@@ -22,25 +22,33 @@
 
 FROM ubuntu:14.04
 
-ADD root /
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq       \
+    python python-dev python-pip automake autotools-dev g++ git                \
+    libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config     \
+    rsyslog python-setuptools curl
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq python python-dev python-pip automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config rsyslog python-setuptools curl
+RUN sed -i "s/#\$ModLoad imudp/\$ModLoad imudp/" /etc/rsyslog.conf &&          \
+    sed -i "s/#\$UDPServerRun/\$UDPServerRun/" /etc/rsyslog.conf &&            \
+    sed -i "s/#\$ModLoad imtcp/\$ModLoad imtcp/" /etc/rsyslog.conf &&          \
+    sed -i "s/#\$InputTCPServerRun/\$InputTCPServerRun/" /etc/rsyslog.conf
+
+RUN cd /tmp && git clone https://github.com/s3fs-fuse/s3fs-fuse.git &&         \
+    cd s3fs-fuse && ./autogen.sh && ./configure && make && make install
+
+ADD root /
 
 RUN curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -s -o /tmp/awslogs-agent-setup.py
 
-RUN python /tmp/awslogs-agent-setup.py -n -r `cat /etc/region.conf` -c /etc/awslogs.conf
+RUN python /tmp/awslogs-agent-setup.py -n -r `cat /tmp/region` -c /tmp/awslogs
 
-RUN sed -i "s/#\$ModLoad imudp/\$ModLoad imudp/" /etc/rsyslog.conf && \
-    sed -i "s/#\$UDPServerRun 514/\$UDPServerRun 514/" /etc/rsyslog.conf && \
-    sed -i "s/#\$ModLoad imtcp/\$ModLoad imtcp/" /etc/rsyslog.conf && \
-    sed -i "s/#\$InputTCPServerRun 514/\$InputTCPServerRun 514/" /etc/rsyslog.conf
+RUN pip install -r /tmp/requirements.txt
 
-RUN pip install -r /etc/simple-collector.requirements.txt
+RUN rm -rf /tmp/*
 
-RUN chmod +x /bin/simple-collector.py
+RUN chmod +x /bin/collector.py
+
+RUN chmod 400 /etc/*.s3fs
 
 EXPOSE 5000
-
-RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && cd s3fs-fuse && ./autogen.sh && ./configure && make && make install
 
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
