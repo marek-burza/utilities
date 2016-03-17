@@ -27,6 +27,7 @@ import logging
 import logging.handlers
 import os
 import stator_configuration
+import time
 
 # Create logger
 logger = logging.getLogger(__file__)
@@ -48,7 +49,10 @@ while True:
     for message in aws_queue.receive_messages():
         logger.info(message.body)
         try:
+            before = time.time()
             os.system(message.body)
+            after = time.time()
+            logger.info('Task completed in %.1f seconds' % (after - before))
         except:
             logger.error(traceback.format_exc())
         message.delete()
