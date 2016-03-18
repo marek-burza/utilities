@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/python
 #
 # The MIT License (MIT)
 #
@@ -22,13 +22,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Move to the base directory
-SELF=$0
-BASE=`dirname "$0"`
-cd $BASE
+import executor
+import os
+import stat
+import sys
 
-# Build docker image
-docker build --rm -t task .
+if __name__ == '__main__':
+    with open('example.sh', 'wb') as script:
+        script.write('#!/bin/bash\necho OK && man\n')
 
-# Launch docker image
-docker run -dt task
+    if len(sys.argv) > 1:
+        logger = executor.logger('example', sys.argv[1])
+    else:
+        print('Try the example like this: ./example.py /tmp/example.log')
+        logger = executor.logger('example')
+
+    executor.execute(['bash', './example.sh'], logger)
+
+    os.remove('example.sh')
+
+    if len(sys.argv) > 1:
+        os.system('cat %s' % sys.argv[1])
