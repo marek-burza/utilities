@@ -96,7 +96,7 @@ docker push $URL/$IMAGE:latest
 
 # Create container definition
 DEF=name=$PREFIX-container
-DEF=$DEF,image=$IMAGE
+DEF=$DEF,image=$URL/$IMAGE:latest
 DEF=$DEF,cpu=1024,memory=6144
 DEF=$DEF,essential=true
 DEF=$DEF,mountPoints=[{sourceVolume=logs,containerPath=/mnt/logs,readOnly=false}]
