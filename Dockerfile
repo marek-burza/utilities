@@ -32,29 +32,24 @@ RUN sed -i "s/#\$ModLoad imudp/\$ModLoad imudp/" /etc/rsyslog.conf &&          \
     sed -i "s/#\$ModLoad imtcp/\$ModLoad imtcp/" /etc/rsyslog.conf &&          \
     sed -i "s/#\$InputTCPServerRun/\$InputTCPServerRun/" /etc/rsyslog.conf
 
-RUN curl http://www.mathworks.com/supportfiles/downloads/R2013b/deployment_files/R2013b/installers/glnxa64/MCR_R2013b_glnxa64_installer.zip -s -o /tmp/MCR_R2013b_glnxa64_installer.zip
-
-RUN unzip /tmp/MCR_R2013b_glnxa64_installer.zip -d /tmp/MCR
-
-RUN cd /tmp/MCR && ./install -mode silent -agreeToLicense yes
+RUN curl http://www.mathworks.com/supportfiles/downloads/R2013b/deployment_files/R2013b/installers/glnxa64/MCR_R2013b_glnxa64_installer.zip -s -o /tmp/MCR_R2013b_glnxa64_installer.zip && \
+    unzip /tmp/MCR_R2013b_glnxa64_installer.zip -d /tmp/MCR &&                 \
+    rm /tmp/MCR_R2013b_glnxa64_installer.zip &&                                \
+    cd /tmp/MCR && ./install -mode silent -agreeToLicense yes                  \
+    cd / && rm -rf /tmp/MCR
 
 RUN cd /tmp && git clone https://github.com/s3fs-fuse/s3fs-fuse.git &&         \
-    cd s3fs-fuse && ./autogen.sh && ./configure && make && make install
+    cd s3fs-fuse && ./autogen.sh && ./configure && make && make install &&     \
+    cd / && rm -rf /tmp/s3fs-fuse && chmod 400 /etc/*.s3fs && mkdir -p /mnt/s3
 
 ADD root /
 
-RUN curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -s -o /tmp/awslogs-agent-setup.py
+RUN curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -s -o /tmp/awslogs-agent-setup.py && \
+    python /tmp/awslogs-agent-setup.py -n -r `cat /tmp/region` -c /tmp/logs && \
+    rm /tmp/awslogs-agent-setup.py /tmp/region /tmp/logs
 
-RUN python /tmp/awslogs-agent-setup.py -n -r `cat /tmp/region` -c /tmp/awslogs
-
-RUN pip install -r /tmp/requirements.txt
-
-RUN rm -rf /tmp/*
+RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 RUN chmod +x /bin/stator.sh
-
-RUN chmod 400 /etc/*.s3fs
-
-RUN mkdir -p /mnt/s3
 
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
