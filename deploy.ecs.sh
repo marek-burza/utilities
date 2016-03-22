@@ -87,7 +87,7 @@ docker push $URL/$IMAGE:latest
 # Create container definition
 MAPPING={containerPort=5000,hostPort=$PORT,protocol=tcp}
 DEF=name=$PREFIX-container
-DEF=$DEF,image=$IMAGE
+DEF=$DEF,image=$URL/$IMAGE:latest
 DEF=$DEF,cpu=32,memory=256
 DEF=$DEF,portMappings=[$MAPPING]
 DEF=$DEF,essential=true
