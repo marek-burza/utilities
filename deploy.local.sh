@@ -53,21 +53,11 @@ SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 rm root/tmp/region 2> /dev/null
 echo $REGION > root/tmp/region
 
-# Store the credentials for the S3FS
-rm root/etc/passwd.s3fs 2> /dev/null
-echo $ID:$SECRET >> root/etc/passwd.s3fs
-
-# Store the config & credentials for the AWS logs and the stator.py
-rm -r root/root 2> /dev/null
-mkdir -p root/root/.aws
-echo [default]                       >> root/root/.aws/config
-echo region = $REGION                >> root/root/.aws/config
-echo [default]                       >> root/root/.aws/credentials
-echo aws_access_key_id = $ID         >> root/root/.aws/credentials
-echo aws_secret_access_key = $SECRET >> root/root/.aws/credentials
-
 # Build docker image
 docker build --rm -t collector .
 
 # Launch docker image
-docker run -dt --privileged -v /var/log:/mnt/logs -p $PORT:5000 collector
+docker run -e AWS_ACCESS_KEY_ID=$ID -e AWS_SECRET_ACCESS_KEY=$SECRET -e AWS_DEFAULT_REGION=$REGION -dt --privileged -v /var/log:/mnt/logs -p $PORT:5000 collector
+
+# Clean-up
+rm root/tmp/region 2> /dev/null
