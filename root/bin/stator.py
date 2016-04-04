@@ -26,7 +26,6 @@ import boto3
 import logging
 import logging.handlers
 import os
-import stator_configuration
 import time
 
 # Create logger
@@ -43,7 +42,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 # Connect to the queue
 aws_sqs = boto3.resource('sqs') #aws_session.resource('sqs')
-aws_queue = aws_sqs.get_queue_by_name(QueueName=stator_configuration.aws_queue)
+aws_queue = aws_sqs.get_queue_by_name(QueueName=os.environ['QUEUE'])
 # Process tasks from the queue
 while True:
     for message in aws_queue.receive_messages():

@@ -40,7 +40,7 @@ RUN curl http://www.mathworks.com/supportfiles/downloads/R2013b/deployment_files
 
 RUN cd /tmp && git clone https://github.com/s3fs-fuse/s3fs-fuse.git &&         \
     cd s3fs-fuse && ./autogen.sh && ./configure && make && make install &&     \
-    cd / && rm -rf /tmp/s3fs-fuse && chmod 400 /etc/*.s3fs && mkdir -p /mnt/s3
+    cd / && rm -rf /tmp/s3fs-fuse && mkdir -p /mnt/s3
 
 ADD root /
 

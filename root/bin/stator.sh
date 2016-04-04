@@ -22,7 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-s3fs `cat /etc/bucket.s3fs` /mnt/s3 -o passwd_file=/etc/passwd.s3fs
+echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY >> /tmp/passwd-s3fs
+chmod 400 /tmp/passwd-s3fs
+
+s3fs $BUCKET /mnt/s3 -o passwd_file=/tmp/passwd-s3fs
 
 while true
 do
