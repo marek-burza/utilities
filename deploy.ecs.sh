@@ -61,27 +61,6 @@ SECRET=`tail -1 $CREDENTIALS | sed 's/"//g' | sed 's/,/ /g' | awk '{print $3}'`
 rm root/tmp/region 2> /dev/null
 echo $REGION > root/tmp/region
 
-# Store the queue
-rm root/bin/stator_configuration.py 2> /dev/null
-echo aws_queue  = \'$QUEUE\'  >> root/bin/stator_configuration.py
-
-# Store the credentials for the S3FS
-rm root/etc/passwd.s3fs 2> /dev/null
-echo $ID:$SECRET >> root/etc/passwd.s3fs
-
-# Store the bucket for the S3FS
-rm root/etc/bucket.s3fs 2> /dev/null
-echo $BUCKET >> root/etc/bucket.s3fs
-
-# Store the config & credentials for the AWS logs and the stator.py
-rm -r root/root 2> /dev/null
-mkdir -p root/root/.aws
-echo [default]                       >> root/root/.aws/config
-echo region = $REGION                >> root/root/.aws/config
-echo [default]                       >> root/root/.aws/credentials
-echo aws_access_key_id = $ID         >> root/root/.aws/credentials
-echo aws_secret_access_key = $SECRET >> root/root/.aws/credentials
-
 # Build docker image
 docker build --rm -t $IMAGE .
 
@@ -95,10 +74,18 @@ docker tag $IMAGE:latest $URL/$IMAGE:latest
 docker push $URL/$IMAGE:latest
 
 # Create container definition
+ENVIRONMENT_REGION={name=AWS_DEFAULT_REGION,value=$REGION}
+ENVIRONMENT_ID={name=AWS_ACCESS_KEY_ID,value=$ID}
+ENVIRONMENT_SECRET={name=AWS_SECRET_ACCESS_KEY,value=$SECRET}
+ENVIRONMENT_CREDENTIALS=$ENVIRONMENT_REGION,$ENVIRONMENT_ID,$ENVIRONMENT_SECRET
+ENVIRONMENT_BUCKET={name=BUCKET,value=$BUCKET}
+ENVIRONMENT_QUEUE={name=QUEUE,value=$QUEUE}
+ENVIRONMENT_CONFIGURATION=$ENVIRONMENT_BUCKET,$ENVIRONMENT_QUEUE
 DEF=name=$PREFIX-container
 DEF=$DEF,image=$URL/$IMAGE:latest
 DEF=$DEF,cpu=1024,memory=6144
 DEF=$DEF,essential=true
+DEF=$DEF,environment=[$ENVIRONMENT_CREDENTIALS,$ENVIRONMENT_CONFIGURATION]
 DEF=$DEF,mountPoints=[{sourceVolume=logs,containerPath=/mnt/logs,readOnly=false}]
 DEF=$DEF,privileged=true
 
@@ -113,7 +100,4 @@ aws ecs create-service --service-name $SERVICE --task-definition $TASK --desired
 
 # Clean-up
 rm root/tmp/region 2> /dev/null
-rm root/bin/stator_configuration.py 2> /dev/null
-rm root/etc/passwd.s3fs 2> /dev/null
-rm root/etc/bucket.s3fs 2> /dev/null
 rm -rf root/root
