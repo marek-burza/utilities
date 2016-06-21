@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "$API_NAME",
+    "title": "%s",
     "description": "This Python script is redirecting uploads to signed S3 URLs (when deployed with AWS Lambda and Amazon API Gateway)"
   },
   "schemes": [
@@ -46,7 +46,7 @@
             }
           },
           "httpMethod": "POST",
-          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/$LAMBDA_ARN/invocations",
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/%s/invocations",
           "type": "aws"
         }
       }
