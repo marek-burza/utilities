@@ -83,7 +83,7 @@ ENVIRONMENT_QUEUE={name=QUEUE,value=$QUEUE}
 ENVIRONMENT_CONFIGURATION=$ENVIRONMENT_BUCKET,$ENVIRONMENT_QUEUE
 DEF=name=$PREFIX-container
 DEF=$DEF,image=$URL/$IMAGE:latest
-DEF=$DEF,cpu=1024,memory=6144
+DEF=$DEF,cpu=1024,memory=5632
 DEF=$DEF,essential=true
 DEF=$DEF,environment=[$ENVIRONMENT_CREDENTIALS,$ENVIRONMENT_CONFIGURATION]
 DEF=$DEF,mountPoints=[{sourceVolume=logs,containerPath=/mnt/logs,readOnly=false}]
