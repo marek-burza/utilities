@@ -40,11 +40,12 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(handler)
-# Connect to the queue
-aws_sqs = boto3.resource('sqs') #aws_session.resource('sqs')
-aws_queue = aws_sqs.get_queue_by_name(QueueName=os.environ['QUEUE'])
+# Access the SQS
+aws_sqs = boto3.resource('sqs')
 # Process tasks from the queue
 while True:
+    # Grab the queue in each iteration (just in case it was purged)
+    aws_queue = aws_sqs.get_queue_by_name(QueueName=os.environ['QUEUE'])
     for message in aws_queue.receive_messages():
         logger.info(message.body)
         try:
