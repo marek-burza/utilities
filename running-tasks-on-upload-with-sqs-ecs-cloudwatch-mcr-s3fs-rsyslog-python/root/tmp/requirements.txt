@@ -1,0 +1,2 @@
+boto3==1.2.6
+supervisor==3.2.2
