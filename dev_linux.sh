@@ -27,6 +27,11 @@
 export USER_NAME=ubuntu
 
 echo
+echo "Updating the system"
+apt-get update
+apt-get upgrade
+
+echo
 echo "Installing Xubuntu desktop"
 apt-get install -y xubuntu-desktop
 
@@ -55,17 +60,12 @@ echo "Cleaning-up"
 apt-get autoremove -y
 
 echo
-echo "Updating the system"
-apt-get update
-apt-get upgrade
-
-echo
 echo "Installing utilities"
 apt-get install -y mc imagemagick
 
 echo
 echo "Installing essential build environment, Java, Python 3, git & meld"
-apt-get install -y build-essential default-jdk python3-pip subversion git meld
+apt-get install -y build-essential default-jdk python-pip python3-pip subversion git meld xclip
 
 echo
 echo "Enabling dynamic display resolution (assuming VirtualBox environment)"
@@ -102,3 +102,4 @@ usermod -aG docker $USER_NAME
 echo
 echo "Instaling AWS Python module"
 pip3 install boto3
+pip3 install awscli
