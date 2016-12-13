@@ -34,7 +34,7 @@ This will have the expected outcome:
     Hello nan
     >>
 
-However, a `matlab_script.m` file in a `matlab_scripts` directory (created next to the `our_module` directory) with only the above statement will result in the following outcome:
+However, a [`matlab_script.m`](matlab_scripts/matlab_script.m) file in a [`matlab_scripts`](matlab_scripts) directory (created next to the `our_module` directory) with only the above statement will result in the following outcome:
 
     >> matlab_script
     Undefined variable "py" or class "py.our_module.our_script.our_function".
