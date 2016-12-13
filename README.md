@@ -62,4 +62,4 @@ It obtains the location of the Python module, finds the base path of that module
 
 Running the corrected script will result in the same expected output as before.
 
-[Here](https://mathworks.com/help/matlab/call-python-libraries.html) is another helpful link to het you going.
+[Here](https://mathworks.com/help/matlab/call-python-libraries.html) is another helpful link to get you going.
