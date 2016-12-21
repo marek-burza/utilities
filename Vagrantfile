@@ -25,8 +25,11 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
 
-  # Install Transmission BitTorrent CLI client
+  # Install Transmission BitTorrent CLI client and OpenVPN client
+  # Based on: http://askubuntu.com/questions/460871/how-to-setup-openvpn-client
   config.vm.provision "shell", inline: <<-SHELL
-    apt-get install -y transmission-cli
+    apt-get install -y transmission-cli openvpn
+    sed -i '/\=\"all\"/s/^#//g' /etc/default/openvpn
+    cp /vagrant/config.conf /etc/openvpn/config.conf
   SHELL
 end
