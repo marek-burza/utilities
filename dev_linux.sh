@@ -103,3 +103,7 @@ echo
 echo "Instaling AWS Python module"
 pip3 install boto3
 pip3 install awscli
+
+echo
+echo "Installation ready - rebooting!"
+reboot
