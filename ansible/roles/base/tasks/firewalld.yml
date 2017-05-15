@@ -1,0 +1,26 @@
+- name: Firewalld - Install
+  yum: name=firewalld state=installed
+
+- name: Firewalld - Ensure it is started before configuration
+  service: name=firewalld state=started enabled=yes
+
+- firewalld:
+    port: 80/tcp
+    permanent: true
+    zone: public
+    state: enabled
+
+- firewalld:
+    port: 443/tcp
+    permanent: true
+    zone: public
+    state: enabled
+
+- firewalld:
+    port: 8822/tcp
+    permanent: true
+    zone: public
+    state: enabled
+
+- name: Firewalld - Ensure it is restarted after configuration
+  service: name=firewalld state=restarted
