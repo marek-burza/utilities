@@ -2,6 +2,8 @@ FROM python:2.7-slim
 
 RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -yq nginx python-dev gcc libpcre3 libpcre3-dev
 
+ADD requirements.txt /tmp/requirements.txt
+
 RUN pip install -r /tmp/requirements.txt && rm -rf /tmp/requirements.txt
 
 RUN chmod 777 /run/ -R
