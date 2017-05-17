@@ -1,11 +1,13 @@
-FROM python:2.7-alpine
+FROM python:2.7-slim
 
-RUN apk add --update nginx supervisor uwsgi-python && rm -rf /var/cache/apk/*
+RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -yq nginx python-dev gcc libpcre3 libpcre3-dev
 
 ADD root /
 
-RUN chown -R nginx:nginx /app && chmod 777 /run/ -R
+RUN pip install -r /tmp/requirements.txt && rm -rf /tmp/requirements.txt
+
+RUN chmod 777 /run/ -R
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
