@@ -1,4 +1,4 @@
-# Minimalistic Python+uWSGI+NGINX Docker Container
+# Python+uWSGI+NGINX Docker Container
 
 WARNING: This container is still using Python 2.7
 
