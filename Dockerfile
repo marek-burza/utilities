@@ -1,10 +1,6 @@
-FROM python:2.7-slim
+FROM alpine:latest
 
-RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -yq nginx python-dev gcc libpcre3 libpcre3-dev
-
-ADD requirements.txt /tmp/requirements.txt
-
-RUN pip install -r /tmp/requirements.txt && rm -rf /tmp/requirements.txt
+RUN apk add --update nginx supervisor uwsgi uwsgi-python3
 
 RUN chmod 777 /run/ -R
 
@@ -12,4 +8,4 @@ ADD root /
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
