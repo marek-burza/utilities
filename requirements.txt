@@ -1,2 +1,0 @@
-uwsgi==2.0.15
-supervisor==3.3.1
