@@ -1,28 +1,4 @@
 #!/bin/bash
-#
-# This script helps to set up the development environment on Xubuntu (in VirtualBox)
-#
-# The MIT License (MIT)
-#
-# Copyright (c) 2016
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
 export USER_NAME=ubuntu
 
@@ -60,12 +36,8 @@ echo "Cleaning-up"
 apt-get autoremove -y
 
 echo
-echo "Installing utilities"
-apt-get install -y mc imagemagick
-
-echo
-echo "Installing essential build environment, Java, Python 3, git & meld"
-apt-get install -y build-essential default-jdk python-pip python3-pip subversion git meld xclip
+echo "Installing additional tools"
+apt-get install -y meld xclip
 
 echo
 echo "Enabling dynamic display resolution (assuming VirtualBox environment)"
@@ -98,11 +70,6 @@ apt-get install -y docker-engine
 service docker start
 groupadd docker 2> /dev/null
 usermod -aG docker $USER_NAME
-
-echo
-echo "Instaling AWS Python module"
-pip3 install boto3
-pip3 install awscli
 
 echo
 echo "Installation ready - rebooting!"
