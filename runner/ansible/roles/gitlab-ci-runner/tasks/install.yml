@@ -1,0 +1,18 @@
+---
+
+- name: GitLab CI Runner - Add systemd unit
+  copy:
+    src: gitlab-ci-runner.service
+    dest: /etc/systemd/system/gitlab-ci-runner.service
+    owner: root
+    group: root
+    mode: 0644
+  register: gitlab_ci_runner_systemd_unit
+
+- name: GitLab CI Runner - Create configuration directory
+  file:
+    state: directory
+    dest: /etc/gitlab-runner
+    owner: root
+    group: root
+    mode: 0700

@@ -1,0 +1,8 @@
+- name: Firewalld - Install
+  yum: name=firewalld state=installed
+
+- name: Firewalld - Ensure it is started before configuration
+  service: name=firewalld state=started enabled=yes
+
+- name: Firewalld - Ensure it is restarted after configuration
+  service: name=firewalld state=restarted

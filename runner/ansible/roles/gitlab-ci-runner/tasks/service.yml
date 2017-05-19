@@ -1,0 +1,8 @@
+---
+
+- name: GitLab CI Runner - Start service
+  systemd: name=gitlab-ci-runner state=started enabled=yes daemon_reload=yes
+
+- name: GitLab CI Runner - Restart service
+  systemd: name=gitlab-ci-runner state=restarted enabled=yes daemon_reload=yes
+  when: gitlab_ci_runner_systemd_unit | changed
