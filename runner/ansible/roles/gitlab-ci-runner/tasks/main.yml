@@ -1,0 +1,10 @@
+---
+
+- include: install.yml
+  become: yes
+
+- include: service.yml
+  become: yes
+
+- include: register.yml
+  become: yes
