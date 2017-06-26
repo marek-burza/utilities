@@ -40,8 +40,6 @@ Vagrant.configure("2") do |config|
     groupadd docker 2> /dev/null
     usermod -aG docker $USER_NAME
 
-    echo "--- Rebooting ---"
-    reboot
-
+    echo "--- Done ---"
   SHELL
 end
