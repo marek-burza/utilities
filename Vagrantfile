@@ -26,6 +26,11 @@ Vagrant.configure("2") do |config|
     echo "--- Cleaning-up ---"
     apt-get -yq autoremove
 
+    echo "--- Installing Atom editor ---"
+    wget -q -O /tmp/atom.deb https://atom.io/download/deb
+    dpkg -i /tmp/atom.deb
+    apt-get -yf install
+
     echo "--- Installing Docker ---"
     apt-get -yq install apt-transport-https ca-certificates software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
