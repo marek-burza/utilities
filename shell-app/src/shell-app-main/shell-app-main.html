@@ -1,29 +1,60 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html"/>
+<link rel="import" href="../../bower_components/paper-button/paper-button.html"/>
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html"/>
+<link rel="import" href="polymer/lib/mixins/gesture-event-listeners.html"/>
 
 <dom-module id="shell-app-main">
   <template>
     <style>
+      * {
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
       :host {
         display: block;
       }
+
+      .horizontal {
+         @apply(--layout-horizontal);
+       }
+
+      paper-button {
+        font-weight: normal;
+        font-size: 14px;
+        max-height: 32px;
+        background-color: var(--paper-indigo-500);
+        color: white;
+      }
+      paper-input {
+        max-width: 600px;
+        max-height: 32px;
+        color: var(--paper-indigo-500);
+      }
+      .inline, paper-input {
+        display: inline;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <h2>[[title]]</h2>
+    <div class="horizontal">
+      <paper-input no-label-float label="Command" value="{{command}}"></paper-input>
+      <paper-button raised class="indigo" on-tap="runCommand">Run</paper-button>
+    </div>
   </template>
 
   <script>
-    /**
-     * @customElement
-     * @polymer
-     */
     class ShellAppMain extends Polymer.Element {
       static get is() { return 'shell-app-main'; }
       static get properties() {
         return {
-          prop1: {
+          title: {
             type: String,
-            value: 'shell-app-main'
+            value: 'Polymer Shell'
           }
         };
+      }
+      runCommand(event){
+        alert("Boo: " + this.command);
       }
     }
 
