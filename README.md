@@ -1,8 +1,12 @@
 # Polymer Shell
 
+Run it with:
+
+    polymer serve --hostname 0.0.0.0
+
 ## Adding elements
 
-Adding elements is described [here]](https://www.polymer-project.org/1.0/start/toolbox/add-elements)
+Adding elements is described [here](https://www.polymer-project.org/2.0/start/toolbox/add-elements)
 
 For example:
 
