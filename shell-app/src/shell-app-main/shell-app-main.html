@@ -1,0 +1,32 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="shell-app-main">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ShellAppMain extends Polymer.Element {
+      static get is() { return 'shell-app-main'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'shell-app-main'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(ShellAppMain.is, ShellAppMain);
+  </script>
+</dom-module>

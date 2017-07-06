@@ -1,0 +1,7 @@
+{
+  "name": "shell-app",
+  "short_name": "shell-app",
+  "description": "Polymer Shell",
+  "start_url": "/",
+  "display": "standalone"
+}
