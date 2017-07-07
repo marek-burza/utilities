@@ -51,8 +51,32 @@
   </template>
 
   <script>
+    class Conduit {
+      constructor(url, component) {
+        var socket = this.socket = new WebSocket(url);
+        socket.onopen = function() {
+          console.log("Ready");
+        };
+        var kurna = "sdsg";
+        socket.onmessage = function (message) {
+          component.receive(message.data);
+        };
+        socket.onclose = function (event) {
+          console.log(event);
+        }
+        socket.onerror = function (event) {
+          console.log(event);
+        };
+      }
+
+      send(data){
+        this.socket.send(data);
+      }
+    }
+
     class ShellAppMain extends Polymer.Element {
       static get is() { return 'shell-app-main'; }
+
       static get properties() {
         return {
           title: {
@@ -61,18 +85,36 @@
           }
         };
       }
-      runCommand(event){
+
+      runCommand(event) {
         var command = this.command;
         if ("undefined" !== typeof command) {
-          var shell = "";
-          if ("undefined" !== typeof this.shell) {
-            shell = this.shell;
-          }
-          this.shell = shell + command + "\n";
-          var terminator = this.$.terminator;
-          var history = this.$.history;
-          history.scrollTop = terminator.offsetTop;
+          this.appendLine("user@server:> " + command);
+          this.conduit.send(command);
         }
+      }
+
+      appendLine(line) {
+        var shell = "";
+        if ("undefined" !== typeof this.shell) {
+          shell = this.shell;
+        }
+        this.shell = shell + line + "\n";
+        var terminator = this.$.terminator;
+        var history = this.$.history;
+        history.scrollTop = terminator.offsetTop;
+      }
+
+      receive(data){
+        this.appendLine(data);
+      }
+
+      constructor() {
+        super();
+        var origin = window.location.href;
+        origin = origin.substring(origin.indexOf("//") + 2);
+        origin = origin.substring(0, origin.indexOf("/"));
+        this.conduit = new Conduit("ws://" + origin + "/ws", this);
       }
     }
 
