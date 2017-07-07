@@ -109,8 +109,8 @@
         this.appendLine(data);
       }
 
-      constructor() {
-        super();
+      constructor() { // ready() {}
+        super();      // super.ready();
         var origin = window.location.href;
         origin = origin.substring(origin.indexOf("//") + 2);
         origin = origin.substring(0, origin.indexOf("/"));
