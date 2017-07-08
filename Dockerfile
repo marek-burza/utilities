@@ -1,20 +1,11 @@
-# docker build -t develop .
-# docker run --name develop --rm -it -v $PWD:/project -p 8081:8081 develop
+FROM node:6
 
-FROM ubuntu:16.04
+COPY /src /app
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y apt-utils
+WORKDIR /app
 
-RUN apt-get install -y build-essential git curl
+RUN npm install
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+EXPOSE 8081
 
-RUN apt-get install -y nodejs
-
-RUN npm install -g bower
-RUN npm install -g polymer-cli
-
-WORKDIR /project
-
-CMD ["/bin/bash"]
+CMD ["node", "server.js"]
