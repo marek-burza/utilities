@@ -11,5 +11,5 @@ apt-get -yq install curl mc imagemagick python3 python3-pip python3-dev python3-
 echo "--- Installing Python modules ---"
 DIRECTORY=$(dirname $0)
 pip3 install --upgrade pip
-pip3 install --no-cache-dir -r $DIRECTORY/requirements.1.txt
-pip3 install --no-cache-dir -r $DIRECTORY/requirements.2.txt
+pip3 install --no-cache-dir -r $DIRECTORY/requirements.txt
+pip3 install git+https://github.com/alexisbcook/tsne.git
