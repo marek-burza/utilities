@@ -14,3 +14,4 @@ pip3 install --upgrade pip
 pip3 install --no-cache-dir -r $DIRECTORY/requirements1.txt
 pip3 install --no-cache-dir -r $DIRECTORY/requirements2.txt
 pip3 install git+https://github.com/alexisbcook/tsne.git
+git clone --recursive https://github.com/ibayer/fastFM.git && mv $DIRECTORY/Makefile.fastFM fastFM/Makefile && cd fastFM && pip3 install -r ./requirements.txt && make && pip3 install .
