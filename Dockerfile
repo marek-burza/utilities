@@ -1,9 +1,8 @@
-FROM ubuntu:xenial-20170619
+FROM ubuntu:artful-20171019
 
-ADD install.sh /install.sh
-ADD requirements*.txt /
-ADD Makefile.fastFM /Makefile.fastFM
+ADD install.sh /tmp/install.sh
+ADD requirements.txt /tmp/requirements.txt
 
-RUN /bin/bash /install.sh && rm -rf /install.sh /requirements*.txt
+RUN /bin/bash /tmp/install.sh && rm -rf /tmp/*
 
 CMD ["/bin/bash"]

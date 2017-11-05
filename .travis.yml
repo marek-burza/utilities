@@ -4,6 +4,6 @@ services:
   - docker
 
 script:
-  - docker build -t altermarkive/lab-environment .
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push altermarkive/lab-environment
+  - docker build -t $DOCKERHUB_USERNAME/lab .
+  - docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+  - docker push $DOCKERHUB_USERNAME/lab
