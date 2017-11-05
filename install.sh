@@ -6,12 +6,9 @@ echo "--- Updating the system ---"
 apt-get -yq update
 
 echo "--- Installing utilities ---"
-apt-get -yq install curl mc imagemagick python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev libopenblas-dev libblas-dev libatlas-base-dev
+apt-get -yq install command-not-found curl nano mc imagemagick poppler-utils python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev libopenblas-dev libblas-dev libatlas-base-dev
 
 echo "--- Installing Python modules ---"
 DIRECTORY=$(dirname $0)
 pip3 install --upgrade pip
-pip3 install --no-cache-dir -r $DIRECTORY/requirements1.txt
-pip3 install --no-cache-dir -r $DIRECTORY/requirements2.txt
-pip3 install git+https://github.com/alexisbcook/tsne.git
-git clone --recursive https://github.com/ibayer/fastFM.git && mv $DIRECTORY/Makefile.fastFM fastFM/Makefile && cd fastFM && pip3 install -r ./requirements.txt && make && pip3 install .
+pip3 install --no-cache-dir -r $DIRECTORY/requirements.txt

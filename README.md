@@ -3,10 +3,10 @@
 [travis-url]: https://travis-ci.org/altermarkive/Lab-Environment
 [travis-img]: https://travis-ci.org/altermarkive/Lab-Environment.svg?branch=master
 
-Environment for experimenting with Python 3, AWS, boto3, numpy, matplotlib
+Environment for experimenting with Python 3, ML, etc.
 
-To use the Docker container:
+To use the environment:
 
-```
-docker run -it --rm -v $PWD:/shared altermarkive/lab-environment
-```
+    docker build -t lab .
+    docker run -it --rm -v $PWD:/shared -w /shared lab
+
