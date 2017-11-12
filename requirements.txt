@@ -1,3 +1,5 @@
+awscli==1.11.185
+boto3==1.4.7
 Cython==0.27.3
 matplotlib==2.1.0
 numpy==1.13.3
