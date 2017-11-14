@@ -9,7 +9,7 @@ from contextlib import closing
 
 
 # /Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf *.odp
-# convert -density 121 *.pdf $(ls *.pdf | sed 's/\.pdf//g').jpg
+# convert -density 174.2 *.pdf $(ls *.pdf | sed 's/\.pdf//g').jpg
 
 
 def silence():
