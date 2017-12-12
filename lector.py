@@ -13,7 +13,8 @@ from contextlib import closing
 
 
 def silence():
-    os.system('ffmpeg -f s16le -ac 1 -t 1 -i /dev/zero -ar 22050 -y silence.mp3')
+    #os.system('ffmpeg -f s16le -ac 1 -t 1 -i /dev/zero -ar 22050 -y silence.mp3')
+    os.system('ffmpeg -f lavfi -i anullsrc=channel_layout=mono:sample_rate=22050 -t 1 -y silence.flac')
 
 
 def what():
@@ -37,7 +38,6 @@ def polly():
 
 
 def tts(prefix, aws_polly, lines, index):
-    index -= 1
     response = aws_polly.synthesize_speech(
         Text=lines[index], OutputFormat='mp3', VoiceId='Matthew')
     name = '{}.{:03d}.mp3'.format(prefix, index)
@@ -47,18 +47,31 @@ def tts(prefix, aws_polly, lines, index):
             mp3.write(handle.read())
 
 
-def prepend(prefix, index):
+def flac(prefix, index):
     name_mp3 = '{}.{:03d}.mp3'.format(prefix, index)
-    name_aac = '{}.{:03d}.aac'.format(prefix, index)
-    template = 'ffmpeg -i concat:"silence.mp3|{}" -strict -2 -y {}'
-    os.system(template.format(name_mp3, name_aac))
+    name_flac = '{}.{:03d}.flac'.format(prefix, index)
+    template = 'ffmpeg -i {} -y {}'
+    command = template.format(name_mp3, name_flac)
+    os.system(command)
+    os.system('rm {}'.format(name_mp3))
+
+
+def prepend(prefix, index):
+    name_flac = '{}.{:03d}.flac'.format(prefix, index)
+    name_ok = '{}.{:03d}.ok.mp3'.format(prefix, index)
+    template = 'ffmpeg -i concat:"silence.flac|{}" -y {}'
+    command = template.format(name_flac, name_ok)
+    os.system(command)
+    os.system('rm {}'.format(name_flac))
 
 
 def mix(prefix, index):
     name_jpg = '{}-{}.jpg'.format(prefix, index)
-    name_aac = '{}.{:03d}.aac'.format(prefix, index)
-    template = 'ffmpeg -loop 1 -i {} -i {} -strict -2 -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y {}.{:03d}.mp4'
-    os.system(template.format(name_jpg, name_aac, prefix, index))
+    name_ok = '{}.{:03d}.ok.mp3'.format(prefix, index)
+    template = 'ffmpeg -loop 1 -i {} -i {} -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y {}.{:03d}.mp4'
+    command = template.format(name_jpg, name_ok, prefix, index)
+    os.system(command)
+    os.system('rm {}'.format(name_ok))
 
 
 def main():
@@ -66,11 +79,12 @@ def main():
     indices = which()
     lines = fetch(prefix)
     if indices is None:
-        indices = range(1, len(lines) + 1)
+        indices = range(len(lines))
     silence()
     aws_polly = polly()
     for index in indices:
         tts(prefix, aws_polly, lines, index)
+        flac(prefix, index)
         prepend(prefix, index)
         mix(prefix, index)
 
