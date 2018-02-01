@@ -14,7 +14,7 @@ Machines which belong to the cluster:
 * Configured to allow IPv4 forwarding
 * Firewall rules configured to allow Ansible and Kubernetes components to communicate
 
-You can find out more at (goo.gl/nF1Nkb)[https://goo.gl/nF1Nkb]
+You can find out more at [goo.gl/nF1Nkb](https://goo.gl/nF1Nkb)
 
 # CentOS
 
@@ -89,7 +89,7 @@ server2
 server3
 ```
 
-You can find out more at (goo.gl/MD11XQ)[https://goo.gl/MD11XQ]
+You can find out more at [goo.gl/MD11XQ](https://goo.gl/MD11XQ)
 
 ## Enable IP4 forwarding on cluster nodes
 
@@ -138,7 +138,7 @@ On deploying machine:
 
 ## Enable Priorities and Preemption
 
-You can find out more at (goo.gl/E4nugc)[https://goo.gl/E4nugc]
+You can find out more at [goo.gl/E4nugc](https://goo.gl/E4nugc)
 
 On deploying machine:
 
