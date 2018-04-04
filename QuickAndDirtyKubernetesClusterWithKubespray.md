@@ -32,11 +32,11 @@ You can find out more [here](https://kubernetes.io/docs/setup/#15-meet-the-under
 
 At the network configuration step during CentOS installation select "Automatically connect to this network when it is available".
 
-![QuickAndDirtyKubernetesClusterWithKubespray.1.jpg](QuickAndDirtyKubernetesClusterWithKubespray.1.jpg)
+![QuickAndDirtyKubernetesClusterWithKubespray.1.jpg](./QuickAndDirtyKubernetesClusterWithKubespray.1.jpg)
 
 At the user creation step during CentOS installation select "Make this user administrator".
 
-![QuickAndDirtyKubernetesClusterWithKubespray.2.jpg](QuickAndDirtyKubernetesClusterWithKubespray.2.jpg)
+![QuickAndDirtyKubernetesClusterWithKubespray.2.jpg](./QuickAndDirtyKubernetesClusterWithKubespray.2.jpg)
 
 
 ## Copy SSH key to cluster nodes
@@ -129,7 +129,7 @@ On deploying machine:
 ## Disable firewalld on cluster nodes
 
 In a similar way the firewall can be disabled.
-️
+
 ⚠️ **WARNING: For security reasons, this is not recommended.**
 
 On deploying machine:
