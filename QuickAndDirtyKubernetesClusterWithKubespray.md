@@ -30,13 +30,13 @@ You can find out more [here](https://kubernetes.io/docs/setup/#15-meet-the-under
 
 ## Make sure all nodes connect automatically
 
-At the network configuration step during CentOS installation select "Automatically connect to this network when it is available".
+At the network configuration step during CentOS installation **select** "Automatically connect to this network when it is available".
 
-![QuickAndDirtyKubernetesClusterWithKubespray.1.jpg](./QuickAndDirtyKubernetesClusterWithKubespray.1.jpg)
+![AutomaticallyConnectToThisNetworkWhenItIsAvailable](https://docs.centos.org/en-US/centos/install-guide/_images/netconfig/network-connections-general.png)
 
-At the user creation step during CentOS installation select "Make this user administrator".
+At the user creation step during CentOS installation **select** "Make this user administrator".
 
-![QuickAndDirtyKubernetesClusterWithKubespray.2.jpg](./QuickAndDirtyKubernetesClusterWithKubespray.2.jpg)
+![MakeThisUserAdministrator](https://docs.centos.org/en-US/centos/install-guide/_images/accountconfig/createuser.png)
 
 
 ## Copy SSH key to cluster nodes
