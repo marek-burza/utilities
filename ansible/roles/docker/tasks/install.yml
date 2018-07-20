@@ -1,0 +1,42 @@
+- name: Docker - Prerequisites
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+
+- name: Docker - GPG
+  apt_key:
+    id: 0EBFCD88
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Docker - Release
+  command: lsb_release -cs
+  register: release_output
+
+- name: Docker - Fact
+  set_fact:
+    release_name: "{{ release_output.stdout }}"
+
+- name: Docker - Repository
+  apt_repository:
+    repo: "deb [arch=armhf] https://download.docker.com/linux/debian {{ release_name }} stable"
+    state: present
+
+- name: Docker - CE
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: Docker - Group
+  group: name=docker
+
+- name: Docker - User
+  user: name={{ ansible_user }} groups=docker append=yes
