@@ -9,6 +9,6 @@ Here is the library/script itself:
 
 And that's how you can use it:
 
-[ddr.html](ddr.html)
+[index.html](index.html)
 
 See the example in action [here](https://altermarkive.github.io/Web-DDR/) (press arrow buttons if you don't have a DDR mat).
