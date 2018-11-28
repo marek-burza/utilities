@@ -7,6 +7,6 @@ This is a basic iOS Web App template. It includes:
 * Splash screens to be used when the app is loading
 * Prevention of viewport & font rescaling
 
-[template.html](template.html)
+[index.html](index.html)
 
-See the example in action [here](https://rawgit.com/altermarkive/iOS-Web-App-Template/master/template.html).
+See the example in action [here](https://altermarkive.github.io/iOS-Web-App-Template/).
