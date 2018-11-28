@@ -11,4 +11,4 @@ And that's how you can use it:
 
 [ddr.html](ddr.html)
 
-See the example in action [here](https://rawgit.com/altermarkive/Web-DDR/master/ddr.html) (press arrow buttons if you don't have a DDR mat).
+See the example in action [here](https://altermarkive.github.io/Web-DDR/) (press arrow buttons if you don't have a DDR mat).
