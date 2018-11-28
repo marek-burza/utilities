@@ -16,6 +16,6 @@ Then, you can compile the code with Emscripten like so:
 Next, the call to the Emscripten-generated code is realized with
 a following HTML/JavaScript file:
 
-[callback.html](callback.html)
+[index.html](index.html)
 
-See the example in action [here](https://rawgit.com/altermarkive/Emscripten-Callback/master/callback.html).
+See the example in action [here](https://altermarkive.github.io/Emscripten-Callback/).
