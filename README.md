@@ -7,8 +7,8 @@ As it turns out a frame-by-frame animation of HTML5 Canvas is still somewhat bro
 
 It's very easy to use - here's an example:
 
-[animation.html](animation.html)
+[index.html](index.html)
 
 Note that in the example I also made sure to have the canvas fill the browser's window fully and without scrollbars appearing.
 
-See the example in action [here](https://rawgit.com/altermarkive/Simplified-HTML5-Canvas-Animation/master/animation.html).
+See the example in action [here](https://altermarkive.github.com/Simplified-HTML5-Canvas-Animation/).
