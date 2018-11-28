@@ -12,4 +12,4 @@ This software is a simplified simulator for illustrating the reaction of supply 
 - Illustrate the forecast accuracy (over multiple SKUs)
 - Ability to advance the model (and thus also the plots) in 1-month-long time units
 
-See it in action [here](http://rawgit.com/altermarkive/Supply-Chain-Reaction-Simulator/master/simulation.html).
+See it in action [here](http://altermarkive.github.io/Supply-Chain-Reaction-Simulator/).
