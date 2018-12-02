@@ -18,4 +18,4 @@ a following HTML/JavaScript file:
 
 [index.html](index.html)
 
-See the example in action [here](https://altermarkive.github.io/Emscripten-Callback/).
+See the example in action [here](https://altermarkive.github.io/web-experiments/emscripten-callback/).
