@@ -9,4 +9,4 @@ This is a basic iOS Web App template. It includes:
 
 [index.html](index.html)
 
-See the example in action [here](https://altermarkive.github.io/iOS-Web-App-Template/).
+See the example in action [here](https://altermarkive.github.io/web-experiments/ios-web-app-template/).
