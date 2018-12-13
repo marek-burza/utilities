@@ -1,8 +1,7 @@
-Yet-Another-Tools-Icon
-======================
+# Miscellaneous Icons
 
-**Title:** Yet Another Tools Icon
+Icons used by my other projects and repositories.
 
-This work is licensed under the Attribution-ShareAlike 4.0 International license
-([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)).
+Converting icons from SVG to PNG:
 
+    convert -background none icon.svg -resize 512x512 icon.png
