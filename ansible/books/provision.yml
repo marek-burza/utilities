@@ -3,4 +3,4 @@
 - hosts: all
   gather_facts: False
 
-- include: provision-docker.yml
+- import_playbook: provision-docker.yml

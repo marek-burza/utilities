@@ -13,7 +13,7 @@
 - name: Docker - GPG
   apt_key:
     id: 0EBFCD88
-    url: https://download.docker.com/linux/debian/gpg
+    url: https://download.docker.com/linux/raspbian/gpg
     state: present
 
 - name: Docker - Release
@@ -26,12 +26,12 @@
 
 - name: Docker - Repository
   apt_repository:
-    repo: "deb [arch=armhf] https://download.docker.com/linux/debian {{ release_name }} stable"
+    repo: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ release_name }} stable"
     state: present
 
 - name: Docker - CE
   apt:
-    name: docker-ce
+    name: docker-ce=5:18.09.0~3-0~raspbian-stretch
     state: present
     update_cache: yes
 
