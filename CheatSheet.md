@@ -1,6 +1,6 @@
 # Chrome
 
-* To enable password import got to [chrome://flags/](chrome://flags/)
+* To enable password import got to `chrome://flags/`
 
 # Bash
 
