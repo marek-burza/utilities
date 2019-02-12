@@ -1,1 +1,0 @@
-* Tutorial about [history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
