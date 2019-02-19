@@ -1,0 +1,3 @@
+HiddenServiceDir /var/lib/tor/service/
+HiddenServicePort 22 127.0.0.1:22
+HiddenServiceAuthorizeClient stealth service
