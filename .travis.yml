@@ -1,9 +1,0 @@
-sudo: required
-
-services:
-  - docker
-
-script:
-  - docker build -t $DOCKERHUB_USERNAME/lab .
-  - docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-  - docker push $DOCKERHUB_USERNAME/lab

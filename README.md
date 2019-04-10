@@ -1,12 +1,14 @@
-# Lab Environment [![Build Status][travis-img]][travis-url]
+# Workspace
 
-[travis-url]: https://travis-ci.org/altermarkive/lab-environment
-[travis-img]: https://travis-ci.org/altermarkive/lab-environment.svg?branch=master
+Workspace for Python 3, Docker, AWS, Azure, ML, etc.
 
-Environment for experimenting with Python 3, ML, etc.
+## Docker
 
-To use the environment:
+    docker build -t workspace .
+    docker run -it --rm -v $HOME/.ssh:/root/.ssh -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:/shared -w /shared workspace
 
-    docker build -t lab .
-    docker run -it --rm -v $PWD:/shared -w /shared lab
+## Vagrant
 
+    vagrant plugin install vagrant-disksize
+    vagrant up
+    vagrant ssh
