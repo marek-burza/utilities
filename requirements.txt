@@ -1,9 +1,14 @@
 awscli==1.16.140
+bandit==1.5.1
 boto3==1.9.130
 Cython==0.29.6
+flake8==3.7.7
 matplotlib==3.0.3
 numpy==1.16.2 
-pandas==0.24.2 
+pandas==0.24.2
+Pillow==6.0.0
+pycodestyle==2.5.0
+pylint==2.3.1
 scikit-learn==0.20.3 
 scipy==1.2.1
 tensorflow==1.13.1
