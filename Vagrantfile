@@ -21,6 +21,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "file", source: "~/.ssh", destination: "$HOME/.ssh"
   config.vm.provision "shell", inline: <<-SHELL
-    /bin/sh /vagrant/workspace/install.sh
+    /bin/sh /vagrant/workspace/install.sh vagrant
   SHELL
 end
