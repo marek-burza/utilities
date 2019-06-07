@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- https://bit.ly/2MtG6KQ -->
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -6,25 +6,27 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Optimize</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" rel="stylesheet" type="text/css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.1.9/vuetify.min.css" rel="stylesheet" type="text/css"></link>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" rel="stylesheet" type="text/css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.14/vuetify.min.css" rel="stylesheet" type="text/css"/>
   <style type="text/css">
-    body{margin:0; padding:0; overflow:hidden;}
+    body {margin: 0; padding: 0; overflow: hidden;}
     #legend {position: fixed; bottom: 0; left: 0;}
   </style>
 </head>
 <body>
   <div id="app">
-    <v-app id="optimize">
+    <v-app id="explore">
       <div>
-        <v-toolbar color="gray" dark>
-            <v-text-field xs6 v-model="pointA" type="string" prepend-icon="place"></v-text-field>
-            <v-select xs2 v-model="modeA" :items="modes" prepend-icon="directions"></v-select>
-            <v-text-field xs6 v-model="pointB" type="string" prepend-icon="place"></v-text-field>
-            <v-select xs2 v-model="modeB" :items="modes" prepend-icon="directions"></v-select>
-            <v-btn xs4 v-on:click.native="optimize()" :disabled="optimizing" :loading="optimizing">Optimize</v-btn>
+        <v-toolbar class="grey darken-4" dark>
+          <v-layout row wrap align-center>
+            <v-flex xs8 pa-2><v-text-field v-model="point" type="string" prepend-icon="place"></v-text-field></v-flex>
+            <v-flex xs1 pa-2><v-btn v-on:click.native="go()" class="grey darken-3">Go</v-btn></v-flex>
+            <v-flex xs1 pa-2><v-select v-model="mode" :items="modes" prepend-icon="directions"></v-select></v-flex>
+            <v-flex xs1 pa-2><v-text-field v-model="density" type="number" min="1" max="25" prepend-icon="grid_on"></v-text-field></v-flex>
+            <v-flex xs1 pa-2><v-btn v-on:click.native="explore()" :disabled="exploring" :loading="exploring" class="grey darken-3">Explore</v-btn></v-flex>
+          </v-layout>
         </v-toolbar>
-        <v-dialog v-model="optimizing" hide-overlay persistent width="300">
+        <v-dialog v-model="exploring" hide-overlay persistent width="300">
           <v-card color="gray" dark>
             <v-card-text>
               Please stand by
@@ -36,44 +38,43 @@
       <div id="map"></div>
       <div id="legend">
         <svg version="1.1" baseProfile="full" width="200" height="600" xmlns="http://www.w3.org/2000/svg">
-          <rect x="25" y="55" width="150" height="520" style="fill:#FFFFFFFF; stroke:none; stroke-width:0;"/>
+          <rect x="25" y="55" width="150" height="520" style="fill:#FFFFFFFF; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="80" text-anchor="middle" style="font-family: Arial;">max. minutes</text>
-          <rect x="50" y="100" width="100" height="50" style="fill:#0000FF80; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="100" width="100" height="50" style="fill:#0000FF80; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="130" text-anchor="middle" style="font-family: Arial;">&lt; 10</text>
-          <rect x="50" y="150" width="100" height="50" style="fill:#0080FF80; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="150" width="100" height="50" style="fill:#0080FF80; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="180" text-anchor="middle" style="font-family: Arial;">10-15</text>
-          <rect x="50" y="200" width="100" height="50" style="fill:#00FFFF80; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="200" width="100" height="50" style="fill:#00FFFF80; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="230" text-anchor="middle" style="font-family: Arial;">15-20</text>
-          <rect x="50" y="250" width="100" height="50" style="fill:#00FF0080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="250" width="100" height="50" style="fill:#00FF0080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="280" text-anchor="middle" style="font-family: Arial;">20-25</text>
-          <rect x="50" y="250" width="100" height="50" style="fill:#00FF0080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="250" width="100" height="50" style="fill:#00FF0080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="280" text-anchor="middle" style="font-family: Arial;">20-25</text>
-          <rect x="50" y="300" width="100" height="50" style="fill:#FFFF0080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="300" width="100" height="50" style="fill:#FFFF0080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="330" text-anchor="middle" style="font-family: Arial;">25-30</text>
-          <rect x="50" y="350" width="100" height="50" style="fill:#FF800080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="350" width="100" height="50" style="fill:#FF800080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="380" text-anchor="middle" style="font-family: Arial;">30-35</text>
-          <rect x="50" y="400" width="100" height="50" style="fill:#FF000080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="400" width="100" height="50" style="fill:#FF000080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="430" text-anchor="middle" style="font-family: Arial;">35-40</text>
-          <rect x="50" y="450" width="100" height="50" style="fill:#FF00FF80; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="450" width="100" height="50" style="fill:#FF00FF80; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="480" text-anchor="middle" style="font-family: Arial;">40-45</text>
-          <rect x="50" y="500" width="100" height="50" style="fill:#00000080; stroke:none; stroke-width:0;"/>
+          <rect x="50" y="500" width="100" height="50" style="fill:#00000080; stroke:none; stroke-width:0;"></rect>
           <text x="100" y="530" text-anchor="middle" style="font-family: Arial;">&gt; 45</text>
         </svg>
       </div>
     </v-app>
   </div>
 
-  <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?callback=go" async defer></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.1.9/vuetify.min.js"></script>
+  <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?callback=run" async defer></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.14/vuetify.min.js"></script>
   <script type="text/javascript">
     var data = {
-      pointA: "2 Kingdom St, London W2 6BD, UK",
-      pointB: "1-13 St Giles High St, London WC2H 8AG, UK",
-      modeA: "Transit",
-      modeB: "Transit",
+      point: "2 Kingdom St, London W2 6BD, UK",
+      mode: "Transit",
       modes: ["Transit", "Driving", "Walking"],
-      optimizing: false,
+      density: 10,
+      exploring: false,
       progress: 0
     };
 
@@ -85,29 +86,26 @@
     var map = null;
     var directions = null;
     var search = null;
-    var km = null;
-    var divisions = 20;
+    var bounds = null;
     var step = 0;
-    var searchBatch = null;
-    var directionsBatch = null;
-    var heartbeat = 0;
+    var batch = null;
+    var heartbeat = (new Date()).getTime();
 
     function watchdog(){
       var now = (new Date()).getTime();
-      if(data.optimizing && now - heartbeat > 10000){
+      if(data.exploring && now - heartbeat > 10000){
         console.log("Woof!");
-        go();
+        run();
         trigger();
       }
     }
 
     setInterval(watchdog, 10000);
     
-    function go(){
+    function run(){
       map = new Microsoft.Maps.Map(document.getElementById("map"), {zoom: 11, credentials: "AlkNKIhqEsPalkMnMQyAAzx4Rm2c9UV-NxGXqOZJAeiVUSsAOK3-cBtRw1awU566"});
       map.setOptions({showMapTypeSelector: false});
       Microsoft.Maps.loadModule(["Microsoft.Maps.Directions", "Microsoft.Maps.Search", "Microsoft.Maps.SpatialMath", "Microsoft.Maps.GeoXml"], function () {
-        km = Microsoft.Maps.SpatialMath.DistanceUnits.Kilometers;
         search = new Microsoft.Maps.Search.SearchManager(map);
         directions = new Microsoft.Maps.Directions.DirectionsManager(map);
         Microsoft.Maps.Events.addHandler(directions, "directionsError", directionsError);
@@ -126,78 +124,60 @@
       }
     }
 
-    function optimize(){
-      data.progress = 0;
-      data.optimizing = true;
-      map.entities.clear();
-      searchBatch = {
-        index: 0,
-        array: [{point: data.pointA, mode: mode(data.modeA)}, {point: data.pointB, mode: mode(data.modeB)}]
+    function go(){
+      var callback = function(reply){
+        var location = reply.results[0].location;
+        location = new Microsoft.Maps.Location(location.latitude, location.longitude);
+        map.setView({center: location});
       };
+      search.geocode({where: data.point, callback: callback});
+    }
+
+    function explore(){
+      data.progress = 0;
+      data.exploring = true;
+      map.entities.clear();
       lookup();
     }
 
     function lookup(){
-      search.geocode({where: searchBatch.array[searchBatch.index].point, callback: located});
+      search.geocode({where: data.point, callback: located});
     }
 
     function located(reply){
       var location = reply.results[0].location;
       location = new Microsoft.Maps.Location(location.latitude, location.longitude);
-      searchBatch.array[searchBatch.index].location = location;
+      data.location = location;
       var pin = new Microsoft.Maps.Pushpin(location);
       map.entities.push(pin);
-      searchBatch.index++;
-      if(searchBatch.index < searchBatch.array.length){
-        lookup();
-      }else{
-        explore();
-      }
+      initiate();
     }
 
-    function explore(){
-      directionsBatch = {
+     function initiate(){
+      batch = {
         index: 0,
         array: []
       };
-      var framed = frame();
-      step = Microsoft.Maps.SpatialMath.getDistanceTo(framed.ne, framed.nw, km, true) / divisions;
-      var corner = Microsoft.Maps.SpatialMath.getDestination(framed.nw, 135, step * Math.sqrt(2) / 2, km);
-      populate(corner);
+      bounds = map.getBounds();
+      step = Math.min(bounds.height, bounds.width) / data.density;
+      populate();
       trigger();
-    }
+     }
 
-    function frame(){
-      var framed = {};
-      framed.pointA = searchBatch.array[0].location;
-      framed.pointB = searchBatch.array[1].location;
-      var distance = Microsoft.Maps.SpatialMath.getDistanceTo(framed.pointA, framed.pointB, km, true);
-      var heading = Microsoft.Maps.SpatialMath.getHeading(framed.pointA, framed.pointB);
-      var center = Microsoft.Maps.SpatialMath.getDestination(framed.pointA, heading, distance / 2.0, km);
-      map.setView({center: center});
-      framed.ne = Microsoft.Maps.SpatialMath.getDestination(center, 45, distance * Math.sqrt(2), km);
-      framed.se = Microsoft.Maps.SpatialMath.getDestination(center, 135, distance * Math.sqrt(2), km);
-      framed.sw = Microsoft.Maps.SpatialMath.getDestination(center, 225, distance * Math.sqrt(2), km);
-      framed.nw = Microsoft.Maps.SpatialMath.getDestination(center, 315, distance * Math.sqrt(2), km);
-      return framed;
-    }
-
-    function populate(corner){
-      for(var x = 0; x < divisions; x++){
-        var top = Microsoft.Maps.SpatialMath.getDestination(corner, 90, x * step, km);
-        for(var y = 0; y < divisions; y++){
-          var origin = Microsoft.Maps.SpatialMath.getDestination(top, 180, y * step, km);
-          for(var index = 0; index < 2; index++){
-            var job = {
-              origin: origin,
-              destination: searchBatch.array[index].location,
-              mode: searchBatch.array[index].mode,
-              x: x,
-              y: y,
-              index: index
-            };
-            directionsBatch.array.push(job);
-          }
+    function populate(){
+      for(var y = 0; y < bounds.height / step; y++){
+        for(var x = 0; x < bounds.width / (2 * step); x++){
+          var origin =  new Microsoft.Maps.Location(
+            bounds.center.latitude + (bounds.height / 2) - (y + 0.5) * step,
+            bounds.center.longitude - (bounds.width / 2) + (x + 0.5) * (2 * step));
+          var job = {
+            x: x,
+            y: y,
+            origin: origin,
+            destination: data.location,
+            mode: data.mode
+          };
+          batch.array.push(job);
         }
       }
     }
@@ -205,10 +185,10 @@
     function trigger(){
       heartbeat = (new Date()).getTime();
       directions.clearAll();
-      directions.setRequestOptions({routeMode: directionsBatch.array[directionsBatch.index].mode, distanceUnit: km});
+      directions.setRequestOptions({routeMode: batch.array[batch.index].mode, distanceUnit: Microsoft.Maps.SpatialMath.DistanceUnits.Kilometers});
       directions.setRenderOptions({autoUpdateMapView: false});
-      var origin = new Microsoft.Maps.Directions.Waypoint({location: directionsBatch.array[directionsBatch.index].origin});
-      var destination = new Microsoft.Maps.Directions.Waypoint({location: directionsBatch.array[directionsBatch.index].destination});
+      var origin = new Microsoft.Maps.Directions.Waypoint({location: batch.array[batch.index].origin});
+      var destination = new Microsoft.Maps.Directions.Waypoint({location: batch.array[batch.index].destination});
       directions.addWaypoint(origin);
       directions.addWaypoint(destination);
       directions.calculateDirections();
@@ -222,15 +202,15 @@
     }
 
     function directionsError(error) {
-      // console.error("Error: " + error.message + "\r\nResponse Code: " + error.responseCode);
+      console.error("Error: " + error.message + "\r\nResponse Code: " + error.responseCode);
       onward(Infinity);
     }
 
     function onward(time){
       update();
-      directionsBatch.array[directionsBatch.index].time = time;
-      directionsBatch.index++;
-      if(directionsBatch.index < directionsBatch.array.length){
+      batch.array[batch.index].time = time;
+      batch.index++;
+      if(batch.index < batch.array.length){
         trigger();
       }else{
         aggregate();
@@ -238,19 +218,17 @@
     }
 
     function update(){
-      data.progress = 100 * directionsBatch.index / directionsBatch.array.length;
+      data.progress = 100 * batch.index / batch.array.length;
     }
 
     function aggregate(){
-      var index = 0;
       var polygons = "";
-      while(index < directionsBatch.array.length){
-        var time = Math.max(directionsBatch.array[index].time, directionsBatch.array[index + 1].time);
+      for(var index = 0; index < batch.array.length; index++){
+        var time = batch.array[index].time;
         var styled = style(time);
-        var spot = directionsBatch.array[index].origin;
+        var spot = batch.array[index].origin;
         var squared = square(spot);
         polygons += polygon(styled, squared);
-        index += 2;
       }
       var kml = wrap(polygons);
       var layer = new Microsoft.Maps.GeoXmlLayer(kml);
@@ -287,16 +265,16 @@
 
     function square(spot){
       var squared = {};
-      var ne = Microsoft.Maps.SpatialMath.getDestination(spot, 45, step * Math.sqrt(2) / 2, km);
+      var ne = new Microsoft.Maps.Location(spot.latitude + 0.5 * step, spot.longitude + step);
       squared.neLon = ne.longitude;
       squared.neLat = ne.latitude;
-      var se = Microsoft.Maps.SpatialMath.getDestination(spot, 135, step * Math.sqrt(2) / 2, km);
+      var se = new Microsoft.Maps.Location(spot.latitude - 0.5 * step, spot.longitude + step);
       squared.seLon = se.longitude;
       squared.seLat = se.latitude;
-      var sw = Microsoft.Maps.SpatialMath.getDestination(spot, 225, step * Math.sqrt(2) / 2, km);
+      var sw = new Microsoft.Maps.Location(spot.latitude - 0.5 * step, spot.longitude - step);
       squared.swLon = sw.longitude;
       squared.swLat = sw.latitude;
-      var nw = Microsoft.Maps.SpatialMath.getDestination(spot, 315, step * Math.sqrt(2) / 2, km);
+      var nw = new Microsoft.Maps.Location(spot.latitude + 0.5 * step, spot.longitude - step);
       squared.nwLon = nw.longitude;
       squared.nwLat = nw.latitude;
       return squared;
@@ -355,7 +333,7 @@ ${polygons}
 
     function finish(){
       directions.clearAll();
-      data.optimizing = false;
+      data.exploring = false;
     }
   </script>
 </body>
