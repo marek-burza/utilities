@@ -1,8 +1,0 @@
-FROM node:8
-
-RUN git clone --branch v3.8.6 https://github.com/swagger-api/swagger-js.git && \
-    cd /swagger-js && \
-    npm install && \
-    npm run build-bundle
-
-CMD ["cp", "/swagger-js/browser/swagger-client.js", "/api/swagger-client.js"]
