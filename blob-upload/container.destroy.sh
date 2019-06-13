@@ -2,17 +2,17 @@
 
 set -e
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: ./container.destroy.sh PREFIX"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./container.destroy.sh PREFIX LOCATION"
     echo "Example:"
-    echo "./container.destroy.sh example"
+    echo "./container.destroy.sh example centralus"
     exit 1
 else
     PREFIX=$1
+    LOCATION=$2
 fi
 
 
-LOCATION=centralus
 RESOURCE_GROUP=${PREFIX}resourcegroup
 STORAGE_ACCOUNT=${PREFIX}storageaccount
 CONTAINER_NAME=${PREFIX}container
