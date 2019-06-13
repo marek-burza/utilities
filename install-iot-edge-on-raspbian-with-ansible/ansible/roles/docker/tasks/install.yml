@@ -1,0 +1,42 @@
+- name: Prerequisites
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+
+- name: GPG
+  apt_key:
+    id: 0EBFCD88
+    url: https://download.docker.com/linux/raspbian/gpg
+    state: present
+
+- name: Release
+  command: lsb_release -cs
+  register: release_output
+
+- name: Fact
+  set_fact:
+    release_name: "{{ release_output.stdout }}"
+
+- name: Repository
+  apt_repository:
+    repo: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ release_name }} stable"
+    state: present
+
+- name: CE
+  apt:
+    name: docker-ce=5:18.09.0~3-0~raspbian-stretch
+    state: present
+    update_cache: yes
+
+- name: Group
+  group: name=docker
+
+- name: User
+  user: name={{ ansible_user }} groups=docker append=yes

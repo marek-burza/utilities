@@ -1,0 +1,11 @@
+- name: HSM Library
+  apt:
+    deb: https://aka.ms/libiothsm-std-linux-armhf-latest
+
+- name: Daemon
+  apt:
+    deb: https://aka.ms/iotedged-linux-armhf-latest
+
+- name: Fix Dependencies
+  apt:
+    force: yes

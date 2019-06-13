@@ -1,0 +1,5 @@
+- name: IoT Edge Configuration
+  lineinfile:
+    path: /etc/iotedge/config.yaml
+    regexp: 'device_connection_string'
+    line: '  device_connection_string: "{{ iotedge_connection_string }}"'
