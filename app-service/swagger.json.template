@@ -1,0 +1,45 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Random API",
+    "version": "1.0.0",
+    "title": "random"
+  },
+  "basePath": "/random",
+  "host": "$APP.azurewebsites.net",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/v1/generate": {
+      "get": {
+        "summary": "Generate random value",
+        "description": "This endpoint allows to generate a random value",
+        "operationId": "generate",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "value"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
