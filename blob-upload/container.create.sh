@@ -2,17 +2,17 @@
 
 set -e
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: ./container.create.sh PREFIX"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./container.create.sh PREFIX LOCATION"
     echo "Example:"
-    echo "./container.create.sh example"
+    echo "./container.create.sh example centralus"
     exit 1
 else
     PREFIX=$1
+    LOCATION=$2
 fi
 
 
-LOCATION=centralus
 RESOURCE_GROUP=${PREFIX}resourcegroup
 STORAGE_ACCOUNT=${PREFIX}storageaccount
 CONTAINER_NAME=${PREFIX}container
