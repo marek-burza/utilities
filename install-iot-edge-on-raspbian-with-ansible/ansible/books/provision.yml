@@ -1,0 +1,5 @@
+- hosts: all
+  gather_facts: False
+
+- import_playbook: provision-docker.yml
+- import_playbook: provision-azure-iot-edge.yml
