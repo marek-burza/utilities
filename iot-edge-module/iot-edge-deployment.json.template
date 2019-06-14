@@ -39,7 +39,7 @@
               "type": "docker",
               "settings": {
                 "image": "$IOTEDGE_MODULE_IMAGE_URI",
-                "createOptions": "{\"HostConfig\":{\"Privileged\":true,\"PortBindings\":{\"80/tcp\":[{\"HostPort\":\"8080\"}]}}}"
+                "createOptions": ""
               },
               "status": "running",
               "restartPolicy": "always",
