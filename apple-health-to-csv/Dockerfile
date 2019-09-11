@@ -2,7 +2,7 @@ FROM python:3.7.4-alpine3.10 AS Core
 
 RUN pip3 install defusedxml==0.6.0
 
-COPY apple_health_to_csv.py /app/apple_health_to_csv.py
+COPY apple-health-to-csv/apple_health_to_csv.py /app/apple_health_to_csv.py
 
 ENTRYPOINT [ "/usr/local/bin/python3", "/app/apple_health_to_csv.py" ]
 
