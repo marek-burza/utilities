@@ -41,9 +41,12 @@ def extract_core(structured, ignored, prefix, entry, log):
         elif isinstance(item, dict):
             extract_core(item, ignored, f'{prefix}.{key}', entry, log)
         elif key == 'memberSince':
-            '-'.join([str(item) for item in structured[key]])
+            item = '-'.join([str(item) for item in structured[key]])
+            entry[f'{prefix}.memberSince'] = item
         elif key == 'heartRateZones':
             extract_hr_zones(item, prefix, entry)
+        elif key == 'weight':
+            entry[f'{prefix}.weight'] = item * 0.453592
         else:
             entry[f'{prefix}.{key}'] = item
 
