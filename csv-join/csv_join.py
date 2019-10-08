@@ -6,7 +6,6 @@ This joins columns in CSV file.
 
 import sys
 
-import numpy
 import pandas
 
 
