@@ -6,7 +6,15 @@ This joins columns in CSV file.
 
 import sys
 
+import numpy
 import pandas
+
+
+def join(items, delimiter):
+    """
+    Custom join which skips NaN values
+    """
+    return delimiter.join(items.dropna())
 
 
 def main():
@@ -21,7 +29,8 @@ def main():
         columns = sys.argv[4:-1]
         column_joinded = sys.argv[-1]
         columns = csv[columns]
-        csv[column_joinded] = columns.apply(delimiter.join, axis=1)
+        csv[column_joinded] = columns.apply(
+            lambda item: join(item, delimiter), axis=1)
         csv.to_csv(sys.argv[2], index=False)
 
 
