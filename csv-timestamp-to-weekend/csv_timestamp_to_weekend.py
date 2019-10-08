@@ -25,14 +25,14 @@ def main():
     """
     Main entry point into the script.
     """
-    if len(sys.argv) < 4:
-        print('USAGE: csv_timestamp_to_weekend.py CSV_FILE COLUMN_FROM COLUMN_TO')  # noqa: E501 pylint: disable=unidiomatic-typecheck
+    if len(sys.argv) < 5:
+        print('USAGE: csv_timestamp_to_weekend.py CSV_FILE_IN CSV_FILE_OUT COLUMN_FROM COLUMN_TO')  # noqa: E501 pylint: disable=unidiomatic-typecheck
     else:
         csv = pandas.read_csv(sys.argv[1])
-        column_from = sys.argv[2]
-        column_to = sys.argv[3]
+        column_from = sys.argv[3]
+        column_to = sys.argv[4]
         csv[column_to] = csv[column_from].apply(timestamp_to_weekend)
-        csv.to_csv(sys.argv[1], index=False)
+        csv.to_csv(sys.argv[2], index=False)
 
 
 if __name__ == '__main__':

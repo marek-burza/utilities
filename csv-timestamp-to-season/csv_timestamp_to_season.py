@@ -60,16 +60,16 @@ def main():
     """
     Main entry point into the script.
     """
-    if len(sys.argv) < 8:
-        print('USAGE: csv_timestamp_to_season.py CSV_FILE COLUMN_FROM COLUMN_TO SPRING_NAME SUMMER_NAME AUTUMN_NAME WINTER_NAME')  # noqa: E501 pylint: disable=C0301
+    if len(sys.argv) < 9:
+        print('USAGE: csv_timestamp_to_season.py CSV_FILE_IN CSV_FILE_OUT COLUMN_FROM COLUMN_TO SPRING_NAME SUMMER_NAME AUTUMN_NAME WINTER_NAME')  # noqa: E501 pylint: disable=C0301
     else:
         csv = pandas.read_csv(sys.argv[1])
-        column_from = sys.argv[2]
-        column_to = sys.argv[3]
-        seasons = sys.argv[4:]
+        column_from = sys.argv[3]
+        column_to = sys.argv[4]
+        seasons = sys.argv[5:]
         csv[column_to] = csv[column_from].apply(
             lambda item: timestamp_to_season(item, seasons))
-        csv.to_csv(sys.argv[1], index=False)
+        csv.to_csv(sys.argv[2], index=False)
 
 
 if __name__ == '__main__':
