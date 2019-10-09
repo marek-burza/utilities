@@ -1,6 +1,6 @@
-FROM python:3.7.4-alpine3.10 AS Core
+FROM python:3.7.4-alpine3.10
 
-COPY csv-join/requirements.txt /tmp/requirements.txt
+COPY shared/requirements/pandas.requirements.txt /tmp/requirements.txt
 
 RUN apk add --update --no-cache build-base && \
     pip3 install -r /tmp/requirements.txt && \
@@ -9,18 +9,3 @@ RUN apk add --update --no-cache build-base && \
 COPY csv-join/csv_join.py /app/csv_join.py
 
 ENTRYPOINT [ "/usr/local/bin/python3", "/app/csv_join.py" ]
-
-
-FROM Core
-
-WORKDIR /app
-
-RUN apk add --update --no-cache build-base && \
-    pip3 install bandit==1.6.2 flake8==3.7.8 pylint==2.3.1 pycodestyle==2.5.0 && \
-    (find . -iname "*.py" | xargs pylint --disable=R0801) && \
-    pycodestyle . && \
-    flake8 *.py && \
-    bandit -r .
-
-
-FROM Core
