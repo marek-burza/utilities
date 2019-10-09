@@ -15,8 +15,6 @@ def timestamp_from_local(item, pattern):
     """
     Converts local date/time to UNIX-epoch timestamp
     """
-    if isinstance(item, float) and math.isnan(item):
-        return float('nan')
     return time.mktime(time.strptime(item, pattern))
 
 
@@ -31,7 +29,10 @@ def main():
         column_from = sys.argv[3]
         column_to = sys.argv[4]
         pattern = sys.argv[5]
-        csv[column_to] = csv[column_from].apply(
+        applicable = csv[column_from].notnull()
+        if column_to not in csv:
+            csv[column_to] = float('nan')
+        csv.loc[applicable, column_to] = csv[applicable][column_from].apply(
             lambda item: timestamp_from_local(item, pattern))
         csv.to_csv(sys.argv[2], index=False)
 

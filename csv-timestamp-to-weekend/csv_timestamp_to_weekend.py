@@ -15,8 +15,6 @@ def timestamp_to_weekend(item):
     """
     Converts UNIX-epoch timestamp to weekend.
     """
-    if isinstance(item, float) and math.isnan(item):
-        return float('nan')
     when = time.localtime(item)
     return 'Weekend' if when.tm_wday in [5, 6] else 'Weekday'
 
@@ -31,7 +29,11 @@ def main():
         csv = pandas.read_csv(sys.argv[1])
         column_from = sys.argv[3]
         column_to = sys.argv[4]
-        csv[column_to] = csv[column_from].apply(timestamp_to_weekend)
+        applicable = csv[column_from].notnull()
+        if column_to not in csv:
+            csv[column_to] = float('nan')
+        csv.loc[applicable, column_to] = csv[applicable][column_from].apply(
+            timestamp_to_weekend)
         csv.to_csv(sys.argv[2], index=False)
 
 
