@@ -18,7 +18,7 @@ def main():
     else:
         csv = pandas.read_csv(sys.argv[1])
         columns = sys.argv[3:]
-        csv = csv[columns]
+        csv = csv[columns].dropna(how='all')
         csv.to_csv(sys.argv[2], index=False)
 
 
