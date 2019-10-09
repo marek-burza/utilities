@@ -5,7 +5,6 @@ This script converts UNIX-epoch timestamp to season in a CSV file.
 """
 
 import datetime
-import math
 import sys
 import time
 
