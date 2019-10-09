@@ -4,7 +4,6 @@
 This script converts UNIX-epoch timestamp to local date/time in a CSV file.
 """
 
-import math
 import sys
 import time
 
