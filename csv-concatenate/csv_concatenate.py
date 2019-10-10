@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This concatenates two CSV files.
+This script concatenates two CSV files.
 """
 
 import sys
