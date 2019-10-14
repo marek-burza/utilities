@@ -21,7 +21,7 @@ def main():
     """
     Main entry point into the script.
     """
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 6:
         print('USAGE: csv_timestamp_to_local.py CSV_FILE_IN CSV_FILE_OUT COLUMN_FROM COLUMN_TO PATTERN')  # noqa: E501 pylint: disable=C0301
     else:
         csv = pandas.read_csv(sys.argv[1])
