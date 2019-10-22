@@ -6,7 +6,7 @@ set -e
 export MSYS_NO_PATHCONV=1
 export DATA=$(cygpath -w $PWD)
 
-rm apple* fitbit* health* *png *timestamped.csv
+rm apple* fitbit* health* *png *timestamped.csv > /dev/null || true
 
 docker run --rm -it -v $DATA:/data altermarkive/apple-health-to-csv /data/export.zip /data/apple.raw.csv
 docker run --rm -it -v $DATA:/data altermarkive/csv-select /data/apple.raw.csv /data/apple.selected.csv HKQuantityTypeIdentifierBloodPressureDiastolicendDate HKQuantityTypeIdentifierBloodPressureDiastolicvalue HKQuantityTypeIdentifierBloodPressureSystolicendDate HKQuantityTypeIdentifierBloodPressureSystolicvalue HKQuantityTypeIdentifierHeartRateendDate HKQuantityTypeIdentifierHeartRatesourceName HKQuantityTypeIdentifierHeartRatevalue HKQuantityTypeIdentifierDistanceWalkingRunningendDate HKQuantityTypeIdentifierDistanceWalkingRunningvalue HKQuantityTypeIdentifierStepCountendDate HKQuantityTypeIdentifierStepCountvalue
