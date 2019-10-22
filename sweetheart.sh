@@ -1,9 +1,12 @@
 #!/bin/sh
+# Diastolic more important before 50
 
 set -e
 
 export MSYS_NO_PATHCONV=1
 export DATA=$(cygpath -w $PWD)
+
+rm apple* fitbit* health* *png *timestamped.csv
 
 docker run --rm -it -v $DATA:/data altermarkive/apple-health-to-csv /data/export.zip /data/apple.raw.csv
 docker run --rm -it -v $DATA:/data altermarkive/csv-select /data/apple.raw.csv /data/apple.selected.csv HKQuantityTypeIdentifierBloodPressureDiastolicendDate HKQuantityTypeIdentifierBloodPressureDiastolicvalue HKQuantityTypeIdentifierBloodPressureSystolicendDate HKQuantityTypeIdentifierBloodPressureSystolicvalue HKQuantityTypeIdentifierHeartRateendDate HKQuantityTypeIdentifierHeartRatesourceName HKQuantityTypeIdentifierHeartRatevalue HKQuantityTypeIdentifierDistanceWalkingRunningendDate HKQuantityTypeIdentifierDistanceWalkingRunningvalue HKQuantityTypeIdentifierStepCountendDate HKQuantityTypeIdentifierStepCountvalue
@@ -60,3 +63,25 @@ docker run --rm -it -v $DATA:/data altermarkive/csv-timestamp-to-weekend /data/h
 docker run --rm -it -v $DATA:/data altermarkive/csv-timestamp-range-label /data/health.combined.1.csv /data/health.combined.2.csv Timestamp /data/apart.timestamped.csv From To '' '' Label Combined
 docker run --rm -it -v $DATA:/data altermarkive/csv-timestamp-range-label /data/health.combined.2.csv /data/health.combined.3.csv Timestamp /data/vacation.timestamped.csv From To '' '' Label Combined
 docker run --rm -it -v $DATA:/data altermarkive/csv-timestamp-range-label /data/health.combined.3.csv /data/health.combined.csv Timestamp /data/planning.timestamped.csv From To '' '' 'Planning Detailed' Combined
+
+docker run --rm -it -v $DATA:/data altermarkive/csv-interpolate /data/health.combined.csv /data/health.interpolated.1.csv Timestamp 'BMI first' 'BMI first'
+docker run --rm -it -v $DATA:/data altermarkive/csv-interpolate /data/health.interpolated.1.csv /data/health.interpolated.csv Timestamp 'Weight first' 'Weight first'
+
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/01.DiastolicTogether.png 'Diastolic first' Together
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/01.DiastolicTogether.png 'Diastolic first' Together
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/02.DiastolicWeekday.png 'Diastolic first' Weekday
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/03.DiastolicWeekend.png 'Diastolic first' Weekend
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/04.DiastolicMonth.png 'Diastolic first' Month
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/05.DiastolicSeason.png 'Diastolic first' Season
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/06.DiastolicPlanning.png 'Diastolic last' Planning Detailed
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/07.DiastolicMedication.png 'Diastolic first' Medication
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/08.DiastolicVacation.png 'Diastolic first' Vacation
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/09.DiastolicSwitch.png 'Diastolic first' Switch
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-grouped /data/health.interpolated.csv /data/10.DiastolicCombined.png 'Diastolic first' Combined
+
+docker run --rm -it -v $DATA:/data altermarkive/plot-boxplot-versus /data/health.interpolated.csv /data/11.DiastolicMorningVsEvening.png 'Diastolic Morning first' 'Diastolic Evening last'
+
+docker run --rm -it -v $DATA:/data altermarkive/plot-scatterplot /data/health.interpolated.csv /data/12.WalkingDiastolic.png 'Walking Distance total' 'Diastolic Evening last'
+docker run --rm -it -v $DATA:/data altermarkive/plot-scatterplot /data/health.interpolated.csv /data/13.StepDiastolic.png 'Step Count total' 'Diastolic Evening last'
+docker run --rm -it -v $DATA:/data altermarkive/plot-scatterplot /data/health.interpolated.csv /data/14.BMIDiastolic.png 'BMI first' 'Diastolic Morning last'
+docker run --rm -it -v $DATA:/data altermarkive/plot-scatterplot /data/health.interpolated.csv /data/15.WeightDiastolic.png 'Weight first' 'Diastolic Morning last'
