@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script interpolates labels a column.
+This script creates a box plot for the given value and group columns.
 """
 
 import sys
