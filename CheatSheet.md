@@ -41,6 +41,10 @@ To scale:
 
     ffmpeg -i video.mp4 -vf scale=540:960 scaled.mp4
 
+To convert video to individual frames:
+
+    ffmpeg -i video.mp4 frame.%08d.png
+
 
 # git
 
