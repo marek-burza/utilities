@@ -5,7 +5,7 @@ set -e
 SELF=$0
 BASE=$(dirname "$0")
 
-DEBIAN_FRONTEND=noninteractive sudo apt-get -yq install build-essential python3-dev
+pip3 install wheel==0.33.6
 
 pip3 install $(find $BASE/../.. -name "*.requirements.txt" -exec cat {} \; | sort | uniq)
 
