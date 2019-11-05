@@ -1,0 +1,13 @@
+name: Automation Script
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Initiating
+        uses: actions/checkout@v1
+      - name: Linting
+        run: shared/automation/python.linting.sh
