@@ -13,3 +13,8 @@ jobs:
         run: /bin/sh shared/automation/build.all.sh
       - name: Linting
         run: /bin/sh shared/automation/lint.all.sh
+      - name: Publishing
+        env:
+          DOCKERHUB_USER: ${{ github.actor }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: /bin/sh shared/automation/publish.all.sh
