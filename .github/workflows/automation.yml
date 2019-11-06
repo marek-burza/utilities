@@ -9,5 +9,7 @@ jobs:
     steps:
       - name: Initiating
         uses: actions/checkout@v1
+      - name: Building
+        run: /bin/sh shared/automation/build.all.sh
       - name: Linting
-        run: /bin/sh shared/automation/python.linting.sh
+        run: /bin/sh shared/automation/lint.all.sh
