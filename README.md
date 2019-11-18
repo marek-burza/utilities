@@ -103,3 +103,10 @@ This script creates a box plot for given columns.
 This script creates a scatter plot for given columns.
 
     docker run --rm -it -v $PWD:/data altermarkive/plot-scatterplot CSV_FILE_IN PNG_FILE_OUT COLUMN_X COLUMN_Y
+
+
+## altermarkive/stat-correlation
+
+This script computes pairwise correlation of columns. For example:
+
+    docker run --rm -it -v $PWD:/data altermarkive/stat-correlation '{"input_file": "input.csv", "output_file": "output.csv", "columns": ["column1", "column2"]}'
