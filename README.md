@@ -98,6 +98,13 @@ This script creates a box plot for given columns.
     docker run --rm -it -v $PWD:/data altermarkive/plot-boxplot-versus CSV_FILE_IN PNG_FILE_OUT COLUMN_1 ...
 
 
+## altermarkive/plot-heatmap
+
+This script creates a heatmap plot.
+
+    docker run --rm -it -v $PWD:/data altermarkive/plot-heatmap '{"input_file": "correlation.csv", "output_file": "figure.png", "cmap_name": "RdBu_r", "title": "Feature Correlation"}'
+
+
 ## altermarkive/plot-scatterplot
 
 This script creates a scatter plot for given columns.
@@ -109,4 +116,4 @@ This script creates a scatter plot for given columns.
 
 This script computes pairwise correlation of columns. For example:
 
-    docker run --rm -it -v $PWD:/data altermarkive/stat-correlation '{"input_file": "input.csv", "output_file": "output.csv", "columns": ["column1", "column2"]}'
+    docker run --rm -it -v $PWD:/data altermarkive/stat-correlation '{"input_file": "input.csv", "output_file": "correlation.csv", "columns": ["feature1", "feature2"]}'
