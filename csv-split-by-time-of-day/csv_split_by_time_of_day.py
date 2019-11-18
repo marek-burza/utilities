@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script splits the value from a given column to separate ones
+This script splits the value from a given column into separate ones
 depending on time of day (night, morning, afternoon, evening).
 """
 
