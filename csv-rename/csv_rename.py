@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script selects columns in CSV file.
+This script renames columns in CSV file.
 """
 
 import sys

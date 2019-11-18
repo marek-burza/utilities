@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script interpolates labels a column.
+This script interpolates across gaps in a column.
 """
 
 import sys

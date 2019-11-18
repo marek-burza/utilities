@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script aggregates a CSV file.
+This script statistically aggregates a CSV file.
 """
 
 import json
