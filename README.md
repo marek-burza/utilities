@@ -112,6 +112,12 @@ This script creates a scatter plot for given columns.
     docker run --rm -it -v $PWD:/data altermarkive/plot-scatterplot CSV_FILE_IN PNG_FILE_OUT COLUMN_X COLUMN_Y
 
 
+## altermarkive/plot-violinplot-per-feature-per-class
+
+This script creates a violin plot.
+
+    docker run --rm -it -v $PWD:/data altermarkive/plot-scatterplot '{"input_file": "data.csv", "output_file": "figure.png", "feature_columns": "^feature", "class_column": "target"}'
+
 ## altermarkive/stat-correlation
 
 This script computes pairwise correlation of columns. For example:
