@@ -4,13 +4,12 @@
 This script creates a heatmap plot.
 """
 
+import json
 import sys
 
-import json
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot
-import numpy
 import pandas
 
 
