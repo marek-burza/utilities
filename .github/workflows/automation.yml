@@ -1,0 +1,24 @@
+name: Automation Script
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-18.04
+    env:
+      DOCKERHUB_USER: ${{ github.actor }}
+    steps:
+      - name: Initiating
+        uses: actions/checkout@v1
+      - name: Building
+        run: |
+          docker build -t $DOCKERHUB_USER/apple-health-to-csv -f apple-health-to-csv/Dockerfile .
+          docker build -t $DOCKERHUB_USER/fitbit-to-csv -f fitbit-to-csv/Dockerfile .
+      - name: Publishing
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
+          docker push $DOCKERHUB_USER/apple-health-to-csv
+          docker push $DOCKERHUB_USER/fitbit-to-csv
