@@ -4,4 +4,4 @@ Just enter the address you often go to, along with the means of transport you us
 
 ![Example](example.png)
 
-[EXPLORE](https://altermarkive.github.io/map-commute-time/)
+[EXPLORE](https://altermarkive.github.io/commute-time-mapper/)
