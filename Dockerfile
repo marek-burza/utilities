@@ -1,4 +1,4 @@
-FROM ubuntu:bionic-20190307
+FROM ubuntu:bionic-20191029
 
 ADD install.sh /tmp/install.sh
 ADD requirements.txt /tmp/requirements.txt
