@@ -5,6 +5,7 @@ This script creates a violin plot.
 """
 
 import json
+import math
 import re
 import sys
 
@@ -24,16 +25,19 @@ def violinplot(arguments):
         feature_columns = list(filter(pattern.search, data.columns))
     feature_count = len(feature_columns)
     class_column = arguments['class_column']
+    size = math.ceil(math.sqrt(feature_count))
     figure, axes = matplotlib.pyplot.subplots(
-        nrows=1, ncols=feature_count)
+        nrows=size, ncols=size)
     figure.set_figwidth(arguments['width'])
     figure.set_figheight(arguments['height'])
     figure.set_dpi(arguments['dpi'])
     for i, feature_column in enumerate(feature_columns):
+        x = i % size
+        y = i // size
         feature_data = data[[feature_column, class_column]]
         feature_data = feature_data.groupby(class_column)
         feature_data = feature_data[feature_column].apply(list)
-        axes[i].violinplot(
+        axes[y, x].violinplot(
             feature_data,
             points=arguments['points'],
             widths=0.9,
@@ -41,16 +45,20 @@ def violinplot(arguments):
             showextrema=False,
             showmedians=False,
             bw_method=arguments['bw_method'])
-        axes[i].boxplot(
+        axes[y, x].boxplot(
             feature_data,
             notch=arguments['notch'],
             sym=arguments['sym'],
             widths=0.3)
-        axes[i].set_title(
+        axes[y, x].set_title(
             feature_column,
             fontsize=arguments['font_size'],
             fontweight=arguments['font_weight'])
-        axes[i].set_xticklabels(feature_data.index)
+        axes[y, x].set_xticklabels(feature_data.index)
+    for i in range(len(feature_columns), size * size):
+        x = i % size
+        y = i // size
+        axes[y, x].axis('off')
     if arguments['title'] is not None:
         figure.suptitle(arguments['title'])
     figure.subplots_adjust(wspace=0.5)
