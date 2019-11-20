@@ -18,4 +18,4 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/workspace
+          docker push $DOCKERHUB_USER/bittorrent-over-vpn
