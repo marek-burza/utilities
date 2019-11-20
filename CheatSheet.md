@@ -45,6 +45,21 @@ To convert video to individual frames:
 
     ffmpeg -i video.mp4 frame.%08d.png
 
+To create a silent audio file:
+
+    ffmpeg -f s16le -ac 1 -t 1 -i /dev/zero -ar 22050 -y silence.mp3
+
+To concatenate files:
+
+    ffmpeg -i concat:"one.mp3|two.mp3" -strict -2 -y three.aac
+
+To combine video frames with audio:
+
+    for ENTRY in $(ls -1 *.jpg | sed -e 's/\.jpg//g')
+    do
+        ffmpeg -loop 1 -i ${ENTRY}.jpg -i ${ENTRY}.aac -strict -2 -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y ${ENTRY}.mp4
+    done
+
 
 # git
 
@@ -80,12 +95,11 @@ To convert video to individual frames:
     git push -u --force origin master
 
 
-# tmux
+## Merging repository into another under a subdirectory
 
-To create new session:
-
-    tmux new-session -s shared
-
-To attach to a session:
-
-    tmux attach-session -t shared
+    git clone $A_URL $A_NAME
+    cd $A_NAME
+    git remote add -f $B_NAME $B_URL
+    git merge --allow-unrelated-histories -s ours --no-commit $B_NAME/master
+    git read-tree --prefix=$SUBDIRECTORY -u $B_NAME/master
+    git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
