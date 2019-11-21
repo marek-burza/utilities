@@ -13,12 +13,12 @@ jobs:
         uses: actions/checkout@v1
       - name: Building
         run: |
-          docker build -t $DOCKERHUB_USER/cron-curl:amd64-$(git describe) -f Dockerfile.amd64 .
-          docker build -t $DOCKERHUB_USER/cron-curl:armv7hf-$(git describe) -f Dockerfile.armv7hf .
+          docker build -t $DOCKERHUB_USER/cron-curl:amd64-$(git describe --tags) -f Dockerfile.amd64 .
+          docker build -t $DOCKERHUB_USER/cron-curl:armv7hf-$(git describe --tags) -f Dockerfile.armv7hf .
       - name: Publishing
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/cron-curl:amd64-$(git describe)
-          docker push $DOCKERHUB_USER/cron-curl:armv7hf-$(git describe)
+          docker push $DOCKERHUB_USER/cron-curl:amd64-$(git describe --tags)
+          docker push $DOCKERHUB_USER/cron-curl:armv7hf-$(git describe --tags)
