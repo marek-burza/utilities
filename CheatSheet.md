@@ -8,13 +8,6 @@
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
 
-# Wireshark
-
-To filter for UDP, a particular MAC and broadcast use this filter:
-
-    udp && (eth.addr == 00:11:22:33:44:55 || eth.addr == FF:FF:FF:FF:FF:FF)
-
-
 # Photos & Videos
 
 To adjust the photo dates install the following packages:
@@ -61,6 +54,21 @@ To combine video frames with audio:
     done
 
 
+# Windows
+
+Beep
+
+    powershell -c (New-Object Media.SoundPlayer "C:\beep.wav").PlaySync();
+
+Lock the screen
+
+    rundll32 user32.dll, LockWorkStation
+
+A command to set the default printer on Windows
+
+    cscript C:\Windows\System32\Printing_Admin_Scripts\en-US\prnmngr.vbs -t -p "\\host\printer"
+
+
 # git
 
 ## Get latest tag with current "distance"
@@ -103,3 +111,10 @@ To combine video frames with audio:
     git merge --allow-unrelated-histories -s ours --no-commit $B_NAME/master
     git read-tree --prefix=$SUBDIRECTORY -u $B_NAME/master
     git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
+
+
+# Wireshark
+
+To filter for UDP, a particular MAC and broadcast use this filter:
+
+    udp && (eth.addr == 00:11:22:33:44:55 || eth.addr == FF:FF:FF:FF:FF:FF)
