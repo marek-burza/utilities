@@ -7,6 +7,7 @@ namespace Explorer
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using Microsoft.Extensions.CommandLineUtils;
     using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ namespace Explorer
             cli.HelpOption("-? | -h | --help");
             RegisterCommand(cli, "hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex);
             RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
+            RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
             try
             {
                 return cli.Execute(arguments);
@@ -69,7 +71,7 @@ namespace Explorer
                 CommandArgument argument = argumentDescription != null ? command.Argument("argument", argumentDescription) : null;
                 command.OnExecute(() =>
                 {
-                    action(argument.Value);
+                    action(argumentDescription != null ? argument.Value : null);
                     return 0;
                 });
             });
@@ -88,6 +90,23 @@ namespace Explorer
             foreach (string line in lines)
             {
                 Logger.LogInformation(line);
+            }
+        }
+
+        private static void LogLinesFromResource(string argument)
+        {
+            Assembly assembly = Assembly.GetEntryAssembly();
+            String name = $"Explorer.resources.example.txt";
+            using (Stream stream = assembly.GetManifestResourceStream(name))
+            {
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    List<string> lines = reader.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+                    foreach (string line in lines)
+                    {
+                        Logger.LogInformation(line);
+                    }
+                }
             }
         }
     }
