@@ -12,6 +12,8 @@ namespace Explorer
     using Microsoft.Extensions.CommandLineUtils;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Main class of the program.
@@ -35,6 +37,7 @@ namespace Explorer
             RegisterCommand(cli, "hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex);
             RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
             RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
+            RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", ParseCSV);
             try
             {
                 return cli.Execute(arguments);
@@ -96,7 +99,7 @@ namespace Explorer
         private static void LogLinesFromResource(string argument)
         {
             Assembly assembly = Assembly.GetEntryAssembly();
-            String name = $"Explorer.resources.example.txt";
+            string name = $"Explorer.resources.example.txt";
             using (Stream stream = assembly.GetManifestResourceStream(name))
             {
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
@@ -108,6 +111,30 @@ namespace Explorer
                     }
                 }
             }
+        }
+
+        private static void ParseCSV(string encodedLines)
+        {
+            JArray decodedLines = JArray.Parse(encodedLines);
+            List<string> lines = decodedLines.ToObject<List<string>>();
+            float[,] parsedCSV = ListToArray(lines.Select(line => Array.ConvertAll(line.Split(','), float.Parse)).ToList());
+            Logger.LogInformation(JsonConvert.SerializeObject(parsedCSV));
+        }
+
+        private static T[,] ListToArray<T>(IList<T[]> arrays)
+        {
+            int count = arrays.Max(array => array.Count());
+            T[,] result = new T[arrays.Count, count];
+
+            for (int i = 0; i < arrays.Count; i++)
+            {
+                for (int j = 0; j < arrays[i].Length; j++)
+                {
+                    result[i, j] = arrays[i][j];
+                }
+            }
+
+            return result;
         }
     }
 }
