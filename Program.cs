@@ -4,6 +4,9 @@
 namespace Explorer
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Text;
     using Microsoft.Extensions.CommandLineUtils;
     using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +31,8 @@ namespace Explorer
             cli.Name = "Explorer";
             cli.Description = "Explorer Application";
             cli.HelpOption("-? | -h | --help");
-            RegisterCommand(cli, "hex", "String to hexadecimal", "string", ExecuteHex);
+            RegisterCommand(cli, "hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex);
+            RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
             try
             {
                 return cli.Execute(arguments);
@@ -56,7 +60,7 @@ namespace Explorer
             return services.BuildServiceProvider();
         }
 
-        private static void RegisterCommand(CommandLineApplication cli, string commandName, string commandDescription, string argumentDescription, Action<string, CommandArgument> action)
+        private static void RegisterCommand(CommandLineApplication cli, string commandName, string commandDescription, string argumentDescription, Action<string> action)
         {
             cli.Command(commandName, (command) =>
             {
@@ -65,17 +69,26 @@ namespace Explorer
                 CommandArgument argument = argumentDescription != null ? command.Argument("argument", argumentDescription) : null;
                 command.OnExecute(() =>
                 {
-                    action(commandName, argument);
+                    action(argument.Value);
                     return 0;
                 });
             });
         }
 
-        private static void ExecuteHex(string command, CommandArgument argument)
+        private static void ConvertToHex(string text)
         {
-            Logger.LogInformation(Hex(Encoding.UTF8.GetBytes(argument.Value)));
+            Logger.LogInformation(Hex(Encoding.UTF8.GetBytes(text)));
         }
 
         private static string Hex(Span<byte> octets) => BitConverter.ToString(octets.ToArray()).Replace("-", string.Empty);
+
+        private static void LogLinesFromFile(string path)
+        {
+            List<string> lines = File.ReadAllLines(path).ToList();
+            foreach (string line in lines)
+            {
+                Logger.LogInformation(line);
+            }
+        }
     }
 }
