@@ -7,6 +7,7 @@ namespace Explorer
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Reflection;
     using System.Text;
     using Microsoft.Extensions.CommandLineUtils;
@@ -39,6 +40,9 @@ namespace Explorer
             RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
             RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", ParseCSV);
             RegisterCommand(cli, "sequence", "Obtain sequence", null, ObtainSequence);
+            RegisterCommand(cli, "interfaces", "List interfaces", null, ListInterfaces);
+            RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, ListBroadcasts);
+            RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", MatchAddress);
             try
             {
                 return cli.Execute(arguments);
@@ -141,6 +145,24 @@ namespace Explorer
         private static void ObtainSequence(string argument)
         {
             Logger.LogInformation($"{Sequence.Obtain()}");
+        }
+
+        private static void ListInterfaces(string argument)
+        {
+            Logger.LogInformation(Networking.FormatInterfaces());
+        }
+
+        private static void ListBroadcasts(string argument)
+        {
+            foreach (IPAddress ip in Networking.EnumerateBroadcastAddresses())
+            {
+                Logger.LogInformation(ip.ToString());
+            }
+        }
+
+        private static void MatchAddress(string address)
+        {
+            Logger.LogInformation($"{Networking.MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
         }
     }
 }
