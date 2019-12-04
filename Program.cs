@@ -38,6 +38,7 @@ namespace Explorer
             RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
             RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
             RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", ParseCSV);
+            RegisterCommand(cli, "sequence", "Obtain sequence", null, ObtainSequence);
             try
             {
                 return cli.Execute(arguments);
@@ -135,6 +136,11 @@ namespace Explorer
             }
 
             return result;
+        }
+
+        private static void ObtainSequence(string argument)
+        {
+            Logger.LogInformation($"{Sequence.Obtain()}");
         }
     }
 }
