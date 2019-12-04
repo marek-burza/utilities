@@ -43,6 +43,7 @@ namespace Explorer
             RegisterCommand(cli, "unix", "Convert date/time to Unix timestamp", "Date/time", Stamp.LogUnixTimestamp);
             RegisterCommand(cli, "floats", "Parse array of strings to array of floats", "Array of strings", Json.LogParsedArray);
             RegisterCommand(cli, "order", "Orders array by key", "Array of objects", Json.LogOrderedArray);
+            RegisterCommand(cli, "datetime", "Local date/time offsets", "Unix timestamp", Stamp.LogLocalTimestamp);
             try
             {
                 return cli.Execute(arguments);
