@@ -44,6 +44,7 @@ namespace Explorer
             RegisterCommand(cli, "floats", "Parse array of strings to array of floats", "Array of strings", Json.LogParsedArray);
             RegisterCommand(cli, "order", "Orders array by key", "Array of objects", Json.LogOrderedArray);
             RegisterCommand(cli, "datetime", "Local date/time offsets", "Unix timestamp", Stamp.LogLocalTimestamp);
+            RegisterCommand(cli, "aggregate", "Aggregate objects", "Array of objects", Json.LogAggregated);
             try
             {
                 return cli.Execute(arguments);
