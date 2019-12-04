@@ -43,9 +43,9 @@ namespace Explorer
         /// </summary>
         /// <param name="argument">Command argument.</param>
         /// <param name="logger">Logger.</param>
-        public static void LogMatchingAddress(string address, ILogger logger)
+        public static void LogMatchingAddress(string argument, ILogger logger)
         {
-            logger.LogInformation($"{MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
+            logger.LogInformation($"{MatchingOwnAddress(IPAddress.Parse(argument)).ToString()}");
         }
 
         private static string FormatIPGlobalProperties()
