@@ -1,4 +1,4 @@
-// <copyright file="Networking.cs" company="altermarkive">
+// <copyright file="Network.cs" company="altermarkive">
 // Copyright (c) 2019 altermarkive.
 // </copyright>
 namespace Explorer
@@ -8,6 +8,7 @@ namespace Explorer
     using System.Net;
     using System.Net.NetworkInformation;
     using System.Net.Sockets;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Networking class of the application.
@@ -15,111 +16,36 @@ namespace Explorer
     public static class Network
     {
         /// <summary>
-        /// Formats the string listing of network interfaces.
+        /// Logs the list of network interfaces.
         /// </summary>
-        /// <returns>String listing of the network interfaces.</returns>
-        public static string FormatInterfaces()
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogInterfaces(string argument, ILogger logger)
         {
-            string result = string.Empty;
-            result += FormatIPGlobalProperties();
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            if (nics == null || nics.Length < 1)
-            {
-                result += "  No network interfaces found\n";
-            }
-            else
-            {
-                result += $"Number of interfaces:                  {nics.Length}\n";
-                foreach (NetworkInterface adapter in nics)
-                {
-                    result += FormatNetworkInterface(adapter);
-                }
-            }
-
-            return result;
+            logger.LogInformation(FormatInterfaces());
         }
 
         /// <summary>
-        /// Collects all broadcasting addresses.
+        /// Logs the list broadcast addresses.
         /// </summary>
-        /// <returns>Broadcasting addresses.</returns>
-        public static List<IPAddress> EnumerateBroadcastAddresses()
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogBroadcastAddresses(string argument, ILogger logger)
         {
-            List<IPAddress> broadcastAddresses = new List<IPAddress>();
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            if (nics != null && nics.Length > 0)
+            foreach (IPAddress ip in EnumerateBroadcastAddresses())
             {
-                foreach (NetworkInterface adapter in nics)
-                {
-                    if (!Useful(adapter))
-                    {
-                        continue;
-                    }
-
-                    IPInterfaceProperties properties = adapter.GetIPProperties();
-                    foreach (UnicastIPAddressInformation addressInformation in properties.UnicastAddresses)
-                    {
-                        IPAddress address = addressInformation.Address;
-                        if (address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            uint ip = BitConverter.ToUInt32(addressInformation.Address.GetAddressBytes(), 0);
-                            uint mask = BitConverter.ToUInt32(addressInformation.IPv4Mask.GetAddressBytes(), 0);
-                            uint broadcast = ip | ~mask;
-                            IPAddress broadcastAddress = new IPAddress(BitConverter.GetBytes(broadcast));
-                            broadcastAddresses.Add(broadcastAddress);
-                        }
-                    }
-                }
-
-                if (broadcastAddresses.Count != 0)
-                {
-                    return broadcastAddresses;
-                }
+                logger.LogInformation(ip.ToString());
             }
-
-            broadcastAddresses.Add(IPAddress.Broadcast);
-
-            return broadcastAddresses;
         }
 
         /// <summary>
-        /// Finds own network interface IP address matching the given one.
+        /// Logs own IP address on the same subnet as the given one.
         /// </summary>
-        /// <param name="address">IP address to match.</param>
-        /// <returns>Own network interface IP address matching the given one.</returns>
-        public static IPAddress MatchingOwnAddress(IPAddress address)
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogMatchingAddress(string address, ILogger logger)
         {
-            uint ip = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            if (nics != null && nics.Length > 0)
-            {
-                foreach (NetworkInterface adapter in nics)
-                {
-                    if (!Useful(adapter))
-                    {
-                        continue;
-                    }
-
-                    IPInterfaceProperties properties = adapter.GetIPProperties();
-                    foreach (UnicastIPAddressInformation addressInformation in properties.UnicastAddresses)
-                    {
-                        IPAddress ownAddress = addressInformation.Address;
-                        if (ownAddress.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            uint ipOwn = BitConverter.ToUInt32(addressInformation.Address.GetAddressBytes(), 0);
-                            uint maskOwn = BitConverter.ToUInt32(addressInformation.IPv4Mask.GetAddressBytes(), 0);
-                            uint subnetOwn = ipOwn & maskOwn;
-                            uint subnet = ip & maskOwn;
-                            if (subnet == subnetOwn)
-                            {
-                                return ownAddress;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return null;
+            logger.LogInformation($"{MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
         }
 
         private static string FormatIPGlobalProperties()
@@ -404,6 +330,27 @@ namespace Explorer
             return result;
         }
 
+        private static string FormatInterfaces()
+        {
+            string result = string.Empty;
+            result += FormatIPGlobalProperties();
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            if (nics == null || nics.Length < 1)
+            {
+                result += "  No network interfaces found\n";
+            }
+            else
+            {
+                result += $"Number of interfaces:                  {nics.Length}\n";
+                foreach (NetworkInterface adapter in nics)
+                {
+                    result += FormatNetworkInterface(adapter);
+                }
+            }
+
+            return result;
+        }
+
         private static bool Useful(NetworkInterface adapter)
         {
             if (adapter.NetworkInterfaceType == NetworkInterfaceType.Loopback)
@@ -422,6 +369,80 @@ namespace Explorer
             }
 
             return true;
+        }
+
+        private static List<IPAddress> EnumerateBroadcastAddresses()
+        {
+            List<IPAddress> broadcastAddresses = new List<IPAddress>();
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            if (nics != null && nics.Length > 0)
+            {
+                foreach (NetworkInterface adapter in nics)
+                {
+                    if (!Useful(adapter))
+                    {
+                        continue;
+                    }
+
+                    IPInterfaceProperties properties = adapter.GetIPProperties();
+                    foreach (UnicastIPAddressInformation addressInformation in properties.UnicastAddresses)
+                    {
+                        IPAddress address = addressInformation.Address;
+                        if (address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            uint ip = BitConverter.ToUInt32(addressInformation.Address.GetAddressBytes(), 0);
+                            uint mask = BitConverter.ToUInt32(addressInformation.IPv4Mask.GetAddressBytes(), 0);
+                            uint broadcast = ip | ~mask;
+                            IPAddress broadcastAddress = new IPAddress(BitConverter.GetBytes(broadcast));
+                            broadcastAddresses.Add(broadcastAddress);
+                        }
+                    }
+                }
+
+                if (broadcastAddresses.Count != 0)
+                {
+                    return broadcastAddresses;
+                }
+            }
+
+            broadcastAddresses.Add(IPAddress.Broadcast);
+
+            return broadcastAddresses;
+        }
+
+        private static IPAddress MatchingOwnAddress(IPAddress address)
+        {
+            uint ip = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            if (nics != null && nics.Length > 0)
+            {
+                foreach (NetworkInterface adapter in nics)
+                {
+                    if (!Useful(adapter))
+                    {
+                        continue;
+                    }
+
+                    IPInterfaceProperties properties = adapter.GetIPProperties();
+                    foreach (UnicastIPAddressInformation addressInformation in properties.UnicastAddresses)
+                    {
+                        IPAddress ownAddress = addressInformation.Address;
+                        if (ownAddress.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            uint ipOwn = BitConverter.ToUInt32(addressInformation.Address.GetAddressBytes(), 0);
+                            uint maskOwn = BitConverter.ToUInt32(addressInformation.IPv4Mask.GetAddressBytes(), 0);
+                            uint subnetOwn = ipOwn & maskOwn;
+                            uint subnet = ip & maskOwn;
+                            if (subnet == subnetOwn)
+                            {
+                                return ownAddress;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

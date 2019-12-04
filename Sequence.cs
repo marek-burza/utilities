@@ -4,6 +4,7 @@
 namespace Explorer
 {
     using System;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Sequence class of the application.
@@ -15,10 +16,16 @@ namespace Explorer
         private static uint sequence = (uint)random.Next();
 
         /// <summary>
-        /// Obtains next sequence number.
+        /// Logs next sequence number.
         /// </summary>
-        /// <returns>Result next sequence.</returns>
-        public static uint Obtain()
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogSequence(string argument, ILogger logger)
+        {
+            logger.LogInformation($"{Obtain()}");
+        }
+
+        private static uint Obtain()
         {
             uint obtained;
 

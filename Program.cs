@@ -7,7 +7,6 @@ namespace Explorer
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Net;
     using System.Reflection;
     using System.Text;
     using Microsoft.Extensions.CommandLineUtils;
@@ -39,10 +38,10 @@ namespace Explorer
             RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
             RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
             RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", ParseCSV);
-            RegisterCommand(cli, "sequence", "Obtain sequence", null, ObtainSequence);
-            RegisterCommand(cli, "interfaces", "List interfaces", null, ListInterfaces);
-            RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, ListBroadcasts);
-            RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", MatchAddress);
+            RegisterCommand(cli, "sequence", "Obtain sequence", null, Sequence.LogSequence);
+            RegisterCommand(cli, "interfaces", "List interfaces", null, Network.LogInterfaces);
+            RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, Network.LogBroadcastAddresses);
+            RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", Network.LogMatchingAddress);
             try
             {
                 return cli.Execute(arguments);
@@ -70,7 +69,7 @@ namespace Explorer
             return services.BuildServiceProvider();
         }
 
-        private static void RegisterCommand(CommandLineApplication cli, string commandName, string commandDescription, string argumentDescription, Action<string> action)
+        private static void RegisterCommand(CommandLineApplication cli, string commandName, string commandDescription, string argumentDescription, Action<string, ILogger> action)
         {
             cli.Command(commandName, (command) =>
             {
@@ -79,29 +78,29 @@ namespace Explorer
                 CommandArgument argument = argumentDescription != null ? command.Argument("argument", argumentDescription) : null;
                 command.OnExecute(() =>
                 {
-                    action(argumentDescription != null ? argument.Value : null);
+                    action(argumentDescription != null ? argument.Value : null, Logger);
                     return 0;
                 });
             });
         }
 
-        private static void ConvertToHex(string text)
+        private static void ConvertToHex(string text, ILogger logger)
         {
-            Logger.LogInformation(Hex(Encoding.UTF8.GetBytes(text)));
+            logger.LogInformation(Hex(Encoding.UTF8.GetBytes(text)));
         }
 
         private static string Hex(Span<byte> octets) => BitConverter.ToString(octets.ToArray()).Replace("-", string.Empty);
 
-        private static void LogLinesFromFile(string path)
+        private static void LogLinesFromFile(string path, ILogger logger)
         {
             List<string> lines = File.ReadAllLines(path, Encoding.UTF8).ToList();
             foreach (string line in lines)
             {
-                Logger.LogInformation(line);
+                logger.LogInformation(line);
             }
         }
 
-        private static void LogLinesFromResource(string argument)
+        private static void LogLinesFromResource(string argument, ILogger logger)
         {
             Assembly assembly = Assembly.GetEntryAssembly();
             string name = $"Explorer.resources.example.txt";
@@ -112,18 +111,18 @@ namespace Explorer
                     List<string> lines = reader.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach (string line in lines)
                     {
-                        Logger.LogInformation(line);
+                        logger.LogInformation(line);
                     }
                 }
             }
         }
 
-        private static void ParseCSV(string encodedLines)
+        private static void ParseCSV(string encodedLines, ILogger logger)
         {
             JArray decodedLines = JArray.Parse(encodedLines);
             List<string> lines = decodedLines.ToObject<List<string>>();
             float[,] parsedCSV = ListToArray(lines.Select(line => Array.ConvertAll(line.Split(','), float.Parse)).ToList());
-            Logger.LogInformation(JsonConvert.SerializeObject(parsedCSV));
+            logger.LogInformation(JsonConvert.SerializeObject(parsedCSV));
         }
 
         private static T[,] ListToArray<T>(IList<T[]> arrays)
@@ -140,29 +139,6 @@ namespace Explorer
             }
 
             return result;
-        }
-
-        private static void ObtainSequence(string argument)
-        {
-            Logger.LogInformation($"{Sequence.Obtain()}");
-        }
-
-        private static void ListInterfaces(string argument)
-        {
-            Logger.LogInformation(Network.FormatInterfaces());
-        }
-
-        private static void ListBroadcasts(string argument)
-        {
-            foreach (IPAddress ip in Network.EnumerateBroadcastAddresses())
-            {
-                Logger.LogInformation(ip.ToString());
-            }
-        }
-
-        private static void MatchAddress(string address)
-        {
-            Logger.LogInformation($"{Network.MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
         }
     }
 }
