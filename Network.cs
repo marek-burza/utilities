@@ -12,7 +12,7 @@ namespace Explorer
     /// <summary>
     /// Networking class of the application.
     /// </summary>
-    public static class Networking
+    public static class Network
     {
         /// <summary>
         /// Formats the string listing of network interfaces.

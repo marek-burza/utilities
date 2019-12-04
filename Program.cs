@@ -149,12 +149,12 @@ namespace Explorer
 
         private static void ListInterfaces(string argument)
         {
-            Logger.LogInformation(Networking.FormatInterfaces());
+            Logger.LogInformation(Network.FormatInterfaces());
         }
 
         private static void ListBroadcasts(string argument)
         {
-            foreach (IPAddress ip in Networking.EnumerateBroadcastAddresses())
+            foreach (IPAddress ip in Network.EnumerateBroadcastAddresses())
             {
                 Logger.LogInformation(ip.ToString());
             }
@@ -162,7 +162,7 @@ namespace Explorer
 
         private static void MatchAddress(string address)
         {
-            Logger.LogInformation($"{Networking.MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
+            Logger.LogInformation($"{Network.MatchingOwnAddress(IPAddress.Parse(address)).ToString()}");
         }
     }
 }
