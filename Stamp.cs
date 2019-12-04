@@ -22,6 +22,20 @@ namespace Explorer
             logger.LogInformation($"{DateTimeToUnixTimestamp(StringToDateTime(argument))}");
         }
 
+        /// <summary>
+        /// Logs local date/time.
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogLocalTimestamp(string argument, ILogger logger)
+        {
+            long stamp = long.Parse(argument);
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime datetime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(stamp);
+            logger.LogInformation($"Days since epoch: {(datetime.Date - epoch.Date).TotalDays}");
+            logger.LogInformation($"Days since midnight: {datetime.TimeOfDay.TotalSeconds}");
+        }
+
         private static DateTime StringToDateTime(string stamp)
         {
             return DateTime.Parse(stamp.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
