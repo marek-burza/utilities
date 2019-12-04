@@ -94,7 +94,7 @@ namespace Explorer
 
         private static void LogLinesFromFile(string path)
         {
-            List<string> lines = File.ReadAllLines(path).ToList();
+            List<string> lines = File.ReadAllLines(path, Encoding.UTF8).ToList();
             foreach (string line in lines)
             {
                 Logger.LogInformation(line);
