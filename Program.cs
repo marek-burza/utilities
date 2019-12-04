@@ -12,8 +12,6 @@ namespace Explorer
     using Microsoft.Extensions.CommandLineUtils;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Main class of the program.
@@ -37,12 +35,13 @@ namespace Explorer
             RegisterCommand(cli, "hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex);
             RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
             RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
-            RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", ParseCSV);
+            RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", Json.ParseCSV);
             RegisterCommand(cli, "sequence", "Obtain sequence", null, Sequence.LogSequence);
             RegisterCommand(cli, "interfaces", "List interfaces", null, Network.LogInterfaces);
             RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, Network.LogBroadcastAddresses);
             RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", Network.LogMatchingAddress);
             RegisterCommand(cli, "unix", "Convert date/time to Unix timestamp", "Date/time", Stamp.LogUnixTimestamp);
+            RegisterCommand(cli, "floats", "Parse array of strings to array of floats", "Array of strings", Json.LogParsedArray);
             try
             {
                 return cli.Execute(arguments);
@@ -116,30 +115,6 @@ namespace Explorer
                     }
                 }
             }
-        }
-
-        private static void ParseCSV(string encodedLines, ILogger logger)
-        {
-            JArray decodedLines = JArray.Parse(encodedLines);
-            List<string> lines = decodedLines.ToObject<List<string>>();
-            float[,] parsedCSV = ListToArray(lines.Select(line => Array.ConvertAll(line.Split(','), float.Parse)).ToList());
-            logger.LogInformation(JsonConvert.SerializeObject(parsedCSV));
-        }
-
-        private static T[,] ListToArray<T>(IList<T[]> arrays)
-        {
-            int count = arrays.Max(array => array.Count());
-            T[,] result = new T[arrays.Count, count];
-
-            for (int i = 0; i < arrays.Count; i++)
-            {
-                for (int j = 0; j < arrays[i].Length; j++)
-                {
-                    result[i, j] = arrays[i][j];
-                }
-            }
-
-            return result;
         }
     }
 }
