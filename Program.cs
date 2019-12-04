@@ -42,6 +42,7 @@ namespace Explorer
             RegisterCommand(cli, "interfaces", "List interfaces", null, Network.LogInterfaces);
             RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, Network.LogBroadcastAddresses);
             RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", Network.LogMatchingAddress);
+            RegisterCommand(cli, "unix", "Convert date/time to Unix timestamp", "Date/time", Stamp.LogUnixTimestamp);
             try
             {
                 return cli.Execute(arguments);
