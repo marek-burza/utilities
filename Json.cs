@@ -40,6 +40,18 @@ namespace Explorer
             logger.LogInformation(JsonConvert.SerializeObject(array));
         }
 
+        /// <summary>
+        /// Logs array ordered by "key".
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogOrderedArray(string argument, ILogger logger)
+        {
+            JArray array = JArray.Parse(argument);
+            array = OrderByKey(array, "key");
+            logger.LogInformation(JsonConvert.SerializeObject(array));
+        }
+
         private static T[,] ListToArray<T>(IList<T[]> arrays)
         {
             int count = arrays.Max(array => array.Count());
@@ -59,6 +71,11 @@ namespace Explorer
         private static JArray ParseStringToFloatArray(JArray array, int offset)
         {
             return new JArray(Array.ConvertAll(array.ToObject<List<string>>().ToArray().AsSpan().Slice(offset).ToArray(), float.Parse));
+        }
+
+        private static JArray OrderByKey(JArray array, string key)
+        {
+            return new JArray(array.OrderBy(item => (long)item[key]));
         }
     }
 }
