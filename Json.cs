@@ -52,6 +52,18 @@ namespace Explorer
             logger.LogInformation(JsonConvert.SerializeObject(array));
         }
 
+        /// <summary>
+        /// Logs aggregated array of objects.
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogAggregated(string argument, ILogger logger)
+        {
+            JArray array = JArray.Parse(argument);
+            JObject aggregated = Aggregate(array);
+            logger.LogInformation(JsonConvert.SerializeObject(aggregated));
+        }
+
         private static T[,] ListToArray<T>(IList<T[]> arrays)
         {
             int count = arrays.Max(array => array.Count());
@@ -76,6 +88,36 @@ namespace Explorer
         private static JArray OrderByKey(JArray array, string key)
         {
             return new JArray(array.OrderBy(item => (long)item[key]));
+        }
+
+        private static JObject Aggregate(JArray objects)
+        {
+            return objects.Select(item => (JObject)item).Aggregate(new JObject(), (a, b) => Merge(a, b));
+        }
+
+        private static JObject Merge(JObject a, JObject b)
+        {
+            ISet<string> keysA = a.Properties().Select(property => property.Name).ToHashSet();
+            ISet<string> keysB = b.Properties().Select(property => property.Name).ToHashSet();
+            ISet<string> keys = keysA.Union(keysB).ToHashSet();
+            JObject merged = new JObject();
+            foreach (string key in keys)
+            {
+                JArray array = new JArray();
+                if (a.ContainsKey(key))
+                {
+                    array.Merge(a[key]);
+                }
+
+                if (b.ContainsKey(key))
+                {
+                    array.Merge(b[key]);
+                }
+
+                merged[key] = array;
+            }
+
+            return merged;
         }
     }
 }
