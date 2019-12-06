@@ -20,6 +20,48 @@ namespace Explorer
     {
         private static readonly ServiceProvider Provider = InitLogging();
         private static readonly ILogger Logger = Program.Provider.GetService<ILogger<Program>>();
+        private static readonly IDictionary<string, Command> Commands = new Dictionary<string, Command>
+        {
+            {
+                "hex", new Command("hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex)
+            },
+            {
+                "file", new Command("file", "Log lines from file", "File to log", LogLinesFromFile)
+            },
+            {
+                "resource", new Command("resource", "Log lines from resource", null, LogLinesFromResource)
+            },
+            {
+                "csv", new Command("csv", "Parse CSV lines", "JSON with CSV lines", Json.ParseCSV)
+            },
+            {
+                "sequence", new Command("sequence", "Obtain sequence", null, Sequence.LogSequence)
+            },
+            {
+                "interfaces", new Command("interfaces", "List interfaces", null, Network.LogInterfaces)
+            },
+            {
+                "broadcasts", new Command("broadcasts", "List broadcasting addresses", null, Network.LogBroadcastAddresses)
+            },
+            {
+                "matching", new Command("matching", "Look-up matching own address", "Address to match", Network.LogMatchingAddress)
+            },
+            {
+                "unix", new Command("unix", "Convert date/time to Unix timestamp", "Date/time", Stamp.LogUnixTimestamp)
+            },
+            {
+                "floats", new Command("floats", "Parse array of strings to array of floats", "Array of strings", Json.LogParsedArray)
+            },
+            {
+                "order", new Command("order", "Orders array by key", "Array of objects", Json.LogOrderedArray)
+            },
+            {
+                "datetime", new Command("datetime", "Local date/time offsets", "Unix timestamp", Stamp.LogLocalTimestamp)
+            },
+            {
+                "aggregate", new Command("aggregate", "Aggregate objects", "Array of objects", Json.LogAggregated)
+            },
+        };
 
         /// <summary>
         /// Main entry into the program.
@@ -32,19 +74,7 @@ namespace Explorer
             cli.Name = "Explorer";
             cli.Description = "Explorer Application";
             cli.HelpOption("-? | -h | --help");
-            RegisterCommand(cli, "hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex);
-            RegisterCommand(cli, "file", "Log lines from file", "File to log", LogLinesFromFile);
-            RegisterCommand(cli, "resource", "Log lines from resource", null, LogLinesFromResource);
-            RegisterCommand(cli, "csv", "Parse CSV lines", "JSON with CSV lines", Json.ParseCSV);
-            RegisterCommand(cli, "sequence", "Obtain sequence", null, Sequence.LogSequence);
-            RegisterCommand(cli, "interfaces", "List interfaces", null, Network.LogInterfaces);
-            RegisterCommand(cli, "broadcasts", "List broadcasting addresses", null, Network.LogBroadcastAddresses);
-            RegisterCommand(cli, "matching", "Look-up matching own address", "Address to match", Network.LogMatchingAddress);
-            RegisterCommand(cli, "unix", "Convert date/time to Unix timestamp", "Date/time", Stamp.LogUnixTimestamp);
-            RegisterCommand(cli, "floats", "Parse array of strings to array of floats", "Array of strings", Json.LogParsedArray);
-            RegisterCommand(cli, "order", "Orders array by key", "Array of objects", Json.LogOrderedArray);
-            RegisterCommand(cli, "datetime", "Local date/time offsets", "Unix timestamp", Stamp.LogLocalTimestamp);
-            RegisterCommand(cli, "aggregate", "Aggregate objects", "Array of objects", Json.LogAggregated);
+            Command.RegisterCommands(cli, Commands, Logger);
             try
             {
                 return cli.Execute(arguments);
