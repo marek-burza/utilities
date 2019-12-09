@@ -64,6 +64,9 @@ namespace Explorer
             {
                 "codec", new Command("codec", "Apply binary codec", "Configuration", Codec.LogCodec)
             },
+            {
+                "web", new Command("web", "Launch web", null, WebStartup.LaunchWeb)
+            },
         };
 
         /// <summary>

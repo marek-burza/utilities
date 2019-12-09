@@ -2,11 +2,11 @@
 
 To create this project I ran:
 
-    docker run -it -v $PWD:/project -w /project mcr.microsoft.com/dotnet/core/sdk:3.0 dotnet new console
+    docker run -it -v $PWD:/project -w /project mcr.microsoft.com/dotnet/core/sdk:3.1 dotnet new console
 
 To add NuGet package:
 
-    docker run -it -v $PWD:/project -w /project mcr.microsoft.com/dotnet/core/sdk:3.0 dotnet add package $PACKAGE
+    docker run -it -v $PWD:/project -w /project mcr.microsoft.com/dotnet/core/sdk:3.1 dotnet add package $PACKAGE
 
 To build the container:
 
