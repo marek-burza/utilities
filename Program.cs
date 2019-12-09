@@ -23,7 +23,7 @@ namespace Explorer
         private static readonly IDictionary<string, Command> Commands = new Dictionary<string, Command>
         {
             {
-                "hex", new Command("hex", "Convert text to hexadecimal", "Text to convert", ConvertToHex)
+                "hex", new Command("hex", "Convert text to hexadecimal", "Text to convert", Codec.ConvertToHex)
             },
             {
                 "file", new Command("file", "Log lines from file", "File to log", LogLinesFromFile)
@@ -60,6 +60,9 @@ namespace Explorer
             },
             {
                 "aggregate", new Command("aggregate", "Aggregate objects", "Array of objects", Json.LogAggregated)
+            },
+            {
+                "codec", new Command("codec", "Apply binary codec", "Configuration", Codec.LogCodec)
             },
         };
 
@@ -116,13 +119,6 @@ namespace Explorer
                 });
             });
         }
-
-        private static void ConvertToHex(string text, ILogger logger)
-        {
-            logger.LogInformation(Hex(Encoding.UTF8.GetBytes(text)));
-        }
-
-        private static string Hex(Span<byte> octets) => BitConverter.ToString(octets.ToArray()).Replace("-", string.Empty);
 
         private static void LogLinesFromFile(string path, ILogger logger)
         {
