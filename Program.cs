@@ -67,6 +67,9 @@ namespace Explorer
             {
                 "web", new Command("web", "Launch web", null, WebStartup.LaunchWeb)
             },
+            {
+                "minmax", new Command("minmax", "Find min and max", "Array of floating point values", Json.LogMinMax)
+            },
         };
 
         /// <summary>
