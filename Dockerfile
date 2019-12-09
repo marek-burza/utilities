@@ -9,6 +9,8 @@ RUN dotnet publish -c release -o published -r linux-x64
 
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim
 
+RUN apt-get -yq update && DEBIAN_FRONTEND=noninteractive apt-get -yq install libgdiplus
+
 WORKDIR /app
 COPY --from=CoreNetBuilder /app/published .
 
