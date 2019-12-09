@@ -77,6 +77,21 @@ namespace Explorer
             logger.LogInformation($"MIN: {min}; MAX: {max};");
         }
 
+        /// <summary>
+        /// Logs keys.
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogKeys(string argument, ILogger logger)
+        {
+            JObject dictionary = JObject.Parse(argument);
+            ISet<string> keys = dictionary.Properties().Select(property => property.Name).ToHashSet();
+            foreach (string key in keys)
+            {
+                logger.LogInformation(key);
+            }
+        }
+
         private static T[,] ListToArray<T>(IList<T[]> arrays)
         {
             int count = arrays.Max(array => array.Count());

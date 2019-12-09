@@ -70,6 +70,9 @@ namespace Explorer
             {
                 "minmax", new Command("minmax", "Find min and max", "Array of floating point values", Json.LogMinMax)
             },
+            {
+                "keys", new Command("keys", "Collect keys", "Dictionary", Json.LogKeys)
+            },
         };
 
         /// <summary>
