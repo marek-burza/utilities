@@ -64,6 +64,19 @@ namespace Explorer
             logger.LogInformation(JsonConvert.SerializeObject(aggregated));
         }
 
+        /// <summary>
+        /// Logs min and max of an array.
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogMinMax(string argument, ILogger logger)
+        {
+            double[] array = JArray.Parse(argument).ToObject<List<double>>().ToArray();
+            double min = array.Cast<double>().Min();
+            double max = array.Cast<double>().Max();
+            logger.LogInformation($"MIN: {min}; MAX: {max};");
+        }
+
         private static T[,] ListToArray<T>(IList<T[]> arrays)
         {
             int count = arrays.Max(array => array.Count());
