@@ -17,7 +17,7 @@ jobs:
           wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
           sudo dpkg -i packages-microsoft-prod.deb
           sudo apt-get -yq update
-          sudo apt-get -yq install dotnet-sdk-3.0
+          sudo apt-get -yq install dotnet-sdk-3.1
       - name: Building
         env:
           DOTNET_CLI_TELEMETRY_OPTOUT: 1
