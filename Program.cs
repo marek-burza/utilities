@@ -73,6 +73,9 @@ namespace Explorer
             {
                 "keys", new Command("keys", "Collect keys", "Dictionary", Json.LogKeys)
             },
+            {
+                "range", new Command("range", "Create range of integers", "Begin and end of integer range", Json.LogRange)
+            },
         };
 
         /// <summary>
