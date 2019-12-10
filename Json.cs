@@ -92,6 +92,24 @@ namespace Explorer
             }
         }
 
+        /// <summary>
+        /// Logs range of values.
+        /// </summary>
+        /// <param name="argument">Command argument.</param>
+        /// <param name="logger">Logger.</param>
+        public static void LogRange(string argument, ILogger logger)
+        {
+            JObject dictionary = JObject.Parse(argument);
+            JToken begin, end;
+            dictionary.TryGetValue("begin", out begin);
+            dictionary.TryGetValue("end", out end);
+            List<int> range = Enumerable.Range((int)begin, (int)end).ToList().ConvertAll(value => (int)value);
+            foreach (int value in range)
+            {
+                logger.LogInformation($"{value}");
+            }
+        }
+
         private static T[,] ListToArray<T>(IList<T[]> arrays)
         {
             int count = arrays.Max(array => array.Count());
