@@ -5,4 +5,7 @@ set -e
 SELF=$0
 BASE=$(dirname "$0")
 
-find $(realpath .) -name "Dockerfile" -exec /bin/sh $BASE/lint.one.sh {} \;
+for ENTRY in $(find . -name "Dockerfile")
+do
+  /bin/sh $BASE/lint.one.sh $ENTRY
+done
