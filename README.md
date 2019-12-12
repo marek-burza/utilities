@@ -105,6 +105,13 @@ This script creates a heatmap plot.
     docker run --rm -it -v $PWD:/data altermarkive/plot-heatmap '{"input_file": "correlation.csv", "output_file": "figure.png", "cmap_name": "RdBu_r", "title": "Feature Correlation"}'
 
 
+## altermarkive/plot-pairplot-sampled
+
+This script creates a sampled pair plot.
+
+    docker run --rm -it -v $PWD:/data altermarkive/plot-pairplot-sampled '{"input_file": "/data/data.csv", "output_file": "/data/figure.png", "n": 1000, "class_column": "target", "feature_columns": "^feature"}'
+
+
 ## altermarkive/plot-scatterplot
 
 This script creates a scatter plot for given columns.
