@@ -7,6 +7,13 @@
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
+* Check if the script was called with root privileges
+
+    if [ "$(id -u)" != "0" ]; then
+      echo "This must be run as root!"
+      exit 1
+    fi
+
 
 # Photos & Videos
 
