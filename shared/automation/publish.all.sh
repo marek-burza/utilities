@@ -7,4 +7,9 @@ BASE=$(dirname "$0")
 
 echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
 
-find $(realpath .) -name "Dockerfile" -exec /bin/sh $BASE/publish.one.sh {} \;
+for ENTRY in $(find . -name "Dockerfile")
+do
+  /bin/sh $BASE/publish.one.sh $ENTRY
+done
+
+docker logout
