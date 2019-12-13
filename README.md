@@ -15,3 +15,7 @@ To build the container:
 To run the container:
 
     docker run --rm -it explorer
+
+To build the application in a container:
+
+    docker run --rm -it -v $PWD:/project -w /project mcr.microsoft.com/dotnet/core/sdk:3.1 /bin/sh -c "dotnet restore ./Explorer.csproj && dotnet publish -c release -o published -r win10-x64"
