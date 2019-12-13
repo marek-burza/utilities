@@ -120,8 +120,16 @@ A command to set the default printer on Windows
     git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
 
 
-# Wireshark
+# Network Troubleshooting
+
+## Wireshark
 
 To filter for UDP, a particular MAC and broadcast use this filter:
 
     udp && (eth.addr == 00:11:22:33:44:55 || eth.addr == FF:FF:FF:FF:FF:FF)
+
+For more see [this link](https://wiki.wireshark.org/DisplayFilters).
+
+## ncat
+
+Here is the [link to ncat man page](http://man7.org/linux/man-pages/man1/ncat.1.html).
