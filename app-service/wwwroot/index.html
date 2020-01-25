@@ -34,7 +34,7 @@
     var swagger = null;
     try {
       new SwaggerClient({
-        url: location.origin + "/swagger-original.json"
+        url: location.origin + "/swagger.json"
       }).then(handle => {swagger = handle;});
     } catch (exception) {
       (console.error || console.log).call(console, exception.stack || exception);
@@ -44,6 +44,19 @@
       console.log(swagger);
       swagger.apis.default.generate().then(function(result){alert(result.body.value);});
     }
+
+    // function authRefresh(){
+    //   fetch('/.auth/refresh', {
+    //     method: 'get'
+    //   }).then(() => { console.log('Auth refresh!'); });
+    // }
+
+    function authLogout(){
+      window.location.href = '/.auth/logout';
+    }
+
+    setTimeout(authLogout, 8 * 3600000);
+
   </script>
 </body>
 </html>

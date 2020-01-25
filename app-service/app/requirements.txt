@@ -1,0 +1,7 @@
+azure-functions
+azure-functions-worker
+grpcio==1.27.2
+grpcio-tools==1.27.2
+protobuf==3.11.3
+six==1.14.0
+numpy==1.18.2

@@ -1,32 +1,18 @@
 {
     "$schema": "http://json.schemastore.org/proxies",
     "proxies": {
-        "index.html": {
+$ENTRIES
+        "proxyroot": {
             "matchCondition": {
-                "route": "index.html",
+                "route": "/",
                 "methods": [
                     "GET"
                 ]
             },
-            "backendUri": "https://$STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/index.html"
-        },
-        "swagger.json": {
-            "matchCondition": {
-                "route": "swagger-original.json",
-                "methods": [
-                    "GET"
-                ]
-            },
-            "backendUri": "https://$STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/swagger-original.json"
-        },
-        "swagger-client.js": {
-            "matchCondition": {
-                "route": "swagger-client.js",
-                "methods": [
-                    "GET"
-                ]
-            },
-            "backendUri": "https://$STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/swagger-client.js"
+            "responseOverrides": {
+                "response.statusCode": "302",
+                "response.headers.Location": "https://$APP.azurewebsites.net/index.html"
+            }
         }
     }
 }

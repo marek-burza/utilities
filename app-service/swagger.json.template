@@ -5,13 +5,13 @@
     "version": "1.0.0",
     "title": "random"
   },
-  "basePath": "/random",
+  "basePath": "/api",
   "host": "$APP.azurewebsites.net",
   "schemes": [
     "https"
   ],
   "paths": {
-    "/v1/generate": {
+    "/generate": {
       "get": {
         "summary": "Generate random value",
         "description": "This endpoint allows to generate a random value",

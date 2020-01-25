@@ -1,0 +1,10 @@
+
+        "$FILE": {
+            "matchCondition": {
+                "route": "$FILE",
+                "methods": [
+                    "GET"
+                ]
+            },
+            "backendUri": "$URL"
+        },
