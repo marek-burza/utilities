@@ -100,6 +100,8 @@ if [ "$AAD_ID" = "" ]; then
     PASSWORD=$(openssl rand -base64 32)
     az ad app create --display-name $AD_NAME --password $PASSWORD --end-date $(date --date='10 years' +"%Y-%m-%d") --native-app false --homepage https://$APP.azurewebsites.net --identifier-uris https://$APP.azurewebsites.net --reply-urls https://$APP.azurewebsites.net/.auth/login/aad/callback --required-resource-accesses @manifest.sign_in_and_read_user_profile.json
 fi
+# Proxy slash decoding
+az functionapp config appsettings set --resource-group $RESOURCE_GROUP --name $APP --settings AZURE_FUNCTION_PROXY_BACKEND_URL_DECODE_SLASHES=true
 # Add auth to the function app
 PASSWORD=$(openssl rand -base64 32)
 AAD_ID=$(az ad app list --query "[?displayName == '$AD_NAME'].appId" --all --output tsv)
@@ -127,6 +129,8 @@ if [ "$VOLUME_RESULT" = "false" ]; then
     STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
     az webapp config storage-account add --resource-group $RESOURCE_GROUP --name $APP --custom-id $VOLUME_NAME --storage-type AzureFiles --account-name $STORAGE_ACCOUNT --share-name $FILES_SHARE_NAME --access-key "$STORAGE_KEY" --mount-path "/data"
 fi
+# Set an example environment variable
+az functionapp config appsettings set --name $APP --resource-group $RESOURCE_GROUP --settings ENVIRONMENT_VARIABLE=VALUE
 # Clean-up
 rm $BASE/app/proxies.json 2> /dev/null || true
 rm $BASE/wwwroot/swagger.json 2> /dev/null || true
