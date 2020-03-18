@@ -9,11 +9,6 @@ export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 echo "--- Updating the system ---"
 apt-get -yq update
 
-echo "--- Installing Node.js ---"
-curl -sL https://deb.nodesource.com/setup_12.x | bash -
-apt-get -yq update
-apt-get -yq install nodejs
-
 echo "--- Installing utilities ---"
 apt-get -yq install apt-transport-https ca-certificates software-properties-common command-not-found curl zip nano mc imagemagick ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev libopenblas-dev libblas-dev libatlas-base-dev jq gettext nmap
 sed -i '/PDF/d' /etc/ImageMagick-6/policy.xml
@@ -21,6 +16,11 @@ if [ "$#" -eq 1 ]; then
     apt-get -yq install ntpdate
     ntpdate 0.pool.ntp.org
 fi
+
+echo "--- Installing Node.js ---"
+curl -sL https://deb.nodesource.com/setup_12.x | bash -
+apt-get -yq update
+apt-get -yq install nodejs
 
 echo "--- Installing Docker ---"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
