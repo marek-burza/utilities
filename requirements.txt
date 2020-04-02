@@ -6,7 +6,7 @@ flake8==3.7.9
 matplotlib==3.1.1
 numpy==1.17.4
 pandas==0.25.3
-Pillow==6.2.1
+Pillow==7.1.0
 pycodestyle==2.5.0
 pylint==2.4.4
 scikit-learn==0.21.3
