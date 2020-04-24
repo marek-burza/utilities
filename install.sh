@@ -17,11 +17,6 @@ if [ "$#" -eq 1 ]; then
     ntpdate 0.pool.ntp.org
 fi
 
-echo "--- Installing Node.js ---"
-curl -sL https://deb.nodesource.com/setup_12.x | bash -
-apt-get -yq update
-apt-get -yq install nodejs
-
 echo "--- Installing Docker ---"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker-ce.list
@@ -37,13 +32,6 @@ echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $CODENAME
 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 apt-get -yq update
 apt-get -yq install azure-cli
-
-echo "--- Installing Azure Functions Core Tools ---"
-curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
-apt-get -yq update
-apt-get -yq install azure-functions-core-tools
 
 echo "--- Installing Python modules ---"
 DIRECTORY=$(dirname $0)
