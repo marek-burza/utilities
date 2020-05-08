@@ -30,6 +30,8 @@ After running the create script the app will be available at:
 * [Falco: Cloud-Native Runtime Security Threat Detection](https://falco.org/)
 * [Audit your Kubernetes clusters against common security controls: kubeaudit](https://github.com/Shopify/kubeaudit)
 * [Check whether Kubernetes is deployed according to security best practices as defined in the CIS Kubernetes Benchmark: kube-bench](https://github.com/aquasecurity/kube-bench)
+* [DZone Security: Implementing Aqua Security to Secure Kubernetes](https://dzone.com/articles/implementing-aqua-security-to-secure-kubernetes)
+* [Advanced Persistence Threats: The Future of Kubernetes Attacks (RSA Conference)](https://www.youtube.com/watch?v=CH7S5rE3j8w)
 
 ## Docker & Security Automation
 
@@ -45,3 +47,4 @@ After running the create script the app will be available at:
 * [SonarQube](https://www.sonarqube.org/)
 * [find-sec-bugs](https://find-sec-bugs.github.io/)
 * [Open Policy Agent - Declarative Policies](https://www.openpolicyagent.org/)
+* [Using Valgrind To Track Down Known And Unknown Bugs In Your Code (Hackaday)](https://hackaday.com/2020/04/29/using-valgrind-to-track-down-known-and-unknown-bugs-in-your-code/)
