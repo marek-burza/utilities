@@ -17,16 +17,6 @@ if [ "$#" -eq 1 ]; then
     ntpdate 0.pool.ntp.org
 fi
 
-echo "--- Installing Docker ---"
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker-ce.list
-apt-get -yq update
-apt-get -yq install docker-ce docker-ce-cli containerd.io
-if [ "$#" -eq 1 ]; then
-    groupadd docker 2> /dev/null || true
-    /bin/sh -c "usermod -aG docker $1"
-fi
-
 echo "--- Installing Azure CLI ---"
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $CODENAME main" | tee /etc/apt/sources.list.d/azure-cli.list
 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
