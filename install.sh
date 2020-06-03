@@ -10,7 +10,7 @@ echo "--- Updating the system ---"
 apt-get -yq update
 
 echo "--- Installing utilities ---"
-apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip nano mc imagemagick ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev libopenblas-dev libblas-dev libatlas-base-dev jq gettext nmap
+apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip nano mc imagemagick ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk golang-go build-essential git libfreetype6-dev libpng-dev libopenblas-dev libblas-dev libatlas-base-dev jq gettext nmap
 sed -i '/PDF/d' /etc/ImageMagick-6/policy.xml
 if [ "$#" -eq 1 ]; then
     apt-get -yq install ntpdate
@@ -36,6 +36,9 @@ apt-get -yq install azure-cli
 echo "--- Installing Python modules ---"
 DIRECTORY=$(dirname $0)
 pip3 install --no-cache-dir -r $DIRECTORY/requirements.txt
+
+echo "--- Installing Go packages ---"
+go get -u golang.org/x/lint/golint
 
 echo "--- Installing date/time enforcement ---"
 
