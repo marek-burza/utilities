@@ -120,6 +120,11 @@ A command to set the default printer on Windows
     git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
 
 
+## Print all files ever committed
+
+    git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-tree --no-commit-id --name-only -r | sort | uniq
+
+
 # Network Troubleshooting
 
 ## Wireshark
