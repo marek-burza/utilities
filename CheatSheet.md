@@ -138,3 +138,7 @@ For more see [this link](https://wiki.wireshark.org/DisplayFilters).
 ## ncat
 
 Here is the [link to ncat man page](http://man7.org/linux/man-pages/man1/ncat.1.html).
+
+Send text "test" in a UDP packet over IPv4 with a connection time of 1 second from port 5000 to a broadcast address 172.17.255.255 and port 10000:
+
+    echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
