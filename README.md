@@ -2,7 +2,7 @@
 
 * [Installing Azure IoT Edge on Raspbian with Ansible](install-iot-edge-on-raspbian-with-ansible)
 * [Uploading to Azure Blob Storage](blob-upload)
-* [Password-protected, managed App Service (Python) with Swagger API and static frontend served from Azure Blob Storage](app-service)
+* [Password-protected, App Service (Python, Flask & Docker) with Swagger API and static frontend served by Nginx](app-service)
 * [Azure IoT Edge module & service boilerplate example](iot-edge-module)
 * [Container Registry creation script](container-registry-creation)
 * [Multicontainer App Service with Volume](multicontainer-app-service-with-volume)

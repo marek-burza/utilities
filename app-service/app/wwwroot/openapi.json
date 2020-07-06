@@ -1,24 +1,17 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "description": "Random API",
     "version": "1.0.0",
-    "title": "random"
+    "title": "Random API"
   },
-  "basePath": "/api",
-  "host": "$APP.azurewebsites.net",
-  "schemes": [
-    "https"
-  ],
+  "servers": [{"url": "/api"}],
   "paths": {
     "/generate": {
       "get": {
         "summary": "Generate random value",
         "description": "This endpoint allows to generate a random value",
         "operationId": "generate",
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "Success",
