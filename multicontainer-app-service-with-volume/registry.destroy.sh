@@ -16,5 +16,5 @@ export CONTAINER_REGISTRY=${PREFIX}cr
 # Destroy container registry
 CONTAINER_REGISTRY_EXISTS=$(az acr list --resource-group $RESOURCE_GROUP --query "contains([].name, '$CONTAINER_REGISTRY')")
 if [ "$CONTAINER_REGISTRY_EXISTS" = "true" ]; then
-  az acr delete --resource-group $RESOURCE_GROUP --name $CONTAINER_REGISTRY
+  az acr delete --resource-group $RESOURCE_GROUP --name $CONTAINER_REGISTRY -y
 fi
