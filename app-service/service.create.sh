@@ -18,6 +18,9 @@ export STORAGE_ACCOUNT=${PREFIX}storageaccount
 export CONTAINER_NAME=${PREFIX}container
 export FILES_SHARE_NAME=${PREFIX}share
 export VOLUME_NAME=${PREFIX}volume
+export CONTAINER_REGISTRY=${PREFIX}registry
+export CONTAINER_IMAGE_TAG=$(git rev-parse --short HEAD)
+export CONTAINER_IMAGE=${CONTAINER_REGISTRY}.azurecr.io/service:$CONTAINER_IMAGE_TAG
 export CONSUMPTION_PLAN=${PREFIX}consumptionplan
 export APP=${PREFIX}app
 export AD_NAME=${PREFIX}ad
@@ -43,25 +46,6 @@ if [ "$STORAGE_ACCOUNT_RESULT" = "true" ]; then
     az storage account create --name $STORAGE_ACCOUNT --location $LOCATION --resource-group $RESOURCE_GROUP --sku Standard_LRS
 fi
 STORAGE_ACCOUNT_CONNECTION_STRING=$(az storage account show-connection-string --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT -o tsv)
-# Create the static content container and upload content
-CONTAINER_RESULT=$(az storage container list --account-name $STORAGE_ACCOUNT --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING --query "contains([].name, '$CONTAINER_NAME')")
-if [ "$CONTAINER_RESULT" = "false" ]; then
-    az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --public-access off --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING
-fi
-envsubst '$APP' < $BASE/swagger.json.template > $BASE/wwwroot/swagger.json
-curl -L https://unpkg.com/swagger-client@3.8.25/browser/index.js -o $BASE/wwwroot/swagger-client.js
-export ENTRIES
-EXPIRY=$(date --date='10 years' '+%Y-%m-%dT%H:%MZ')
-cd $BASE/wwwroot/
-for FILE in $(find . -type f | cut -c 3-)
-do
-    export FILE
-    az storage blob upload --file $FILE --container-name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --name $FILE --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING
-    export URL=https://$STORAGE_ACCOUNT.blob.core.windows.net/$CONTAINER_NAME/$FILE?$(az storage blob generate-sas --container-name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --name $FILE --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING --permissions r --expiry $EXPIRY --https-only --output tsv)
-    ENTRY=$(envsubst '\$FILE\$URL' < $BASE/proxies-entry.json.template)
-    ENTRIES=$ENTRIES$ENTRY
-done
-cd -
 # Create the files volume and upload content
 FILES_SHARE_RESULT=$(az storage share list --account-name $STORAGE_ACCOUNT --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING --query "contains([].name, '$FILES_SHARE_NAME')")
 if [ "$FILES_SHARE_RESULT" = "false" ]; then
@@ -69,6 +53,18 @@ if [ "$FILES_SHARE_RESULT" = "false" ]; then
 fi
 date > $BASE/date.txt
 az storage file upload --source $BASE/date.txt --share-name $FILES_SHARE_NAME --account-name $STORAGE_ACCOUNT --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING
+# Create container registry
+CONTAINER_REGISTRY_RESULT=$(az acr list --resource-group $RESOURCE_GROUP --query "contains([].name, '$CONTAINER_REGISTRY')")
+if [ "$CONTAINER_REGISTRY_RESULT" = "false" ]; then
+    az acr create --resource-group $RESOURCE_GROUP --location $LOCATION --name $CONTAINER_REGISTRY --sku Basic --admin-enabled true
+fi
+# Build and upload container image
+az acr login --name $CONTAINER_REGISTRY
+docker build -t service .
+docker tag service $CONTAINER_IMAGE
+docker push $CONTAINER_IMAGE
+docker rmi service
+docker rmi $CONTAINER_IMAGE
 # Create the consumption plan
 CONSUMPTION_PLAN_RESULT=$(az functionapp plan list --query "contains([].name, '$CONSUMPTION_PLAN')")
 if [ "$CONSUMPTION_PLAN_RESULT" = "false" ]; then
@@ -77,31 +73,16 @@ fi
 # Create the function app
 APP_RESULT=$(az functionapp list --resource-group $RESOURCE_GROUP --query "contains([].name,'$APP')")
 if [ "$APP_RESULT" = "false" ]; then
-    az functionapp create --name $APP --plan $CONSUMPTION_PLAN --resource-group $RESOURCE_GROUP --storage-account $STORAGE_ACCOUNT --os-type Linux --runtime python --runtime-version 3.7 --functions-version 2
+    PASSWORD=$(az acr credential show --name $CONTAINER_REGISTRY --query "passwords[0].value" --output tsv)
+    az webapp create --name $APP --plan $CONSUMPTION_PLAN --resource-group $RESOURCE_GROUP --docker-registry-server-user $CONTAINER_REGISTRY --docker-registry-server-password "$PASSWORD" --deployment-container-image-name $CONTAINER_IMAGE
 fi
-rm -rf $BASE/app/.python_packages 2> /dev/null || true
-rm -rf $BASE/app/azure-functions-core-tools 2> /dev/null || true
-while [ $(az functionapp list --query "contains([?state=='Running'].name, '$APP')") = "false" ]; do
-    echo "Waiting..."
-    sleep 5
-done
-envsubst '$ENTRIES$APP' < $BASE/proxies.json.template > $BASE/app/proxies.json
-cat $BASE/app/proxies.json
-cd $BASE/app
-until func azure functionapp publish $APP --python
-do
-    echo "Waiting..."
-    sleep 5
-done
-cd -
+az webapp config container set --name $APP --resource-group $RESOURCE_GROUP --docker-registry-server-user $CONTAINER_REGISTRY --docker-registry-server-password "$PASSWORD" --docker-custom-image-name $CONTAINER_IMAGE
 # Create the AD client
 AAD_ID=$(az ad app list --query "[?displayName == '$AD_NAME'].appId" --all --output tsv)
 if [ "$AAD_ID" = "" ]; then
     PASSWORD=$(openssl rand -base64 32)
     az ad app create --display-name $AD_NAME --password $PASSWORD --end-date $(date --date='10 years' +"%Y-%m-%d") --native-app false --homepage https://$APP.azurewebsites.net --identifier-uris https://$APP.azurewebsites.net --reply-urls https://$APP.azurewebsites.net/.auth/login/aad/callback --required-resource-accesses @manifest.sign_in_and_read_user_profile.json
 fi
-# Proxy slash decoding
-az functionapp config appsettings set --resource-group $RESOURCE_GROUP --name $APP --settings AZURE_FUNCTION_PROXY_BACKEND_URL_DECODE_SLASHES=true
 # Add auth to the function app
 PASSWORD=$(openssl rand -base64 32)
 AAD_ID=$(az ad app list --query "[?displayName == '$AD_NAME'].appId" --all --output tsv)
@@ -129,12 +110,5 @@ if [ "$VOLUME_RESULT" = "false" ]; then
     STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
     az webapp config storage-account add --resource-group $RESOURCE_GROUP --name $APP --custom-id $VOLUME_NAME --storage-type AzureFiles --account-name $STORAGE_ACCOUNT --share-name $FILES_SHARE_NAME --access-key "$STORAGE_KEY" --mount-path "/data"
 fi
-# Set an example environment variable
-az functionapp config appsettings set --name $APP --resource-group $RESOURCE_GROUP --settings ENVIRONMENT_VARIABLE=VALUE
 # Clean-up
-rm $BASE/app/proxies.json 2> /dev/null || true
-rm $BASE/wwwroot/swagger.json 2> /dev/null || true
-rm $BASE/wwwroot/swagger-client.js 2> /dev/null || true
 rm $BASE/date.txt 2> /dev/null || true
-rm -rf $BASE/app/.python_packages 2> /dev/null || true
-rm -rf $BASE/app/azure-functions-core-tools 2> /dev/null || true
