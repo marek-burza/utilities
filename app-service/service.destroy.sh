@@ -42,7 +42,7 @@ AAD_ID=$(az ad app list --query "[?displayName == '$AD_NAME'].appId" --all --out
 if [ "$AAD_ID" != "" ]; then
     az ad app delete --id $(az ad app list --query "[?displayName == '$AD_NAME'].appId" --all --output tsv)
 fi
-# Destroy container registry
+# Destroy the container registry
 CONTAINER_REGISTRY_RESULT=$(az acr list --resource-group $RESOURCE_GROUP --query "contains([].name, '$CONTAINER_REGISTRY')")
 if [ "$CONTAINER_REGISTRY_RESULT" = "true" ]; then
     az acr delete --resource-group $RESOURCE_GROUP --name $CONTAINER_REGISTRY -y

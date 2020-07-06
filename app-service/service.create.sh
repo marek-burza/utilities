@@ -53,7 +53,7 @@ if [ "$FILES_SHARE_RESULT" = "false" ]; then
 fi
 date > $BASE/date.txt
 az storage file upload --source $BASE/date.txt --share-name $FILES_SHARE_NAME --account-name $STORAGE_ACCOUNT --connection-string $STORAGE_ACCOUNT_CONNECTION_STRING
-# Create container registry
+# Create the container registry
 CONTAINER_REGISTRY_RESULT=$(az acr list --resource-group $RESOURCE_GROUP --query "contains([].name, '$CONTAINER_REGISTRY')")
 if [ "$CONTAINER_REGISTRY_RESULT" = "false" ]; then
     az acr create --resource-group $RESOURCE_GROUP --location $LOCATION --name $CONTAINER_REGISTRY --sku Basic --admin-enabled true
@@ -71,9 +71,9 @@ if [ "$CONSUMPTION_PLAN_RESULT" = "false" ]; then
     az functionapp plan create --resource-group $RESOURCE_GROUP --name $CONSUMPTION_PLAN --sku B1 --is-linux true
 fi
 # Create the function app
-APP_RESULT=$(az functionapp list --resource-group $RESOURCE_GROUP --query "contains([].name,'$APP')")
+PASSWORD=$(az acr credential show --name $CONTAINER_REGISTRY --query "passwords[0].value" --output tsv)
+APP_RESULT=$(az webapp list --resource-group $RESOURCE_GROUP --query "contains([].name,'$APP')")
 if [ "$APP_RESULT" = "false" ]; then
-    PASSWORD=$(az acr credential show --name $CONTAINER_REGISTRY --query "passwords[0].value" --output tsv)
     az webapp create --name $APP --plan $CONSUMPTION_PLAN --resource-group $RESOURCE_GROUP --docker-registry-server-user $CONTAINER_REGISTRY --docker-registry-server-password "$PASSWORD" --deployment-container-image-name $CONTAINER_IMAGE
 fi
 az webapp config container set --name $APP --resource-group $RESOURCE_GROUP --docker-registry-server-user $CONTAINER_REGISTRY --docker-registry-server-password "$PASSWORD" --docker-custom-image-name $CONTAINER_IMAGE
