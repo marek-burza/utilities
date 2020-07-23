@@ -1,4 +1,4 @@
-FROM ubuntu:bionic-20190718
+FROM ubuntu:bionic-20200630
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive && \
