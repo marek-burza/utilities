@@ -1,5 +1,7 @@
 # Keyboard Shortcuts
 
+| Shortcut           | Function                                                         |
+| ------------------ | ---------------------------------------------------------------- |
 | Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
 | Win + B            | Windows: Go to System Tray                                       |
 | Shift + F10        | Windows: Right-click in System Tray                              |
