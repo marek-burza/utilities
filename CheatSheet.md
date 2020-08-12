@@ -1,3 +1,12 @@
+# Keyboard Shortcuts
+
+| Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
+| Win + B            | Windows: Go to System Tray                                       |
+| Shift + F10        | Windows: Right-click in System Tray                              |
+| Ctrl + Shift + E   | Visual Studio Code: Navigate between editor and file tree panels |
+| Ctrl + L           | Firefox: Go to address bar                                       |
+
+
 # Chrome
 
 * To enable password import got to `chrome://flags/`
