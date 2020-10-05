@@ -1,0 +1,39 @@
+openapi: "3.0.0"
+info:
+  title: API
+  version: api
+servers:
+  - url: /api
+paths:
+  /lottery:
+    post:
+      summary: Lottery
+      operationId: api.lottery
+      requestBody:
+        description: Lottery request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LotteryRequest"
+      responses:
+        default:
+          description: Lottery reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LotteryReply"
+components:
+  schemas:
+    LotteryRequest:
+      type: object
+      properties:
+        parameter:
+          type: string
+    LotteryReply:
+      type: object
+      required:
+        - random
+      properties:
+        random:
+          type: number
