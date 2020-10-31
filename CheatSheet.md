@@ -162,3 +162,8 @@ Send text "test" in a UDP packet over IPv4 with a connection time of 1 second fr
 # Science
 
 * [SciHub](https://sci-hub.se/)
+
+
+# Cloud
+
+* [Google Cloud Shell](https://shell.cloud.google.com/)
