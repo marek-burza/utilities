@@ -2,6 +2,6 @@
 
 ## Workspace
 
-Workspace for Python 3, Docker, AWS, ML, etc.:
+Workspace for Python 3, Azure, AWS, format conversions, etc.:
 
-    docker run --rm --name workspace -it -v $HOME/.ssh:/root/.ssh -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:/shared -w /shared -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro --user=$(id -u) ghcr.io/altermarkive/workspace
+    docker run --rm --name workspace -it -v $HOME/.ssh:/root/.ssh -v $PWD:/shared -w /shared -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro --user=$(id -u) ghcr.io/altermarkive/workspace
