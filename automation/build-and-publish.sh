@@ -3,7 +3,7 @@
 set -e
 
 SELF=$0
-BASE=$(dirname "$0")
+BASE=$(realpath $(dirname "$0"))
 
 for ENTRY in $(find . -name "Dockerfile")
 do
@@ -15,5 +15,5 @@ do
   docker build -t $NAME .
   docker tag $NAME $IMAGE
   docker push $IMAGE
-  cd $BASE
+  cd $BASE/..
 done
