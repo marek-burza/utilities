@@ -12,6 +12,8 @@ jobs:
       - name: Initiating
         uses: actions/checkout@v1
       - name: Building & Publishing
+        env:
+          DOCKER_REGISTRY_TOKEN: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
         run: |
-          echo ${{ secrets.DOCKER_REGISTRY_TOKEN }} | docker login ghcr.io --username $GITHUB_ACTOR --password-stdin
+          echo $DOCKER_REGISTRY_TOKEN | docker login --username $GITHUB_ACTOR --password-stdin
           /bin/sh automation/build-and-publish.sh
