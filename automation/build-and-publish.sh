@@ -9,7 +9,8 @@ for ENTRY in $(find . -name "Dockerfile")
 do
   DIRECTORY=$(dirname $ENTRY)
   NAME=$(basename $DIRECTORY)
-  IMAGE=docker.pkg.github.com/$GITHUB_ACTOR/workspace/$NAME:latest
+  IMAGE=ghcr.io/$GITHUB_ACTOR/$NAME:latest
+  echo "Building & Publishing: $IMAGE"
   cd $DIRECTORY
   docker build -t $NAME .
   docker tag $NAME $IMAGE
