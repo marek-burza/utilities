@@ -11,12 +11,7 @@ jobs:
     steps:
       - name: Initiating
         uses: actions/checkout@v1
-      - name: Building
+      - name: Building & Publishing
         run: |
-          docker build -t $DOCKERHUB_USER/workspace .
-      - name: Publishing
-        env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/workspace
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login --username $GITHUB_ACTOR --password-stdin
+          /bin/sh automation/build-and-publish.sh
