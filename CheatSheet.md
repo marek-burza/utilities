@@ -174,3 +174,8 @@ Send text "test" in a UDP packet over IPv4 with a connection time of 1 second fr
 Completely disable sleep on any Mac:
 
     sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep 1;
+
+List partition and format a USB stick:
+
+    diskutil list disk2
+    diskutil partitionDisk disk2 1 MBR MS-DOS STICK R
