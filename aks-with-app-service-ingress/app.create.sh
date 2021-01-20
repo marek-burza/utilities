@@ -41,6 +41,7 @@ if ! command -v kubectl > /dev/null; then
     echo "Install kubectl"
     exit 1
 fi
+sudo /usr/bin/pip3 install --system decorator
 
 # Create the consumption plan
 CONSUMPTION_PLAN_RESULT=$(az functionapp plan list --query "contains([].name, '$CONSUMPTION_PLAN')")

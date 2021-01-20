@@ -28,6 +28,8 @@ if [ "$CLUSTER_PRINCIPAL_RESULT" = "false" ]; then
     az ad sp create-for-rbac --name http://$CLUSTER_PRINCIPAL --skip-assignment
 fi
 # Create the cluster
+mv $HOME/.azure/aksServicePrincipal.json $HOME/.azure/aksServicePrincipal.json.$(date +"%Y%m%d%H%M%S") || true  # Related to https://docs.microsoft.com/en-us/azure/aks/kubernetes-service-principal#troubleshoot
+mv $HOME/.kube $HOME/.kube.$(date +"%Y%m%d%H%M%S") || true
 AKS_CLUSTER_RESULT=$(az aks list --resource-group $RESOURCE_GROUP --query "contains([].name, '$AKS_CLUSTER')")
 if [ "$AKS_CLUSTER_RESULT" = "false" ]; then
     PASSWORD=$(openssl rand -base64 32)
@@ -47,5 +49,5 @@ fi
 SECRET_RESULT=$(kubectl get secret -o json | jq -e '.items[].metadata | select(.name == "azure-secret") | .name == "azure-secret"' 2> /dev/null || echo false)
 if [ "$SECRET_RESULT" != "true" ]; then
     STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
-    kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=$STORAGE_ACCOUNT --from-literal=azurestorageaccountkey=$STORAGE_KEY
+    kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=$STORAGE_ACCOUNT --from-literal="azurestorageaccountkey=$STORAGE_KEY"
 fi

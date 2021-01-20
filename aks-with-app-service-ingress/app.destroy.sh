@@ -19,6 +19,8 @@ export CONSUMPTION_PLAN=${PREFIX}plan
 export APP=${PREFIX}app
 export AD_NAME=${PREFIX}ad
 
+sudo /usr/bin/pip3 install --system decorator
+
 # Destroy the app
 APP_RESULT=$(az functionapp list --resource-group $RESOURCE_GROUP --query "contains([].name,'$APP')")
 if [ "$APP_RESULT" = "true" ]; then
