@@ -16,8 +16,8 @@ SELF=$0
 REAL=$(realpath "$SELF")
 BASE=$(dirname "$REAL")
 
-az aks install-cli
-apt-get -yq install jq gettext nmap
+sudo az aks install-cli --install-location /usr/bin/kubectl
+sudo apt-get -yq install jq gettext nmap
 
 /bin/sh $BASE/resourcegroup.create.sh $PREFIX $LOCATION
 
