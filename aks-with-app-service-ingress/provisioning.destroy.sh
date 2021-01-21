@@ -16,11 +16,6 @@ SELF=$0
 REAL=$(realpath "$SELF")
 BASE=$(dirname "$REAL")
 
-if [ -z "${EXAMPLE_VARIABLE}" ]; then
-    echo "Error: EXAMPLE_VARIABLE must be defined"
-    exit 1
-fi
-
 sudo az aks install-cli --install-location /usr/bin/kubectl
 sudo apt-get -yq install jq gettext nmap
 
