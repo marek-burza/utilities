@@ -33,6 +33,12 @@ After running the create script the app will be available at:
 * [DZone Security: Implementing Aqua Security to Secure Kubernetes](https://dzone.com/articles/implementing-aqua-security-to-secure-kubernetes)
 * [Advanced Persistence Threats: The Future of Kubernetes Attacks (RSA Conference)](https://www.youtube.com/watch?v=CH7S5rE3j8w)
 
+## Kubernetes Across Cloud & Edge
+
+* [Scale out your Raspberry-Pi Kubernetes cluster to the cloud](https://blog.nativecloud.dev/scale-out-your-raspberry-pi-k3s-cluster-to-the-cloud/)
+* [Scale out your Raspberry Pi Nomad cluster to the cloud](https://johansiebens.dev/posts/2020/09/scale-out-your-raspberry-pi-nomad-cluster-to-the-cloud/)
+* [Consul Service Mesh across a private Raspberry Pi and a public Cloud](https://johansiebens.dev/posts/2020/09/consul-service-mesh-across-a-private-raspberry-pi-and-a-public-cloud/)
+
 ## Docker & Security Automation
 
 * [AppArmor security profiles for Docker (docker.com)](https://docs.docker.com/engine/security/apparmor/)
