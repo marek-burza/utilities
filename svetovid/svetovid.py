@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import time
+import urllib.parse
 import urllib.request
 
 
@@ -80,7 +81,7 @@ def prepare_parameters():
     Prepare the operational parameters
     """
     instance = os.environ.get('ATLASSIAN_INSTANCE')
-    query = os.environ.get('ATLASSIAN_QUERY')
+    query = urllib.parse.quote(os.environ.get('ATLASSIAN_QUERY'))
     watcher = os.environ.get('ATLASSIAN_WATCHER')
     sleep = int(os.environ.get('SVETOVID_SLEEP'))
     return (instance, query, watcher, sleep)
