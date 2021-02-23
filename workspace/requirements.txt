@@ -1,7 +1,7 @@
-awscli==1.18.188
-bandit==1.6.2
-boto3==1.16.28
+awscli==1.19.13
+bandit==1.7.0
+boto3==1.17.13
 flake8==3.8.4
-Pillow==8.0.1
+Pillow==8.1.0
 pycodestyle==2.6.0
-pylint==2.6.0
+pylint==2.7.0
