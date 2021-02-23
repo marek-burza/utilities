@@ -5,4 +5,4 @@ ADD requirements.txt /tmp/requirements.txt
 
 RUN /bin/sh /tmp/install.sh && rm -rf /tmp/*
 
-CMD ["/bin/bash"]
+CMD ["/bin/bash", "--login"]

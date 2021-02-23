@@ -17,6 +17,12 @@ if [ "$#" -eq 1 ]; then
     ntpdate 0.pool.ntp.org
 fi
 
+echo "--- Installing Go ---"
+curl -sL https://golang.org/dl/go1.16.linux-amd64.tar.gz -o go.tar.gz
+tar -C /usr/local -xzf go.tar.gz
+rm go.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile
+
 echo "--- Installing Docker ---"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker-ce.list
