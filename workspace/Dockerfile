@@ -1,4 +1,4 @@
-FROM ubuntu:focal-20200423
+FROM ubuntu:focal-20210119
 
 ADD install.sh /tmp/install.sh
 ADD requirements.txt /tmp/requirements.txt
