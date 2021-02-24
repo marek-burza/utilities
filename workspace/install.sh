@@ -12,12 +12,6 @@ apt-get -yq update
 echo "--- Installing utilities ---"
 apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev jq gettext nmap netcat-openbsd tcpdump
 
-echo "--- Installing Go ---"
-curl -sL https://golang.org/dl/go1.16.linux-amd64.tar.gz -o go.tar.gz
-tar -C /usr/local -xzf go.tar.gz
-rm go.tar.gz
-echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile
-
 echo "--- Installing Azure CLI ---"
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $CODENAME main" | tee /etc/apt/sources.list.d/azure-cli.list
 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
