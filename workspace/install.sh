@@ -10,8 +10,7 @@ echo "--- Updating the system ---"
 apt-get -yq update
 
 echo "--- Installing utilities ---"
-apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip nano mc imagemagick ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk build-essential git tmux libfreetype6-dev libpng-dev jq gettext nmap netcat-openbsd tcpdump
-sed -i '/PDF/d' /etc/ImageMagick-6/policy.xml
+apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip nano mc ffmpeg poppler-utils libgxps-utils python3 python3-pip python3-dev python3-tk build-essential git tmux libfreetype6-dev libpng-dev jq gettext nmap netcat-openbsd tcpdump
 if [ "$#" -eq 1 ]; then
     apt-get -yq install ntpdate
     ntpdate 0.pool.ntp.org
