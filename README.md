@@ -17,6 +17,20 @@ Can be used to forward a service on a local port to an SSH jump server:
     docker run --restart always -d --network host -v $HOME/.ssh:/ssh:ro altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /ssh/id_rsa -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
 
 
+## cli-azure
+
+Can be used to run Azure CLI in a bash shell like this:
+
+    docker run --rm -it -v $HOME/.azure:/root/.azure -v $PWD:/w -w /w altermarkive/cli-azure
+
+
+## cli-azure
+
+Can be used to run AWS CLI in a bash shell like this:
+
+    docker run --rm -it -v $HOME/.azure:/root/.azure -v $PWD:/w -w /w altermarkive/cli-aws
+
+
 ## ffmpeg
 
 Can be used for AV conversion between formats:
