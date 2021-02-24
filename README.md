@@ -32,6 +32,14 @@ Can be used for conversion between formats:
     docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick -density 600 example.pdf example.png
 
 
+## poppler
+
+Can be used to extract pages from a PDF file and to join PDF files:
+
+    docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
+    docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite poppler example.pdf 1.pdf result.pdf
+
+
 ## svetovid
 
 If you want to automatically become a watcher of Atlassian Jira issues (and are not the owner/administrator) then you can use this service to accomplish this (with suitable email client rules it creates an office experience by revealing what is generally happening without the necessity of acting upon it):
@@ -43,4 +51,4 @@ If you want to automatically become a watcher of Atlassian Jira issues (and are 
 
 Can be used for conversion from XPS to PDF:
 
-    docker run -it -v $PWD:/w -w /w xpstopdf example.xps example.pdf
+    docker run --rm -it -v $PWD:/w -w /w xpstopdf example.xps example.pdf
