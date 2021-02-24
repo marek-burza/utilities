@@ -65,6 +65,13 @@ Can be used to extract pages from a PDF file and to join PDF files:
     docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive/poppler example.pdf 1.pdf result.pdf
 
 
+## python-linters
+
+Can be used for thorough Python linting of the current directory like this:
+
+    docker run -it -v $PWD:/w -w /w --entrypoint /bin/lint.sh altermarkive/python-linters
+
+
 ## retroactive-git
 
 Can be used in the following way:
