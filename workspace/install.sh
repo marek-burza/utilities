@@ -10,7 +10,7 @@ echo "--- Updating the system ---"
 apt-get -yq update
 
 echo "--- Installing utilities ---"
-apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev jq gettext nmap netcat-openbsd tcpdump
+apt-get -yq install apt-transport-https ca-certificates gnupg-agent software-properties-common curl zip python3 python3-pip python3-dev python3-tk build-essential git libfreetype6-dev libpng-dev gettext nmap netcat-openbsd tcpdump
 
 echo "--- Installing Azure CLI ---"
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $CODENAME main" | tee /etc/apt/sources.list.d/azure-cli.list
