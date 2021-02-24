@@ -39,6 +39,24 @@ Contains nmap, netcat & tcpdump available for bash shell:
     docker run --rm -it --network host altermarkive/networking
 
 
+## pillow
+
+Can be used like this:
+
+    docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/local/bin/python altermarkive/pillow example.py
+
+Where the `example.py` could look like this:
+
+```python
+from PIL import Image, ImageDraw
+
+image = Image.new('RGB', (128, 128))
+draw = ImageDraw.Draw(image)
+draw.text((10,10), 'Hello', fill=(255,255,255))
+image.save('example.png')
+```
+
+
 ## poppler
 
 Can be used to extract pages from a PDF file and to join PDF files:
