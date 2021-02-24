@@ -40,6 +40,14 @@ Can be used to extract pages from a PDF file and to join PDF files:
     docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite poppler example.pdf 1.pdf result.pdf
 
 
+## retroactive-git
+
+Can be used in the following way:
+
+    LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='1970-01-01 00:00:00' date
+    LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='+365d' date
+
+
 ## svetovid
 
 If you want to automatically become a watcher of Atlassian Jira issues (and are not the owner/administrator) then you can use this service to accomplish this (with suitable email client rules it creates an office experience by revealing what is generally happening without the necessity of acting upon it):
