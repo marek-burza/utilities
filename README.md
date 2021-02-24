@@ -32,18 +32,26 @@ Can be used for conversion between formats:
     docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick -density 600 example.pdf example.png
 
 
+## networking
+
+Contains nmap, netcat & tcpdump available for bash shell:
+
+    docker run --rm -it --network host altermarkive/networking
+
+
 ## poppler
 
 Can be used to extract pages from a PDF file and to join PDF files:
 
     docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
-    docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite poppler example.pdf 1.pdf result.pdf
+    docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive/poppler example.pdf 1.pdf result.pdf
 
 
 ## retroactive-git
 
 Can be used in the following way:
 
+    docker run --rm -it -v $PWD:/w -w /w altermarkive/retroactive-git
     LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='1970-01-01 00:00:00' date
     LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='+365d' date
 
@@ -59,4 +67,4 @@ If you want to automatically become a watcher of Atlassian Jira issues (and are 
 
 Can be used for conversion from XPS to PDF:
 
-    docker run --rm -it -v $PWD:/w -w /w xpstopdf example.xps example.pdf
+    docker run --rm -it -v $PWD:/w -w /w altermarkive/xpstopdf example.xps example.pdf
