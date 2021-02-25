@@ -6,7 +6,6 @@ and adds the user if not watching.
 """
 
 import base64
-import datetime
 import json
 import logging
 import os
@@ -24,7 +23,7 @@ def init_logging():
     return logging.getLogger('svetovid')
 
 
-def http(url, method, headers, data=None):
+def http(logger, url, method, headers, data=None):
     """
     Fetches the given URL (with reply caching & optional authorization)
     """
@@ -33,13 +32,15 @@ def http(url, method, headers, data=None):
         if headers is None:
             request = urllib.request.Request(url, method=method, data=data)
         else:
-            request = urllib.request.Request(url, method=method, data=data, headers=headers)
+            request = urllib.request.Request(
+                url, method=method, data=data, headers=headers)
         try:
-            reply = urllib.request.urlopen(request)
+            reply = urllib.request.urlopen(request)  # nosec
             if reply.getcode() in [200, 204]:
                 result = reply.read().decode('utf-8')
                 break
-        except urllib.error.HTTPError:
+        except urllib.error.HTTPError as exception:
+            logger.exception(exception)
             break
     return result
 
@@ -87,13 +88,16 @@ def prepare_parameters():
     return (instance, query, watcher, sleep)
 
 
-def query_issues(instance, query, headers):
+def query_issues(instance, query, headers, logger):
+    """
+    Queries for issues and aggregates over paging
+    """
     template = 'https://%s.atlassian.net/rest/api/2/search?&jql=%s&startAt=%d'
     issues = []
     index = 0
     while True:
         url = template % (instance, query, index)
-        reply = http(url, 'GET', headers)
+        reply = http(logger, url, 'GET', headers)
         reply = json.loads(reply)
         if 'issues' not in reply:
             break
@@ -126,7 +130,7 @@ def watch_issues(not_watching, instance, watcher, headers, logger):
         issue_key = issue['key']
         issue_summary = issue['fields']['summary']
         url = template % (instance, issue_key)
-        http(url, 'POST', headers, watcher)
+        http(logger, url, 'POST', headers, watcher)
         logger.info(f'{issue_key} {issue_summary}')
 
 
@@ -138,7 +142,7 @@ def main():
     headers = prepare_headers()
     instance, query, watcher, sleep = prepare_parameters()
     while True:
-        issues = query_issues(instance, query, headers)
+        issues = query_issues(instance, query, headers, logger)
         not_watching = filter_issues(issues)
         watch_issues(not_watching, instance, watcher, headers, logger)
         time.sleep(sleep)
