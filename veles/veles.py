@@ -21,7 +21,7 @@ def init_logging():
     """
     pattern = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(format=pattern, level=logging.INFO)
-    return logging.getLogger('svetovid')
+    return logging.getLogger('veles')
 
 
 def http(logger, url, method, headers, data=None):
