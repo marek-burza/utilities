@@ -129,6 +129,7 @@ def find_missing_labels(issue_summary, issue_labels):
     """
     found = re.findall(r'\[.*?\]', issue_summary)
     found = [item.replace('[', '').replace(']', '') for item in found]
+    found = [item.replace(' ', '_') for item in found]
     found = [item.upper() for item in found]
     return [item for item in found if item not in issue_labels]
 
