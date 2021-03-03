@@ -90,6 +90,10 @@ Removing Dead Icons From Taskbar
 
 * See: https://www.tenforums.com/tutorials/3151-reset-clear-taskbar-pinned-apps-windows-10-a-3.html
 
+List the password of a WiFi network:
+
+    netsh wlan show profile name=$SSID key=clear
+
 
 # git
 
