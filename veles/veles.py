@@ -122,6 +122,18 @@ def add_issue_labels(instance, issue_key, labels, headers, logger):
     logger.info(f'{issue_key} - {labels}')
 
 
+def change_summary(instance, issue_key, issue_summary, headers, logger):
+    """
+    Changes summary of an issue
+    """
+    template = 'https://%s.atlassian.net/rest/api/2/issue/%s'
+    url = template % (instance, issue_key)
+    payload = {'fields': {'summary': issue_summary}}
+    payload = json.dumps(payload).encode('utf-8')
+    http(logger, url, 'PUT', headers, payload)
+    logger.info(f'{issue_key} - {issue_summary}')
+
+
 def find_missing_labels(issue_summary, issue_labels):
     """
     Returns the list of strings in square brackets from summary
