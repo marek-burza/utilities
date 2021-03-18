@@ -19,17 +19,17 @@ jobs:
           git checkout --orphan gh-pages
           mkdir dist
           cp *.svg dist/
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 152x154 altermarkive.152.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 144x144 altermarkive.144.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 120x120 altermarkive.120.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 114x114 altermarkive.114.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 76x76 altermarkive.76.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 72x72 altermarkive.72.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 57x57 altermarkive.57.png
-          docker run --rm -it -v $PWD/dist:/dist -w /dist altermarkive/imagemagick tools.svg tools.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 152x154 altermarkive.152.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 144x144 altermarkive.144.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 120x120 altermarkive.120.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 114x114 altermarkive.114.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 76x76 altermarkive.76.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 72x72 altermarkive.72.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 57x57 altermarkive.57.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick tools.svg tools.png
           git --work-tree dist add --all
           git --work-tree dist commit -m gh-pages
           git remote add github "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
