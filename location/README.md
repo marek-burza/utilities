@@ -78,6 +78,8 @@ And last, I disable the bounce effect when the user is attempting scrolling.
 ```css
 body,
 html {
-    position: fixed;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 ```
