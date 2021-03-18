@@ -14,7 +14,7 @@ I started with a minimalistic HTML file:
 
 <head>
     <meta charset="UTF-8" />
-    <title>🌐</title>
+    <title>⤓</title>
     <style>
         body {
             background-color: white;
@@ -25,7 +25,7 @@ I started with a minimalistic HTML file:
 
 <body>
     <center>
-        <h1>🌐</h1>
+        <h1>⤓</h1>
     </center>
 </body>
 
@@ -37,7 +37,7 @@ Then, I added an indication for the Safari browser that the HTML file can run as
 ```html
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="🌐" />
+<meta name="apple-mobile-web-app-title" content="⤓" />
 ```
 
 Next, I included icons for several different form factors (to be featured as app icons when it is added to the home screen):
