@@ -20,10 +20,10 @@ jobs:
           mkdir dist
           cp *.svg dist/
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
-          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
-          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 512x512 altermarkive.512.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 256x256 altermarkive.256.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 152x154 altermarkive.152.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 144x144 altermarkive.144.png
+          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 128x128 altermarkive.128.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 120x120 altermarkive.120.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 114x114 altermarkive.114.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 76x76 altermarkive.76.png
