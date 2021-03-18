@@ -1,0 +1,38 @@
+name: Automation Script
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Initiating
+        uses: actions/checkout@v1
+      - name: Building
+        run: |
+          sudo apt update
+          sudo apt install imagemagick
+          git config user.name $GITHUB_ACTOR
+          git config user.email $GITHUB_ACTOR@users.noreply.github.com
+          git checkout --orphan gh-pages
+          mkdir dist
+          cp *.svg dist/
+          convert -background none altermarkive.svg -resize 512x512 dist/altermarkive.512.png
+          convert -background none altermarkive.svg -resize 152x154 dist/altermarkive.152.png
+          convert -background none altermarkive.svg -resize 144x144 dist/altermarkive.144.png
+          convert -background none altermarkive.svg -resize 120x120 dist/altermarkive.120.png
+          convert -background none altermarkive.svg -resize 114x114 dist/altermarkive.114.png
+          convert -background none altermarkive.svg -resize 76x76 dist/altermarkive.76.png
+          convert -background none altermarkive.svg -resize 72x72 dist/altermarkive.72.png
+          convert -background none altermarkive.svg -resize 57x57 dist/altermarkive.57.png
+          git --work-tree dist add --all
+          git --work-tree dist commit -m gh-pages
+          git remote add github "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
+          git push github HEAD:gh-pages --force
+          rm -r dist
+          git checkout -f master
+          git branch -D gh-pages
