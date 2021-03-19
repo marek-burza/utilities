@@ -10,33 +10,44 @@ I started with a minimalistic HTML file:
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <title>⤓</title>
     <style>
         body {
-            background-color: white;
+            background-image: linear-gradient(#96D7C6, #BAC94A);
             color: black;
+            font-family: sans-serif;
+        }
+
+        #card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 30px;
         }
     </style>
 </head>
 
 <body>
-    <center>
-        <h1>⤓</h1>
-    </center>
+    <div id="card">
+    </div>
 </body>
 
 </html>
 ```
 
-Then, I added an indication for the Safari browser that the HTML file can run as a full-screen web app with a default status bar and an unassuming app name:
+Then, I added an indication for the Safari browser that the HTML file can run as a full-screen web app with a translucent status bar and an unassuming app name:
 
 ```html
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="⤓" />
 ```
 
@@ -76,10 +87,10 @@ html {
 And last, I disable the bounce effect when the user is attempting scrolling.
 
 ```css
-body,
 html {
     height: 100%;
+    width: 100%;
     overflow: hidden;
-    position: relative;
+    position: fixed;
 }
 ```
