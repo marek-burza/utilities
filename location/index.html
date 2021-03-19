@@ -57,17 +57,18 @@
 
 <body>
     <div id="card">
+        <div id="coordinates"></div>
+        <div>°N,°E</div>
         <button onclick="retry()">Retry</button>
         <div id="status"></div>
     </div>
     <script>
-        var handle = null;
-
         function updated(position) {
             if (handle != null) {
                 clearInterval(handle);
                 handle = null;
             }
+            document.getElementById("coordinates").innerHTML = `${position.coords.latitude},${position.coords.longitude}`;
             document.getElementById("status").innerHTML = "OK";
         }
 
@@ -82,12 +83,9 @@
         }
 
         function retry() {
-            if (navigator.geolocation && handle == null) {
-                navigator.geolocation.getCurrentPosition(updated, failed, { enableHighAccuracy: true });
-            }
+            location.reload();
         }
 
-        handle = setInterval(request, 10000);
         request();
     </script>
 </body>
