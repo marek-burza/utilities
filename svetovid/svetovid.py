@@ -40,6 +40,7 @@ def http(logger, url, method, headers, data=None):
                 result = reply.read().decode('utf-8')
                 break
         except urllib.error.HTTPError as exception:
+            logger.error(f'{method} {url} {data}')
             logger.exception(exception)
             break
     return result
