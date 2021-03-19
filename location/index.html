@@ -29,7 +29,17 @@
             position: fixed;
         }
 
+        #center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+        }
+
         #card {
+            vertical-align: middle;
             position: absolute;
             left: 50%;
             top: 50%;
@@ -37,12 +47,16 @@
             width: 90%;
             height: 90%;
             background-color: white;
-            border-radius: 30px;
+            border-radius: 5vmin;
             text-align: center;
         }
 
         .field {
             font-weight: bolder;
+        }
+
+        a {
+            text-decoration: none;
         }
     </style>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.152.png" sizes="152x152"
@@ -61,37 +75,50 @@
 
 <body>
     <div id="card">
-        <div id="coordinates" class="field">&nbsp;</div>
-        <div>°N,°E</div>
-        <div id="accuracy" class="field">&nbsp;</div>
-        <div>±meters</div>
-        <div id="altitude" class="field">&nbsp;</div>
-        <div>meters</div>
-        <div id="altitude-accuracy" class="field">&nbsp;</div>
-        <div>±meters</div>
-        <div id="heading" class="field">&nbsp;</div>
-        <div>°</div>
-        <div id="speed" class="field">&nbsp;</div>
-        <div>meters/second</div>
-        <div id="status" class="field">&nbsp;</div>
-        <button onclick="retry()">⟳</button>
+        <div id="center">
+            <div id="coordinates" class="field">&nbsp;</div>
+            <div>°N,°E</div>
+            <div id="accuracy" class="field">&nbsp;</div>
+            <div>±meters</div>
+            <div id="altitude" class="field">&nbsp;</div>
+            <div>meters</div>
+            <div id="altitude-accuracy" class="field">&nbsp;</div>
+            <div>±meters</div>
+            <div id="heading" class="field">&nbsp;</div>
+            <div>°</div>
+            <div id="speed" class="field">&nbsp;</div>
+            <div>meters/second</div>
+            <div id="status" class="field">&nbsp;</div>
+            <a href="#" onclick="retry()">⟳</a>
+        </div>
     </div>
     <script>
         function updated(position) {
             document.getElementById("coordinates").innerHTML = `${position.coords.latitude.toFixed(5)},${position.coords.longitude.toFixed(5)}`;
             document.getElementById("accuracy").innerHTML = position.coords.accuracy;
-            document.getElementById("altitude").innerHTML = position.coords.altitude;
-            document.getElementById("altitude-accuracy").innerHTML = position.coords.altitudeAccuracy;
-            document.getElementById("heading").innerHTML = position.coords.heading;
-            document.getElementById("speed").innerHTML = position.coords.speed;
-            document.getElementById("status").innerHTML = position.timestamp;
+            document.getElementById("altitude").innerHTML = position.coords.altitude != null ? position.coords.altitude.toFixed(0) : "?";
+            document.getElementById("altitude-accuracy").innerHTML = position.coords.altitudeAccuracy != null ? position.coords.altitudeAccuracy : "?";
+            document.getElementById("heading").innerHTML = position.coords.heading != null ? position.coords.heading : "?";
+            document.getElementById("speed").innerHTML = position.coords.speed != null ? position.coords.speed : "?";
+            var timestamp = new Date(position.timestamp);
+            document.getElementById("status").innerHTML = `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`;
         }
 
         function failed(error) {
             switch (error.code) {
-
+                case error.PERMISSION_DENIED:
+                    error = "Permission Denied";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    error = "Position Unavailable";
+                    break;
+                case error.TIMEOUT:
+                    error = "Timeout";
+                    break;
+                default:
+                    error = `Error: ${error.code}`;
             }
-            document.getElementById("status").innerHTML = "Error: " + error.code;
+            document.getElementById("status").innerHTML = error;
         }
 
         function request() {
