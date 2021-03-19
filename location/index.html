@@ -57,7 +57,7 @@
 
 <body>
     <div id="card">
-        <button onclick="request()">Retry</button>
+        <button onclick="retry()">Retry</button>
         <div id="status"></div>
     </div>
     <script>
@@ -78,6 +78,12 @@
         function request() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(updated, failed, { enableHighAccuracy: true });
+            }
+        }
+
+        function retry() {
+            if (navigator.geolocation && handle == null) {
+                navigator.geolocation.getCurrentPosition(updated, failed, { enableHighAccuracy: true });
             }
         }
 
