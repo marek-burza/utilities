@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <title>⤓</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="⤓" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=0, minimum-scale=1, maximum-scale=1" />
@@ -15,19 +15,28 @@
         }
 
         body {
-            background-color: white;
+            background-color: #96D7C6;
+            background-image: linear-gradient(#96D7C6, #BAC94A);
             color: black;
             font-family: sans-serif;
         }
 
-        html,
-        body {
+        html {
             height: 100%;
+            width: 100%;
             overflow: hidden;
-            position: relative;
+            position: fixed;
         }
 
-        h1 {
+        #card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 30px;
             text-align: center;
         }
     </style>
@@ -46,9 +55,33 @@
 </head>
 
 <body>
-    <div width="100%">
-        <h1>⤓</h1>
+    <div id="card">
+        <div id="status"></div>
     </div>
+    <script>
+        var handle = null;
+
+        function updated(position) {
+            if (handle != null) {
+                clearInterval(handle);
+                handle = null;
+            }
+            document.getElementById("status").innerHTML = "OK";
+        }
+
+        function failed(error) {
+            document.getElementById("status").innerHTML = "Error: " + error.code;
+        }
+
+        function request() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updated, failed, { enableHighAccuracy: true });
+            }
+        }
+
+        handle = setInterval(request, 10000);
+        request();
+    </script>
 </body>
 
 </html>
