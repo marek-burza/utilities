@@ -17,6 +17,7 @@ I started with a minimalistic HTML file:
     <title>⤓</title>
     <style>
         body {
+            background-color: #96D7C6;
             background-image: linear-gradient(#96D7C6, #BAC94A);
             color: black;
             font-family: sans-serif;
@@ -31,6 +32,7 @@ I started with a minimalistic HTML file:
             height: 90%;
             background-color: white;
             border-radius: 30px;
+            text-align: center;
         }
     </style>
 </head>
