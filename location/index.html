@@ -58,7 +58,6 @@
 <body>
     <div id="card">
         <div id="status"></div>
-        <button onclick="trigger()">Click me</button>
     </div>
     <script>
         var handle = null;
@@ -81,14 +80,8 @@
             }
         }
 
-        // handle = setInterval(request, 10000);
-        // request();
-
-        function trigger() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(updated, failed);
-            }
-        }
+        handle = setInterval(request, 10000);
+        request();
     </script>
 </body>
 
