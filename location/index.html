@@ -40,6 +40,10 @@
             border-radius: 30px;
             text-align: center;
         }
+
+        .field {
+            font-weight: bolder;
+        }
     </style>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.152.png" sizes="152x152"
         rel="apple-touch-icon" />
@@ -57,22 +61,36 @@
 
 <body>
     <div id="card">
-        <div id="coordinates"></div>
+        <div id="coordinates" class="field">&nbsp;</div>
         <div>°N,°E</div>
-        <button onclick="retry()">Retry</button>
-        <div id="status"></div>
+        <div id="accuracy" class="field">&nbsp;</div>
+        <div>±meters</div>
+        <div id="altitude" class="field">&nbsp;</div>
+        <div>meters</div>
+        <div id="altitude-accuracy" class="field">&nbsp;</div>
+        <div>±meters</div>
+        <div id="heading" class="field">&nbsp;</div>
+        <div>°</div>
+        <div id="speed" class="field">&nbsp;</div>
+        <div>meters/second</div>
+        <div id="status" class="field">&nbsp;</div>
+        <button onclick="retry()">⟳</button>
     </div>
     <script>
         function updated(position) {
-            if (handle != null) {
-                clearInterval(handle);
-                handle = null;
-            }
-            document.getElementById("coordinates").innerHTML = `${position.coords.latitude},${position.coords.longitude}`;
-            document.getElementById("status").innerHTML = "OK";
+            document.getElementById("coordinates").innerHTML = `${position.coords.latitude.toFixed(5)},${position.coords.longitude.toFixed(5)}`;
+            document.getElementById("accuracy").innerHTML = position.coords.accuracy;
+            document.getElementById("altitude").innerHTML = position.coords.altitude;
+            document.getElementById("altitude-accuracy").innerHTML = position.coords.altitudeAccuracy;
+            document.getElementById("heading").innerHTML = position.coords.heading;
+            document.getElementById("speed").innerHTML = position.coords.speed;
+            document.getElementById("status").innerHTML = position.timestamp;
         }
 
         function failed(error) {
+            switch (error.code) {
+
+            }
             document.getElementById("status").innerHTML = "Error: " + error.code;
         }
 
