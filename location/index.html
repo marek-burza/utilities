@@ -104,16 +104,16 @@
             var latitude = position.coords.latitude.toFixed(5);
             var longitude = position.coords.longitude.toFixed(5);
             document.getElementById("coordinates").innerHTML = `${latitude},${longitude}`;
-            document.getElementById("accuracy").innerHTML = position.coords.accuracy;
+            document.getElementById("accuracy").innerHTML = position.coords.accuracy.toFixed(0);
             document.getElementById("altitude").innerHTML = position.coords.altitude != null ? position.coords.altitude.toFixed(0) : "?";
-            document.getElementById("altitude-accuracy").innerHTML = position.coords.altitudeAccuracy != null ? position.coords.altitudeAccuracy : "?";
-            document.getElementById("heading").innerHTML = position.coords.heading != null ? position.coords.heading : "?";
-            document.getElementById("speed").innerHTML = position.coords.speed != null ? position.coords.speed : "?";
+            document.getElementById("altitude-accuracy").innerHTML = position.coords.altitudeAccuracy != null ? position.coords.altitudeAccuracy.toFixed(0) : "?";
+            document.getElementById("heading").innerHTML = position.coords.heading != null ? position.coords.heading.toFixed(0) : "?";
+            document.getElementById("speed").innerHTML = position.coords.speed != null ? position.coords.speed.toFixed(1) : "?";
             var timestamp = new Date(position.timestamp);
             document.getElementById("status").innerHTML = `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`;
             document.getElementById("google").setAttribute("href", `https://maps.google.com/maps?z=17&q=${latitude},${longitude}`);
-            document.getElementById("microsoft").setAttribute("href", `https://www.bing.com/maps/?v=2&lvl=17&cp=${latitude}~${longitude}`);
             document.getElementById("openstreetmap").setAttribute("href", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}`);
+            document.getElementById("microsoft").setAttribute("href", `https://www.bing.com/maps/?v=2&lvl=17&cp=${latitude}~${longitude}`);
         }
 
         function failed(error) {
