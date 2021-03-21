@@ -225,8 +225,8 @@ a {
 }
 
 img {
-    width: 5vmin;
-    height: 5vmin;
+    width: 6vmin;
+    height: 6vmin;
 }
 ```
 
