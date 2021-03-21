@@ -223,6 +223,11 @@ a {
 
     font-size: 10vmin;
 }
+
+img {
+    width: 5vmin;
+    height: 5vmin;
+}
 ```
 
 I also decided to stick to the black-and-white looks so the "Retry" button and the links to maps received appropriate styling:
@@ -234,6 +239,7 @@ a {
 }
 
 img {
+
     filter: grayscale(100%);
 }
 ```
