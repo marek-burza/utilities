@@ -13,8 +13,9 @@ jobs:
         uses: actions/checkout@v1
       - name: Building
         run: |
-          docker build -t $DOCKERHUB_USER/gpx-to-png:$(git describe --tags) .
-          docker tag $DOCKERHUB_USER/gpx-to-png:$(git describe --tags) $DOCKERHUB_USER/gpx-to-png:latest
+          docker build -t gpx-to-png .
+          docker tag gpx-to-png $DOCKERHUB_USER/gpx-to-png:$(git describe --tags)
+          docker tag gpx-to-png $DOCKERHUB_USER/gpx-to-png:latest
       - name: Publishing
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
