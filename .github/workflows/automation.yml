@@ -1,0 +1,24 @@
+name: Automation Script
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    env:
+      DOCKERHUB_USER: ${{ github.actor }}
+    steps:
+      - name: Initiating
+        uses: actions/checkout@v1
+      - name: Building
+        run: |
+          docker build -t $DOCKERHUB_USER/gpx-to-png:$(git describe --tags) .
+          docker tag $DOCKERHUB_USER/gpx-to-png:$(git describe --tags) $DOCKERHUB_USER/gpx-to-png:latest
+      - name: Publishing
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
+          docker push $DOCKERHUB_USER/gpx-to-png:$(git describe --tags)
+          docker push $DOCKERHUB_USER/gpx-to-png:latest
