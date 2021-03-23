@@ -14,12 +14,12 @@ jobs:
       - name: Building
         run: |
           docker build -t gpx-to-png .
-          docker tag gpx-to-png $DOCKERHUB_USER/gpx-to-png:$(git describe --tags)
+          docker tag gpx-to-png $DOCKERHUB_USER/gpx-to-png:GITHUB_SHA
           docker tag gpx-to-png $DOCKERHUB_USER/gpx-to-png:latest
       - name: Publishing
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/gpx-to-png:$(git describe --tags)
+          docker push $DOCKERHUB_USER/gpx-to-png:GITHUB_SHA
           docker push $DOCKERHUB_USER/gpx-to-png:latest
