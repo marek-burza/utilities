@@ -27,10 +27,10 @@ jobs:
           echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
           docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64
           docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
-          docker manifest create $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8} $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-arm32v7
+          docker manifest create $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8} $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker manifest push --purge $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}
           docker push $DOCKERHUB_USER/azure-iot-edge:latest-amd64
           docker push $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf
-          docker manifest create $DOCKERHUB_USER/azure-iot-edge:latest $DOCKERHUB_USER/azure-iot-edge:latest-amd64 $DOCKERHUB_USER/azure-iot-edge:latest-arm32v7
+          docker manifest create $DOCKERHUB_USER/azure-iot-edge:latest $DOCKERHUB_USER/azure-iot-edge:latest-amd64 $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf
           docker manifest push --purge $DOCKERHUB_USER/azure-iot-edge:latest
 
