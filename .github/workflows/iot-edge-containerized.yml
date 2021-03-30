@@ -15,12 +15,12 @@ jobs:
         run: |
           cd iot-edge-containerized
           docker build -t azure-iot-edge -f amd64.Dockerfile .
-          docker tag azure-iot-edge $DOCKERHUB_USER/azure-iot-edge:GITHUB_SHA
+          docker tag azure-iot-edge $DOCKERHUB_USER/azure-iot-edge:$GITHUB_SHA
           docker tag azure-iot-edge $DOCKERHUB_USER/azure-iot-edge:latest
       - name: Publishing
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/azure-iot-edge:GITHUB_SHA
+          docker push $DOCKERHUB_USER/azure-iot-edge:$GITHUB_SHA
           docker push $DOCKERHUB_USER/azure-iot-edge:latest
