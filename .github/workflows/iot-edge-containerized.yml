@@ -11,11 +11,16 @@ jobs:
     steps:
       - name: Initiating
         uses: actions/checkout@v1
+      - name: QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
       - name: Building
         run: |
           cd iot-edge-containerized
-          docker build -t azure-iot-edge-amd64 -f amd64.Dockerfile .
-          docker build -t azure-iot-edge-armv7hf -f armv7hf.Dockerfile .
+          docker buildx build --platform linux/amd64 -t azure-iot-edge-amd64 -f amd64.Dockerfile .
+          docker buildx build --platform linux/arm/v7 -t azure-iot-edge-armv7hf -f armv7hf.Dockerfile .
           docker tag azure-iot-edge-amd64 $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64
           docker tag azure-iot-edge-armv7hf $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker tag azure-iot-edge-amd64 $DOCKERHUB_USER/azure-iot-edge:latest-amd64
