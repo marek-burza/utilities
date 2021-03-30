@@ -20,11 +20,13 @@ jobs:
           docker tag azure-iot-edge-armv7hf $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker tag azure-iot-edge-amd64 $DOCKERHUB_USER/azure-iot-edge:latest-amd64
           docker tag azure-iot-edge-armv7hf $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf
+      - name: Authorizing
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publishing
-        env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
           docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64
           docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker manifest create $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8} $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
