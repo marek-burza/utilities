@@ -16,24 +16,20 @@ jobs:
       - name: Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
-      - name: Building
-        run: |
-          cd iot-edge-containerized
-          docker buildx build --platform linux/amd64 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 -t $DOCKERHUB_USER/azure-iot-edge:latest-amd64 -f amd64.Dockerfile .
-          docker buildx build --platform linux/arm/v7 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf -t $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf -f armv7hf.Dockerfile .
       - name: Authorizing
         uses: docker/login-action@v1
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Building
+        run: |
+          cd iot-edge-containerized
+          docker buildx build --platform linux/amd64 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 -t $DOCKERHUB_USER/azure-iot-edge:latest-amd64 --push -f amd64.Dockerfile .
+          docker buildx build --platform linux/arm/v7 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf -t $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf --push -f armv7hf.Dockerfile .
       - name: Publishing
         run: |
-          docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64
-          docker push $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker manifest create $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8} $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf
           docker manifest push --purge $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}
-          docker push $DOCKERHUB_USER/azure-iot-edge:latest-amd64
-          docker push $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf
           docker manifest create $DOCKERHUB_USER/azure-iot-edge:latest $DOCKERHUB_USER/azure-iot-edge:latest-amd64 $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf
           docker manifest push --purge $DOCKERHUB_USER/azure-iot-edge:latest
 
