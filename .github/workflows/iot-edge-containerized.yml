@@ -20,7 +20,7 @@ jobs:
         run: |
           cd iot-edge-containerized
           docker buildx build --platform linux/amd64 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-amd64 -t $DOCKERHUB_USER/azure-iot-edge:latest-amd64 -f amd64.Dockerfile .
-          docker buildx build --platform linux/arm/v7 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf -t DOCKERHUB_USER/azure-iot-edge:latest-armv7hf -f armv7hf.Dockerfile .
+          docker buildx build --platform linux/arm/v7 -t $DOCKERHUB_USER/azure-iot-edge:${GITHUB_SHA::8}-armv7hf -t $DOCKERHUB_USER/azure-iot-edge:latest-armv7hf -f armv7hf.Dockerfile .
       - name: Authorizing
         uses: docker/login-action@v1
         with:
