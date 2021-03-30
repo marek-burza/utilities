@@ -17,18 +17,16 @@ ARG CONTAINERD_VERSION
 ARG AZURE_IOT_EDGE_VERSION
 
 # Disable interactive configuration prompts
-ARG DEBIAN_FRONTEND noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Update and install required prerequisites
 #  Shared: curl
 #  Docker: apt-transport-https ca-certificates gnupg lsb-release
-#  Azure IoT Edge: software-properties-common yq
+#  Azure IoT Edge: yq
 RUN apt-get -yq update && \
-    apt-get -yq install curl apt-transport-https ca-certificates gnupg lsb-release software-properties-common && \
-    (gpg -q --keyserver keyserver.ubuntu.com --recv-keys CC86BB64 > /tmp/yq.gpg) && \
-    mv /tmp/yq.gpg /etc/apt/trusted.gpg.d/yq.gpg && \
-    add-apt-repository ppa:rmescandon/yq && \
-    apt-get -yq install yq=${YQ_VERSION}
+    apt-get -yq install curl apt-transport-https ca-certificates gnupg lsb-release && \
+    curl -fsSL https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -o /usr/bin/yq && \
+    chmod +x /usr/bin/yq
 
 # Install Docker-in-Docker
 RUN (curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg) && \
