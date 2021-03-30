@@ -14,7 +14,7 @@ jobs:
       - name: Building
         run: |
           cd iot-edge-containerized
-          docker build -t azure-iot-edge .
+          docker build -t azure-iot-edge -f amd64.Dockerfile .
           docker tag azure-iot-edge $DOCKERHUB_USER/azure-iot-edge:GITHUB_SHA
           docker tag azure-iot-edge $DOCKERHUB_USER/azure-iot-edge:latest
       - name: Publishing
