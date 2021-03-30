@@ -1,2 +1,0 @@
-- name: Service Restart
-  systemd: name=iotedge state=restarted enabled=yes daemon_reload=yes

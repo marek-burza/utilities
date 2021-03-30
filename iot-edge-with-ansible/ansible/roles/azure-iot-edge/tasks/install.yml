@@ -1,11 +1,10 @@
-- name: HSM Library
-  apt:
-    deb: https://aka.ms/libiothsm-std-linux-armhf-latest
-
-- name: Daemon
-  apt:
-    deb: https://aka.ms/iotedged-linux-armhf-latest
-
-- name: Fix Dependencies
-  apt:
-    force: yes
+- name: Azure IoT Edge
+  docker_container:
+    name: azure-iot-edge
+    image: altermarkive/azure-iot-edge
+    restart_policy: always
+    container_default_behavior: compatibility
+    env:
+      AZURE_IOT_EDGE_CONNECTION_STRING: "{{ azure_iot_edge_connection_string }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

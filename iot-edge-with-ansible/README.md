@@ -1,19 +1,24 @@
 # Introduction
 
-This is a set of Ansible scripts which automate installation of Azure IoT Edge on Raspbian.
+This is a set of Ansible scripts which automate installation of Azure IoT Edge.
 
-The scripts are based on the original guide [here](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-install-iot-edge-linux-arm).
+The scripts are based on the original guide [here](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-install-iot-edge).
 
 
 # Assumptions
 
 It is assumed that:
-* The IP address of the Raspberry Pi is placed in the file `inventory` in the main directory of this cloned repository
-* The Raspberry Pi is running Raspbian (the scripts were tested with Stretch)
-* SSH is installed and accessible from outside of the Raspberry Pi
-* Your public SSH key was copied to the Raspberry Pi
+
+* The IP address of the target machine is placed in the file `inventory` in the main directory of this cloned repository
+* SSH server is installed and accessible from outside of the target machine
+* Your public SSH key was copied to the target machine
   (see [here](https://www.raspberrypi.org/documentation/remote-access/ssh/passwordless.md) for details)
 
+Here is an example `inventory` file if you decide to use the included `Vagrantfile`:
+
+```
+machine ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
+```
 
 # Installation
 
@@ -23,13 +28,21 @@ First, register an Azure IoT Edge Device ([here](https://docs.microsoft.com/en-u
 
 An example script to automate the above steps can be found [here](./iot_edge.creation.sh).
 
-Then, once you have connection string, run these commands:
+Then, once you have connection string, run these commands (here, assuming a Raspberry Pi as the target machine):
 
 ```shell
-read -s -p "Please enter IoT Edge Device connection string: " IOTEDGE_CONNECTION_STRING
+read -s -p "Please enter IoT Edge Device connection string: " AZURE_IOT_EDGE_CONNECTION_STRING
 cd ansible
+ansible-galaxy install geerlingguy.docker
+ansible-galaxy install geerlingguy.docker_arm
 export ANSIBLE_ROLES_PATH=$(pwd)/roles
-ansible-playbook -u pi -i ../inventory --extra-vars "ansible_dir=$(pwd) ansible_ssh_user=pi iotedge_connection_string=$IOTEDGE_CONNECTION_STRING" books/provision.yml
+ansible-playbook -u pi -i ../inventory --extra-vars "ansible_dir=$(pwd) ansible_ssh_user=pi azure_iot_edge_connection_string=$AZURE_IOT_EDGE_CONNECTION_STRING" books/provision.yml
+```
+
+Here is the variant of the last command for the included `Vagrantfile`:
+
+```shell
+ansible-playbook -u vagrant -i ../inventory --key-file=~/.vagrant.d/insecure_private_key --extra-vars "ansible_user=vagrant azure_iot_edge_connection_string=$AZURE_IOT_EDGE_CONNECTION_STRING" books/provision.yml
 ```
 
 
