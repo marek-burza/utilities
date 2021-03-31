@@ -10,5 +10,5 @@ RUN apt-get -yq update && \
     tar -zxvf /tmp/helm-linux-amd64.tar.gz && \
     mv linux-amd64/helm /usr/bin/helm && \
     rm -rf /tmp/helm-linux-amd64.tar.gz linux-amd64 && \
-    curl -fsSL https://github.com/mikefarah/yq/releases/download/4.6.3/yq_linux_amd64 -o /usr/bin/yq && \
+    curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64 -o /usr/bin/yq && \
     chmod +x /usr/bin/yq
