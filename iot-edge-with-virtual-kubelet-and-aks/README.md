@@ -25,3 +25,16 @@ To accomplish this step, run:
 ```bash
 ./provisioning2.create.sh $PREFIX
 ```
+
+## Step 3: Experiment
+
+Tag the device:
+
+```bash
+az iot hub device-twin update --device-id ${PREFIX}prototype --hub-name ${PREFIX}hub --set tags='{"device":"'${PREFIX}'prototype"}'
+sed 's/DEVICE_TAG/'${PREFIX}prototype'/g' prototype-deployment.yaml.template > prototype-deployment.yaml
+```
+
+```bash
+kubectl apply -f prototype-deployment.yaml
+```

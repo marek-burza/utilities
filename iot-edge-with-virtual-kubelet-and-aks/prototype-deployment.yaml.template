@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prototypedeployment
+spec:
+  selector:
+    matchLabels:
+      app: prototypeapp
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0%
+      maxUnavailable: 100%
+  template:
+    metadata:
+      labels:
+        app: prototypeapp
+      annotations:
+        isEdgeDeployment: "true"
+        targetCondition: "tags.device='DEVICE_TAG'"
+        priority: "15"
+        loggingOptions: ""
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - prototypeapp
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: example
+          image: "tutum/hello-world"
+      nodeSelector:
+        type: virtual-kubelet
+      tolerations:
+        - key: virtual-kubelet.io/provider
+          operator: Equal
+          value: iotedge
+          effect: NoSchedule
+        - key: node.kubernetes.io/network-unavailable
+          operator: Exists
+          effect: NoSchedule
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: edgehub
+data:
+  desiredProperties: |
+    {
+      "routes": {
+        "route": "FROM /* INTO $upstream"
+      },
+      "storeAndForwardConfiguration": {
+        "timeToLiveSecs": 7200
+      }
+    }
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: example
+data:
+  status: running
+  restartPolicy: always
+  version: "1.0"
+  createOptions: "{\n  \"HostConfig\": {\n    \"Privileged\": true,\n    \"network\" : \"host\"\n  }     \n}"
+
