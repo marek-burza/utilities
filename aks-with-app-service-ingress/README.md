@@ -8,6 +8,8 @@ After running the create script the app will be available at:
 
     https://[PREFIX]app.azurewebsites.net/index.html
 
+Note: RBAC is required for deployment of updated container images to the cluster
+
 
 # Extras
 
