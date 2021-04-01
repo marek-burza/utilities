@@ -3,7 +3,7 @@ FROM ubuntu:focal-20210119
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -yq update && \
-    apt-get -yq install curl jq && \
+    apt-get -yq install curl jq git && \
     (curl -sL https://aka.ms/InstallAzureCLIDeb | /bin/bash) && \
     az aks install-cli --install-location /usr/bin/kubectl && \
     curl -fsSL https://get.helm.sh/helm-v3.5.3-linux-amd64.tar.gz -o /tmp/helm-linux-amd64.tar.gz && \
