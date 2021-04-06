@@ -144,6 +144,11 @@ List the password of a WiFi network:
     git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-tree --no-commit-id --name-only -r | sort | uniq
 
 
+## Correcting author for selected commits
+
+    See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit)
+
+
 # Network Troubleshooting
 
 ## Wireshark
