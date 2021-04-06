@@ -146,7 +146,7 @@ List the password of a WiFi network:
 
 ## Correcting author for selected commits
 
-    See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit)
+See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit).
 
 
 # Network Troubleshooting
