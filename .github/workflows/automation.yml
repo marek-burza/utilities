@@ -14,8 +14,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view -R https://github.com/tailscale/tailscale.git
           VERSION=$(gh release view -R https://github.com/tailscale/tailscale.git | grep ^tag\: | sed 's/tag\:\t*v//g')
+          echo $VERSION
+          git clone https://github.com/tailscale/tailscale.git
+          cd tailscale
+          git show-ref --hash tags/v${VERSION}
+          cd -
           echo ::set-output name=version::${VERSION}
       - name: Tags
         id: tags
