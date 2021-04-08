@@ -1,24 +1,24 @@
-FROM ubuntu:20.04 AS Build
+FROM golang:1.16-alpine3.13 AS Build
 
 ARG VERSION
-ARG DEBIAN_FRONTEND=noninteractive
+ARG COMMIT_HASH
 
-RUN apt-get -yq update && apt-get -yq install curl
+WORKDIR /go/src/tailscale
 
-COPY architecture.sh /tmp/architecture.sh
+RUN apk add --no-cache git
 
-RUN dpkg --print-architecture && mkdir -p /tmp/tailscale && \
-    cd /tmp/tailscale && \
-    curl -fsSL https://pkgs.tailscale.com/stable/tailscale_${VERSION}_$(/bin/sh /tmp/architecture.sh).tgz -o tailscale.tar.gz && \
-	tar --strip-components=1 -xzf tailscale.tar.gz && \
-	cp tailscale tailscaled /usr/local/bin/ && \
-	rm -rf /tmp/tailscale /tmp/architecture.sh
+RUN git clone https://github.com/tailscale/tailscale.git . && \
+    git checkout $VERSION
+
+RUN go mod download
+
+RUN go install -tags=xversion -ldflags="-X tailscale.com/version.Long=$VERSION -X tailscale.com/version.Short=$VERSION -X tailscale.com/version.GitCommit=$COMMIT_HASH" -v ./cmd/...
 
 FROM alpine:3.13
 
 RUN apk add --no-cache ca-certificates iptables iproute2
 
-COPY --from=Build /usr/local/bin/tailscale* /usr/local/bin/
+COPY --from=Build /go/bin/tailscale* /usr/local/bin/
 
 COPY entrypoint.sh /entrypoint.sh
 
