@@ -15,12 +15,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(gh release view -R https://github.com/tailscale/tailscale.git | grep ^tag\: | sed 's/tag\:\t*v//g')
-          echo $VERSION
           git clone https://github.com/tailscale/tailscale.git
           cd tailscale
-          git show-ref --hash tags/v${VERSION}
+          COMMIT_HASH=$(git show-ref --hash tags/v${VERSION})
           cd -
           echo ::set-output name=version::${VERSION}
+          echo ::set-output name=commit_hash::${COMMIT_HASH}
       - name: Tags
         id: tags
         run: |
@@ -43,5 +43,5 @@ jobs:
           build-args: VERSION=${{ steps.version.outputs.version }}
           context: .
           push: true
-          platforms: linux/amd64,linux/386,linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/arm/v5,linux/mips64le
+          platforms: linux/amd64,linux/386,linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/mips64,linux/mips64le
           tags: ${{ steps.tags.outputs.tags }}
