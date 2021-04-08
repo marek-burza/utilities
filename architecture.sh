@@ -14,12 +14,6 @@ case "${DPKG_ARCH##*-}" in
   arm64)
     echo arm64
     ;;
-  mipsel)
-    echo mips
-    ;;
-  mipsle)
-    echo mipsle
-    ;;
   *)
     echo "unsupported"
     ;;
