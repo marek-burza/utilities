@@ -1,4 +1,4 @@
-FROM debian:10.09 AS Build
+FROM debian:10.9 AS Build
 
 ARG VERSION
 ARG DEBIAN_FRONTEND=noninteractive
