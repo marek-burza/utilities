@@ -1,4 +1,4 @@
-FROM debian:10.9 AS Build
+FROM ubuntu:20.04 AS Build
 
 ARG VERSION
 ARG DEBIAN_FRONTEND=noninteractive
