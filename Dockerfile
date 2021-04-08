@@ -5,7 +5,7 @@ ARG COMMIT_HASH
 
 WORKDIR /go/src/tailscale
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git build-base
 
 RUN git clone https://github.com/tailscale/tailscale.git . && \
     git checkout v${VERSION}
