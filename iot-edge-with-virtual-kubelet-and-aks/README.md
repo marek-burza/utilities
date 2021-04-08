@@ -38,3 +38,5 @@ sed 's/DEVICE_TAG/'${PREFIX}prototype'/g' prototype-deployment.yaml.template > p
 ```bash
 kubectl apply -f prototype-deployment.yaml
 ```
+
+At this point I encountered [this issue](https://github.com/Azure/iot-edge-virtual-kubelet-provider/issues/24) and decided to put further experimentation on hold.
