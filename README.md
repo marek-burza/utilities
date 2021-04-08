@@ -1,4 +1,4 @@
-# Unofficial Docker image for Tailscale ![Build status](https://github.com/altermarkive/tailscale/workflows/Automation/badge.svg)
+# Unofficial Docker image for Tailscale ![Build status](https://github.com/altermarkive/tailscale/workflows/Docker%20Build/badge.svg)
 
 Given that [Tailscale](https://tailscale.com/) does not yet publish their own Docker image (see [this issue](https://github.com/tailscale/tailscale/issues/504) for details) I decided to put together my own (and the outcome is partially inspired by https://github.com/function61/tailscale-dockerimage).
 
