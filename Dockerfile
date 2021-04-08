@@ -8,7 +8,7 @@ WORKDIR /go/src/tailscale
 RUN apk add --no-cache git
 
 RUN git clone https://github.com/tailscale/tailscale.git . && \
-    git checkout $VERSION
+    git checkout v${VERSION}
 
 RUN go mod download
 
