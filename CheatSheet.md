@@ -5,6 +5,10 @@
 | Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
 | Win + B            | Windows: Go to System Tray                                       |
 | Shift + F10        | Windows: Right-click in System Tray                              |
+| Win + V            | Windows: Paste from Clipboard history                            |
+| Win + H            | Windows: Start dictation                                         |
+| Win + I            | Windows: System settings                                         |
+| Alt + P            | Windows Explorer: Toggle preview panel                           |
 | Ctrl + Shift + E   | Visual Studio Code: Navigate between editor and file tree panels |
 | Ctrl + L           | Firefox: Go to address bar                                       |
 
