@@ -7,7 +7,7 @@ if [ ! -f "/var/lib/tailscale/tailscaled.state" -a ! -z "$TAILSCALE_AUTH_KEY" ];
     ( sleep $TAILSCALE_AUTH_DELAY; /usr/local/bin/tailscale up --authkey=$TAILSCALE_AUTH_KEY ) &
 fi
 
-if [ ! -f "/dev/net/tun" ]; then
+if [ ! -e "/dev/net/tun" ]; then
     mkdir -p /dev/net
     mknod /dev/net/tun c 10 200
 fi
