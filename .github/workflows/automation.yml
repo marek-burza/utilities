@@ -23,8 +23,10 @@ jobs:
         id: tags
         run: |
           DOCKER_IMAGE=${{ github.actor }}/${GITHUB_REPOSITORY#*/}
-          TAGS="${DOCKER_IMAGE}:${{ steps.version.outputs.version }},${DOCKER_IMAGE}:latest"
-          echo ::set-output name=tags::${TAGS}
+          TAGS_INNERNET_SERVER="${DOCKER_IMAGE}-server:${{ steps.version.outputs.version }},${DOCKER_IMAGE}-server:latest"
+          TAGS_INNERNET="${DOCKER_IMAGE}:${{ steps.version.outputs.version }},${DOCKER_IMAGE}:latest"
+          echo ::set-output name=tags_innernet_server::${TAGS_INNERNET_SERVER}
+          echo ::set-output name=tags_innernet::${TAGS_INNERNET}
       - name: QEMU
         uses: docker/setup-qemu-action@v1.1.0
       - name: Buildx
@@ -44,7 +46,7 @@ jobs:
           file: innernet-server.Dockerfile
           push: true
           platforms: linux/386,linux/amd64,linux/arm64/v8
-          tags: ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags_innernet_server }}
       - name: Build (innernet)
         uses: docker/build-push-action@v2.4.0
         with:
@@ -54,4 +56,4 @@ jobs:
           file: innernet.Dockerfile
           push: true
           platforms: linux/386,linux/amd64,linux/arm64/v8
-          tags: ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags_innernet }}
