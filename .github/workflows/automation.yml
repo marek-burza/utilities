@@ -40,7 +40,8 @@ jobs:
         with:
           build-args: |
             VERSION=${{ steps.version.outputs.version }}
-          context: innernet-server.Dockerfile
+          context: .
+          file: innernet-server.Dockerfile
           push: true
           platforms: linux/386,linux/amd64,linux/arm64/v8,linux/arm/v7
           tags: ${{ steps.tags.outputs.tags }}
@@ -49,7 +50,8 @@ jobs:
         with:
           build-args: |
             VERSION=${{ steps.version.outputs.version }}
-          context: innernet.Dockerfile
+          context: .
+          file: innernet.Dockerfile
           push: true
           platforms: linux/386,linux/amd64,linux/arm64/v8,linux/arm/v7
           tags: ${{ steps.tags.outputs.tags }}
