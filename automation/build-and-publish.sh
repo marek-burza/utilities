@@ -9,6 +9,9 @@ for ENTRY in $(find . -name "Dockerfile")
 do
   DIRECTORY=$(dirname $ENTRY)
   NAME=$(basename $DIRECTORY)
+  if [ -e ".github/workflows/$NAME.yml" ]; then
+    continue
+  fi
   IMAGE=$GITHUB_ACTOR/$NAME:latest
   echo "Building & Publishing: $IMAGE"
   cd $DIRECTORY
