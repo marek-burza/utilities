@@ -88,6 +88,23 @@ Can be used in the following way:
     LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='+365d' date
 
 
+## socat
+
+To expose Docker host ports on Docker networks it is often enough to use [qoomon/docker-host](https://github.com/qoomon/docker-host) (and it may be necessary to add `--network host`):
+
+```bash
+docker run --restart always -d --name forwarder --cap-add=NET_ADMIN --cap-add=NET_RAW qoomon/docker-host
+```
+
+However, if an another image is interfering with firewall rules (or cannot grant `NET_ADMIN` or `NET_RAW` cabilities)
+it may be necessary to tunnel the traffic with [`socat`](https://www.redhat.com/sysadmin/getting-started-socat),
+here an example for `ssh`:
+
+```bash
+docker run --restart always -d --name forwarder altermarkive/socat TCP4-LISTEN:22,fork,reuseaddr TCP4:host.docker.internal:22
+```
+
+
 ## svetovid
 
 If you want to automatically become a watcher of Atlassian Jira issues (and are not the owner/administrator) then you can use this service to accomplish this (with suitable email client rules it creates an office experience by revealing what is generally happening without the necessity of acting upon it):
