@@ -110,7 +110,7 @@ LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME
 
 ## socat
 
-To expose Docker host ports on Docker networks it is often enough to use [qoomon/docker-host](https://github.com/qoomon/docker-host) (and it may be necessary to add `--network host`):
+To expose Docker host ports on Docker networks it is often enough to use [`qoomon/docker-host`](https://github.com/qoomon/docker-host) (and it may be necessary to add `--network host`):
 
 ```bash
 docker run --restart always -d --name forwarder --cap-add=NET_ADMIN --cap-add=NET_RAW qoomon/docker-host
