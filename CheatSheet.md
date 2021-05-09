@@ -75,6 +75,10 @@ To combine video frames with audio:
         ffmpeg -loop 1 -i ${ENTRY}.jpg -i ${ENTRY}.aac -strict -2 -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y ${ENTRY}.mp4
     done
 
+Rename photos to feature album name and creation date:
+
+    find -type f -printf "mv %p \$ALBUM.\$(exiftool -CreateDate %p | cut -c 35- | sed 's/[ :]//g').jpg\n" | sh
+
 
 # Windows
 
