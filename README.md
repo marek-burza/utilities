@@ -124,6 +124,8 @@ here an example for `ssh`:
 docker run --restart always -d --name forwarder altermarkive/socat TCP4-LISTEN:22,fork,reuseaddr TCP4:host.docker.internal:22
 ```
 
+Note: On Linux, the following option might be necessary to be added to the command above: `--add-host=host.docker.internal:host-gateway`
+
 
 ## svetovid
 
