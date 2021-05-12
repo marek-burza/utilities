@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+    "proxies": {
+        "proxystatic": {
+            "matchCondition": {
+                "route": "{*all}",
+                "methods": [
+                    "GET"
+                ]
+            },
+            "backendUri": "http://$LB_IP/{all}"
+        }
+    }
+}

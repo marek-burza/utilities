@@ -1,0 +1,38 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Random API",
+    "version": "1.0.0",
+    "title": "Random API"
+  },
+  "servers": [{"url": "/api"}],
+  "paths": {
+    "/generate": {
+      "get": {
+        "summary": "Generate random value",
+        "description": "This endpoint allows to generate a random value",
+        "operationId": "generate",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "value"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
