@@ -9,7 +9,6 @@
 * [Azure IoT Edge: Containerized](azure/iot-edge-containerized)
 * [Azure IoT Edge: Module & service boilerplate example](azure/iot-edge-module)
 * [Azure IoT Edge: Provisioning with Ansible](azure/iot-edge-with-ansible)
-* [Azure IoT Edge: Virtual Kubelet & AKS](azure/iot-edge-with-virtual-kubelet-and-aks)
 
 
 # AWS Experiments
