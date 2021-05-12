@@ -1,3 +1,17 @@
+# Azure Experiments
+
+* [Uploading to Azure Blob Storage](azure/blob-upload)
+* [Password-protected, App Service (Python, Flask & Docker) with Swagger API and static frontend served by Nginx](azure/app-service)
+* [Container Registry creation script](azure/container-registry-creation)
+* [Multicontainer App Service with Volume](azure/multicontainer-app-service-with-volume)
+* [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
+* [Azure VPN Gateway & on-premise facility integration](azure/on-premise-integration/README.md)
+* [Azure IoT Edge: Containerized](azure/iot-edge-containerized)
+* [Azure IoT Edge: Module & service boilerplate example](azure/iot-edge-module)
+* [Azure IoT Edge: Provisioning with Ansible](azure/iot-edge-with-ansible)
+* [Azure IoT Edge: Virtual Kubelet & AKS](azure/iot-edge-with-virtual-kubelet-and-aks)
+
+
 # AWS Experiments
 
 * [Logging files with S3, Lambda, CloudWatch and Python](aws/logging-files-with-s3-lambda-cloudwatch-python)
