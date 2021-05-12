@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random</title>
+</head>
+<body>
+  <div id="app">
+    <div>
+      <button type="button" onclick="generate()">Generate</button> 
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.14/vuetify.min.js"></script>
+  <script src="./swagger-client.js"></script>
+  <script>
+    var data = {
+    };
+
+    new Vue({
+      el: '#app',
+      data: data
+    });
+
+    var swagger = null;
+    try {
+      new SwaggerClient({
+        url: location.origin + "/openapi.json"
+      }).then(handle => {swagger = handle;});
+    } catch (exception) {
+      (console.error || console.log).call(console, exception.stack || exception);
+    }
+
+    function generate(){
+      console.log(swagger);
+      swagger.apis.default.generate().then(function(result){alert(result.body.value);});
+    }
+
+    // function authRefresh(){
+    //   fetch('/.auth/refresh', {
+    //     method: 'get'
+    //   }).then(() => { console.log('Auth refresh!'); });
+    // }
+
+    function authLogout(){
+      window.location.href = '/.auth/logout';
+    }
+
+    setTimeout(authLogout, 8 * 3600000);
+
+  </script>
+</body>
+</html>

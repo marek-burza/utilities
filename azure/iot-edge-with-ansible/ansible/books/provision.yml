@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: True
+
+- import_playbook: provision-docker-x86_64.yml
+  when: "'x86_64' in ansible_architecture"
+
+- import_playbook: provision-docker-arm.yml
+  when: "'arm' in ansible_architecture"
+
+- import_playbook: provision-azure-iot-edge.yml

@@ -1,0 +1,10 @@
+- name: Azure IoT Edge
+  docker_container:
+    name: azure-iot-edge
+    image: altermarkive/azure-iot-edge
+    restart_policy: always
+    container_default_behavior: compatibility
+    env:
+      AZURE_IOT_EDGE_CONNECTION_STRING: "{{ azure_iot_edge_connection_string }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
