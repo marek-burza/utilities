@@ -43,7 +43,7 @@ def collect_metadata(prefix, element, entry, log):
     for child in element.childNodes:
         if child.nodeType == child.TEXT_NODE:
             continue
-        elif child.tagName == 'MetadataEntry':
+        if child.tagName == 'MetadataEntry':
             key = child.attributes['key'].value
             key = f'{prefix}{key}'
             value = child.attributes['value'].value
@@ -137,7 +137,7 @@ def extract_all_from_apple_export(export, flat, log):
         for child in structured.documentElement.childNodes:
             if child.nodeType == child.TEXT_NODE:
                 continue
-            elif child.tagName == 'ExportDate':
+            if child.tagName == 'ExportDate':
                 extract_simple_entry(child, flat, log)
             elif child.tagName == 'Me':
                 extract_simple_entry(child, flat, log)
