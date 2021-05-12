@@ -1,0 +1,59 @@
+name: Docker Build
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(gh release view -R https://github.com/tonarino/innernet.git | grep ^tag\: | sed 's/tag\:\t*v//g')
+          echo ::set-output name=version::${VERSION}
+      - name: Tags
+        id: tags
+        run: |
+          DOCKER_IMAGE=${{ github.actor }}/${GITHUB_REPOSITORY#*/}
+          TAGS_INNERNET_SERVER="${DOCKER_IMAGE}-server:${{ steps.version.outputs.version }},${DOCKER_IMAGE}-server:latest"
+          TAGS_INNERNET="${DOCKER_IMAGE}:${{ steps.version.outputs.version }},${DOCKER_IMAGE}:latest"
+          echo ::set-output name=tags_innernet_server::${TAGS_INNERNET_SERVER}
+          echo ::set-output name=tags_innernet::${TAGS_INNERNET}
+      - name: QEMU
+        uses: docker/setup-qemu-action@v1.1.0
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.3.0
+      - name: Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build (innernet-server)
+        uses: docker/build-push-action@v2.4.0
+        with:
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+          context: .
+          file: innernet-server.Dockerfile
+          push: true
+          platforms: linux/386,linux/amd64,linux/arm64/v8
+          tags: ${{ steps.tags.outputs.tags_innernet_server }}
+      - name: Build (innernet)
+        uses: docker/build-push-action@v2.4.0
+        with:
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+          context: .
+          file: innernet.Dockerfile
+          push: true
+          platforms: linux/386,linux/amd64,linux/arm64/v8
+          tags: ${{ steps.tags.outputs.tags_innernet }}
