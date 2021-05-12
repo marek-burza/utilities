@@ -12,21 +12,21 @@ docker run --restart always -d --network host -v $HOME/.ssh:/ssh:ro altermarkive
 ```
 
 
+## cli-aws
+
+Can be used to run AWS CLI in a bash shell like this:
+
+```bash
+docker run --rm -it -v $HOME/.aws:/root/.aws -v $PWD:/w -w /w altermarkive/cli-aws
+```
+
+
 ## cli-azure
 
 Can be used to run Azure CLI in a bash shell like this:
 
 ```bash
 docker run --rm -it -v $HOME/.azure:/root/.azure -v $PWD:/w -w /w altermarkive/cli-azure
-```
-
-
-## cli-azure
-
-Can be used to run AWS CLI in a bash shell like this:
-
-```bash
-docker run --rm -it -v $HOME/.azure:/root/.azure -v $PWD:/w -w /w altermarkive/cli-aws
 ```
 
 
