@@ -1,6 +1,6 @@
-FROM alpine:3.13
+FROM alpine:3.13.5
 
-RUN apk add --update-cache curl
+RUN apk add --update --no-cache curl
 
 ADD run.sh /
 
