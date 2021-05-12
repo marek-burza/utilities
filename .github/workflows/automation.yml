@@ -24,4 +24,4 @@ jobs:
           file: Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ${{ github.actor }}/${GITHUB_REPOSITORY#*/}:latest
+          tags: ${{ github.actor }}/apple-health-to-csv:latest
