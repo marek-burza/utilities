@@ -17,12 +17,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(gh release view -R https://github.com/tailscale/tailscale.git | grep ^tag\: | sed 's/tag\:\t*v//g')
           git clone https://github.com/tailscale/tailscale.git
           cd tailscale
-          VCS_REF=$(git show-ref --hash tags/v${VERSION})
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+          VCS_REF=$(git show-ref --hash tags/${VERSION})
           cd -
-          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=version::${VERSION#v}
           echo ::set-output name=vcs_ref::${VCS_REF}
       - name: Tags
         id: tags
