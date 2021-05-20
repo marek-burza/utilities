@@ -15,8 +15,8 @@ LogLevel INFO
 LoginGraceTime 10
 PermitRootLogin no
 StrictModes no
-MaxAuthTries 1
-MaxSessions 0
+MaxAuthTries 6
+MaxSessions 10
 
 PubkeyAuthentication yes
 
