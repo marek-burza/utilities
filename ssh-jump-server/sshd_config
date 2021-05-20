@@ -36,23 +36,12 @@ PermitEmptyPasswords no
 
 ChallengeResponseAuthentication no
 
-KerberosAuthentication no
-KerberosOrLocalPasswd yes
-KerberosTicketCleanup yes
-KerberosGetAFSToken no
-
-GSSAPIAuthentication no
-GSSAPICleanupCredentials yes
-
-UsePAM no
-
 AllowAgentForwarding yes
 AllowTcpForwarding yes
 GatewayPorts yes
 X11Forwarding no
 PermitTTY yes
 PrintMotd no
-PrintLastLog yes
 TCPKeepAlive yes
 PermitUserEnvironment no
 Compression yes
