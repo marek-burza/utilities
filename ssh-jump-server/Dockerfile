@@ -7,7 +7,10 @@ ADD entrypoint.sh /entrypoint.sh
 
 RUN rm -rf /etc/ssh/ssh_host_*_key
 
+RUN adduser -s "/bin/true" -D -G "users" "user" && \
+    passwd -u "user" &> /dev/null
+
 EXPOSE 22
 
 ENTRYPOINT [ "/bin/sh", "/entrypoint.sh" ]
-CMD [ "/usr/sbin/sshd", "-D" ]
+CMD [ "/usr/sbin/sshd", "-D", "-e" ]
