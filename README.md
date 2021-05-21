@@ -233,6 +233,12 @@ or shorter:
 docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /ssh/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
 ```
 
+Additional materials:
+
+* [How to SSH Into a Kubernetes Pod From Outside the Cluster](https://betterprogramming.pub/how-to-ssh-into-a-kubernetes-pod-from-outside-the-cluster-354b4056c42b)
+* [Kubernetes - Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
+* [Kubernetes - Get a Shell to a Running Container](https://kubernetes.io/docs/tasks/debug-application-cluster/get-shell-running-container/)
+* [Kubernetes - Create an External Load Balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/)
 
 
 ## svetovid
