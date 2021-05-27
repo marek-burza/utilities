@@ -224,13 +224,13 @@ Forward the SSH:
 
 ```bash
 docker run --restart always -d --name forward22 --network host --add-host=host.docker.internal:host-gateway altermarkive/socat TCP4-LISTEN:10022,fork,reuseaddr TCP4:host.docker.internal:22
-docker run --restart always -d --name autossh22 --network host -v $HOME/.jump:/keys:ro altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /ssh/id_rsa -R 22002:127.0.0.1:10022 -N user@${JUMP_SERVER_HOST}
+docker run --restart always -d --name autossh22 --network host -v $HOME/.jump:/keys:ro altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:127.0.0.1:10022 -N user@${JUMP_SERVER_HOST}
 ```
 
 or shorter:
 
 ```bash
-docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /ssh/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
+docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
 ```
 
 Additional materials:
