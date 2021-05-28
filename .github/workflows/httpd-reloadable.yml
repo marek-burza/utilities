@@ -1,0 +1,40 @@
+name: Automation for httpd-reloadable
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    env:
+      DOCKERHUB_USER: ${{ github.actor }}
+    steps:
+      - name: Version
+        id: version
+        run: |
+          VERSION=$(curl -L -s 'https://registry.hub.docker.com/v2/repositories/library/httpd/tags?page_size=1000000' | jq -r '."results"[]["name"]' | grep "2\..*\..*\-alpine" | sort | tail -1)
+          DOCKER_IMAGE=${{ github.actor }}/httpd-reloadable
+          TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:latest"
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=tags::${TAGS}
+      - name: Initiating
+        uses: actions/checkout@v2.3.4
+      - name: QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.3.0
+      - name: Authorizing
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Building
+        uses: docker/build-push-action@v2.5.0
+        with:
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+          context: azure/apache-reverse-proxy-lets-encrypt-aad
+          push: true
+          platforms: linux/386,linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
+          tags: ${{ steps.version.outputs.tags }}

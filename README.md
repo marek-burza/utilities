@@ -9,6 +9,7 @@
 * [Azure IoT Edge: Containerized](azure/iot-edge-containerized)
 * [Azure IoT Edge: Module & service boilerplate example](azure/iot-edge-module)
 * [Azure IoT Edge: Provisioning with Ansible](azure/iot-edge-with-ansible)
+* [Apache-based reverse proxy with Let's Encrypt and Azure Active Directory authentication](azure/apache-reverse-proxy-lets-encrypt-aad)
 
 
 # AWS Experiments
