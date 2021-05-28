@@ -1,4 +1,4 @@
-name: Automation Script
+name: Automation for azure-iot-edge
 
 on: [push]
 
