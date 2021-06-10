@@ -201,7 +201,7 @@ ServerName $FQDN
 MDContactEmail $EMAIL
 MDomain $FQDN
 MDCertificateAgreement accepted
-MDMessageCmd /bin/sh -c "sudo /usr/local/apache2/bin/apache-graceful-reload.sh"
+MDNotifyCmd /bin/sh -c "sudo /usr/local/apache2/bin/apache-graceful-reload.sh"
 
 <VirtualHost *:80>
   ServerAdmin $EMAIL
@@ -226,6 +226,9 @@ the config file above):
 ```bash
 docker run -d --name apache-proxy -p 80:80 -v $PWD/apache-https.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro altermarkive/httpd-reloadable:2.4.48-alpine
 ```
+
+The configuration can be the verified online with this service:
+[https://www.ssllabs.com/ssltest/](https://www.ssllabs.com/ssltest/)
 
 
 ## To Be Continued...
