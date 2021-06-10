@@ -238,3 +238,122 @@ further extended with a suitable module capable of authentication with OpenID pr
 Here, the [mod_auth_openidc](https://github.com/zmartzone/mod_auth_openidc) module will be used
 and the modification will be based partially on the example
 [here](https://github.com/zmartzone/mod_auth_openidc/blob/master/Dockerfile-alpine)
+
+
+## Authentication with Azure Active Directory
+
+This part covers configuration of the Apache with OpenID and it is based on an article publicated
+[here](http://dbaharrison.blogspot.com/2018/08/modern-apache-authentication-with-azure.html).
+
+First, register the app with Azure Active Directory:
+
+```bash
+export TENNANT_ID=$(az account show --query ["tenantId"][0] --output tsv)
+export PASSWORD=$(openssl rand -base64 32)
+az ad app create --display-name $NAME --password $PASSWORD --end-date $(date --date='2 years' +"%Y-%m-%d") --reply-urls https://${FQDN}/secure/redirect_uri --native-app false --required-resource-accesses @required-resource-accesses.json
+export PASSPHRASE=$(openssl rand -base64 32)
+```
+
+This series of commands requires the presence of following file (`required-resource-accesses.json`):
+
+```
+[
+    {
+        "additionalProperties": null,
+        "resourceAccess": [
+            {
+                "additionalProperties": null,
+                "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                "type": "Scope"
+            }
+        ],
+        "resourceAppId": "00000003-0000-0000-c000-000000000000"
+    }
+]
+```
+
+Then, create the config file (don't forget to replace `$REVERSE_PROXIED_HOST`, `$FQDN`, `$EMAIL`,
+`$TENANT_ID`, `$ID`, `$PASSWORD`, `$PASSPHRASE` with suitable values):
+
+```
+ServerRoot "/usr/local/apache2"
+
+Listen *:80
+Listen *:443
+
+LoadModule mpm_event_module modules/mod_mpm_event.so
+LoadModule authz_core_module modules/mod_authz_core.so
+LoadModule log_config_module modules/mod_log_config.so
+LoadModule unixd_module modules/mod_unixd.so
+LoadModule dir_module modules/mod_dir.so
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule proxy_connect_module modules/mod_proxy_connect.so
+LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
+LoadModule ssl_module modules/mod_ssl.so
+LoadModule watchdog_module modules/mod_watchdog.so
+LoadModule md_module modules/mod_md.so
+LoadModule authn_core_module modules/mod_authn_core.so
+LoadModule authz_user_module modules/mod_authz_user.so
+LoadModule auth_openidc_module /usr/lib/apache2/mod_auth_openidc.so
+
+User daemon
+Group daemon
+
+<Directory />
+  AllowOverride None
+  Require all denied
+</Directory>
+
+ErrorLog /proc/self/fd/2
+
+LogLevel info
+LogFormat "%h %l %u %t \"%r\" %>s %b" common
+CustomLog /proc/self/fd/1 common
+
+Protocols h2 http/1.1
+SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1 -TLSv1.2
+SSLHonorCipherOrder Off
+SSLSessionTickets Off
+ServerName $FQDN
+
+MDContactEmail $EMAIL
+MDomain $FQDN
+MDCertificateAgreement accepted
+MDNotifyCmd /bin/sh -c "sudo /usr/local/apache2/bin/apache-graceful-reload.sh"
+
+OIDCProviderMetadataURL https://login.microsoftonline.com/$TENANT_ID/.well-known/openid-configuration
+OIDCClientID $ID
+OIDCClientSecret $PASSWORD
+OIDCRedirectURI https://$FQDN/secure/redirect_uri
+OIDCCryptoPassphrase $PASSPHRASE
+
+<VirtualHost *:80>
+  ServerAdmin $EMAIL
+  MDRequireHttps permanent
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerAdmin $EMAIL
+  ProxyRequests Off
+  ProxyPreserveHost On
+  SSLEngine On
+  SSLProxyEngine On
+  ProxyPass / http://$REVERSE_PROXIED_HOST/
+  ProxyPassReverse / http://$REVERSE_PROXIED_HOST/
+</VirtualHost>
+
+<Location />
+  AuthType openid-connect
+  Require expr %{REQUEST_URI} =~ m#^/.well-known/acme-challenge#
+  Require valid-user
+</Location>
+```
+
+The command to run the HTTPS encrypted reverse proxy authenticated with Azure Active Directory
+is largely unchanged except for the reference to the modified container image
+(`apache-aad.httpd.conf` refers to the config file above):
+
+```bash
+docker run -d --name apache-aad -p 80:80 -v $PWD/apache-aad.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro altermarkive/httpd-reloadable-openid:2.4.48-alpine
+```
