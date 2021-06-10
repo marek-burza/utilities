@@ -36,5 +36,5 @@ jobs:
             VERSION=${{ steps.version.outputs.version }}
           context: azure/apache-reverse-proxy-lets-encrypt-aad
           push: true
-          platforms: linux/386,linux/amd64,linux/arm64/v8,linux/arm/v7,linux/ppc64le
+          platforms: linux/386,linux/amd64,linux/arm64/v8,linux/ppc64le
           tags: ${{ steps.version.outputs.tags }}
