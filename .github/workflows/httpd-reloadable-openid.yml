@@ -1,4 +1,4 @@
-name: Automation for httpd-reloadable
+name: Automation for httpd-reloadable-openid
 
 on: [push]
 
