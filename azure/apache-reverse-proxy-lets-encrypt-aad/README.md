@@ -231,4 +231,10 @@ The configuration can be the verified online with this service:
 [https://www.ssllabs.com/ssltest/](https://www.ssllabs.com/ssltest/)
 
 
-## To Be Continued...
+## Apache with OpenID module
+
+To be able to authenticate with Azure Active Directory the Apache Docker container must be
+further extended with a suitable module capable of authentication with OpenID provider.
+Here, the [mod_auth_openidc](https://github.com/zmartzone/mod_auth_openidc) module will be used
+and the modification will be based partially on the example
+[here](https://github.com/zmartzone/mod_auth_openidc/blob/master/Dockerfile-alpine)
