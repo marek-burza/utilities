@@ -196,37 +196,6 @@ mkdir /tmp/nexus-data && sudo chown -R 200 /tmp/nexus-data
 docker run -p 8081:8081 -p 8082:8082 --name nexus -v /tmp/nexus-data:/nexus-data -it sonatype/nexus3:3.4.0
 ```
 
-## Docker Garbage Collection
-
-Demonstrating Docker Registry Garbage Collection:
-
-```bash
-rm -rf registry-cli 2> /dev/null
-git clone https://github.com/andrey-pohilko/registry-cli.git
-docker stop registry 2> /dev/null
-docker rm registry 2> /dev/null
-docker run -d -p 5000:5000 --restart=always --name registry -e REGISTRY_STORAGE_DELETE_ENABLED=true registry:2
-/bin/cat > Dockerfile << EOF
-FROM ubuntu:xenial
-ADD big.bin /big.bin
-EOF
-while :
-do
-  dd if=/dev/urandom of=big.bin bs=64M count=8 iflag=fullblock
-  docker build -t bloated .
-  rm big.bin
-  docker tag bloated localhost:5000/bloated
-  docker push localhost:5000/bloated
-  python3 registry-cli/registry.py -r http://localhost:5000 --delete-all --num 1
-  python3 registry-cli/registry.py -r http://localhost:5000
-  docker exec registry bin/registry garbage-collect /etc/docker/registry/config.yml
-  docker rmi bloated
-  docker rmi localhost:5000/bloated
-  docker images
-  df
-done
-```
-
 
 # Science
 
