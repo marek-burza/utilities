@@ -21,4 +21,4 @@
 * [Matlab Task Processing with SQS, MCR, Python, S3FS, rsyslog, Ubuntu, Docker, ECS and CloudWatch](aws/running-tasks-on-upload-with-sqs-ecs-cloudwatch-mcr-s3fs-rsyslog-python)
 * [Serving files from S3 with Amazon API Gateway, Lambda and Python](aws/serving-files-s3-apigateway-lambda-python)
 * [Kraken Logger with Lambda, DynamoDB and Python](aws/kraken-logger-with-lambda-dynamodb-python)
-* [Artificial Lector with Amazon Polly](artificial-lector-with-amazon-polly)
+* [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
