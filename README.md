@@ -6,3 +6,4 @@
 * [Boilerplate Python+aiohttp+connexion Docker container](aiohttp-connexion-container)
 * [Python script for converting text file written in Polish from ANSI to UTF-8 encoding](convert-polish-ansi-to-utf8)
 * [LG G Watch R - Sensors - Video with SVG & ffmpeg](lg-g-watch-r-sensors-video)
+* [Script replacing a color on a stenciled image](replace-color-on-stencil)
