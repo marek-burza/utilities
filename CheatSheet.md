@@ -175,6 +175,15 @@ Send text "test" in a UDP packet over IPv4 with a connection time of 1 second fr
 
     echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
 
+## HTTP
+
+Headers to prevent browsers from caching:
+
+```
+Cache-Control: no-cache, no-store, must-revalidate
+Pragma: no-cache
+```
+
 
 # Science
 
