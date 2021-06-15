@@ -10,7 +10,7 @@
 | Win + I            | Windows: System settings                                         |
 | Alt + P            | Windows Explorer: Toggle preview panel                           |
 | Ctrl + Shift + E   | Visual Studio Code: Navigate between editor and file tree panels |
-| Ctrl + L           | Firefox: Go to address bar                                       |
+| Alt + D            | Edge: Select the URL in the address bar to edit                  |
 
 
 # Chrome
