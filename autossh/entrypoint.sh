@@ -6,4 +6,4 @@ then
   echo $AUTOSSH_ID_KEY > /root/.ssh/id_key
 fi
 
-exec "$@"
+/usr/bin/autossh "$@"
