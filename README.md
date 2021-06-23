@@ -55,8 +55,6 @@ docker run --restart always -d -e CRONTAB="$(cat crontab)" altermarkive/cron-cur
 
 ## exif
 
-# Photos & Videos
-
 To run the tools included in exif image use these commands:
 
 ```bash
@@ -145,6 +143,15 @@ Can be used for conversion between formats:
 ```bash
 docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick example.png example.pdf
 docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick -density 600 example.pdf example.png
+```
+
+Or, in combination with the `altermarkive/exif` utility, one can run the following `compact.sh` (for example with this command - `find . -name "*.JPG" -exec /bin/sh compact.sh {} \;`):
+
+```bash
+#!/bin/sh
+export FILE_IN=$1
+export FILE_OUT=$PREFIX.$(docker run --rm -v $PWD:/w -w /w --entrypoint /usr/bin/exiftool altermarkive/exif -CreateDate $1 | sed 's/[^0-9]*//g').heic
+docker run --rm -v $PWD:/w -w /w altermarkive/imagemagick $FILE_IN $FILE_OUT
 ```
 
 
