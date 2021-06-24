@@ -1,13 +1,14 @@
-FROM golang:1.16.2-alpine AS Build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 as BuildStage
 
-WORKDIR /input
-COPY . .
-RUN go get -d -v
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /output/gpx2png
+ADD . /app
+WORKDIR /app
+
+RUN dotnet publish -c Release
 
 
-FROM golang:1.16.2-alpine
+FROM nginx:1.21.0-alpine
 
-COPY --from=Build /output/gpx2png /gpx2png
+COPY --from=BuildStage /app/bin/Release/net5.0/publish/wwwroot /app
+COPY nginx.conf /etc/nginx/nginx.conf
 
-ENTRYPOINT [ "/gpx2png" ]
+EXPOSE 80
