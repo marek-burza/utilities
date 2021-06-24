@@ -44,6 +44,7 @@ jobs:
           git config user.email $GITHUB_ACTOR@users.noreply.github.com
           git checkout --orphan gh-pages
           dotnet publish -c Release
+          touch bin/Release/net5.0/publish/wwwroot/.nojekyll
           git --work-tree bin/Release/net5.0/publish/wwwroot add --all
           git --work-tree bin/Release/net5.0/publish/wwwroot commit -m gh-pages
           git remote add github "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
