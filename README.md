@@ -1,5 +1,18 @@
-# GPX to PNG
+# GPX to SVG
 
-To convert a GPX to a static image in PNG format run:
+Originally started as a CLI written in Go but ported to C# as a Blazor WebAssembly front-end app
 
-    docker run --rm -it -v $PWD:/data -w /data altermarkive/gpx2png tour.gpx opentopomap 5000 5000 FF0000 16 FF00FF 16 tour.png
+To build & run it locally:
+
+```bash
+docker build -t gpx-to-svg .
+docker run --rm -it -p 8080:80 gpx-to-svg
+```
+
+To use a pre-built Docker container image:
+
+```bash
+docker run --rm -it -p 8080:80 altermarkive/gpx-to-svg
+```
+
+Or just go [here](https://altermarkive.github.io/gpx-to-svg/).
