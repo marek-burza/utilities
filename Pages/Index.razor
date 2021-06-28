@@ -1,0 +1,82 @@
+@page "/"
+
+<style>
+    #mapWrapper {
+        position: relative;
+        height: 100%;
+    }
+
+    #mapId {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    #legend {
+        margin: 0;
+        padding: 0;
+        width: 70vw;
+        height: calc(70vw * 110 / 950);
+        position: absolute;
+        top: calc(95vh - 70vw * 110 / 950);
+        left: 15vw;
+        right: 85vw;
+        bottom: 95vh;
+        z-index: 100000;
+    }
+</style>
+
+<MudAppBar>
+    <MudGrid>
+        <MudItem xs="4">
+            <MudTextField @bind-Value="point" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>
+        <MudItem xs="1" Class="d-flex align-center justify-center">
+            <MudIconButton Icon="@Icons.Material.Filled.Place" Size="Size.Medium" OnClick="Go" />
+        </MudItem>
+        <MudItem xs="3">
+            <MudSelect @bind-Value="mode" Variant="Variant.Outlined" Margin="Margin.Dense">
+                @foreach (KeyValuePair<string, string> entry in modes)
+
+                {
+                    <MudSelectItem Value="@entry.Key">@entry.Value</MudSelectItem>
+
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="3">
+            <MudSelect T="int" @bind-Value="density" Variant="Variant.Outlined" Margin="Margin.Dense">
+                @foreach (int item in Enumerable.Range(10, 31).ToArray())
+
+                {
+                    <MudSelectItem Value="@item">@item</MudSelectItem>
+
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="1" Class="d-flex align-center justify-center">
+            <MudIconButton Icon="@Icons.Material.Outlined.GridOn" Size="Size.Medium" OnClick="Explore" />
+        </MudItem>
+    </MudGrid>
+</MudAppBar>
+<MudMainContent Style="height: 100vh;">
+    <div id="mapWrapper">
+        <Map @ref="mapRef" MapOptions="@mapOptions"></Map>
+    </div>
+    <div id="legend">
+        <img src="legend.svg" width="100%" />
+    </div>
+</MudMainContent>
+<MudDialogProvider DisableBackdropClick="true" />
+<MudDialog @bind-IsVisible="exploring" DisableBackdropClick="true">
+    <TitleContent>
+        <MudText>Please stand by...</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudPaper>
+            <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="@progress" Class="mb-4" />
+        </MudPaper>
+    </DialogContent>
+</MudDialog>
