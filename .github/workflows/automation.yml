@@ -1,0 +1,35 @@
+name: Automation Script
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Prepare
+        uses: actions/setup-dotnet@v1.8.0
+        with:
+          dotnet-version: '5.0.301'
+      - name: Publish
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          BING_MAPS_API_KEY: ${{ secrets.BING_MAPS_API_KEY }}
+        run: |
+          sudo apt-get -yq update
+          sudo apt-get -yq install gettext
+          envsubst '$BING_MAPS_API_KEY' < BingMaps.cs | tee BingMaps.cs
+          git config user.name $GITHUB_ACTOR
+          git config user.email $GITHUB_ACTOR@users.noreply.github.com
+          git checkout --orphan gh-pages
+          dotnet publish -c Release
+          touch bin/Release/net5.0/publish/wwwroot/.nojekyll
+          git --work-tree bin/Release/net5.0/publish/wwwroot add --all
+          git --work-tree bin/Release/net5.0/publish/wwwroot commit -m gh-pages
+          git remote add github "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
+          git push github HEAD:gh-pages --force
+          rm -r bin obj
+          git checkout -f master
+          git branch -D gh-pages

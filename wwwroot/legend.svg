@@ -1,0 +1,22 @@
+<svg version="1.1" baseProfile="full" width="950" height="110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="950" height="110" style="fill:#FFFFFFFF; stroke:none; stroke-width:0;"></rect>
+    <text x="475" y="25" text-anchor="middle" style="font-family: Arial;">max. minutes</text>
+    <rect x="25" y="40" width="100" height="50" style="fill:#0000FF80; stroke:none; stroke-width:0;"></rect>
+    <text x="75" y="70" text-anchor="middle" style="font-family: Arial;">&lt; 10</text>
+    <rect x="125" y="40" width="100" height="50" style="fill:#0080FF80; stroke:none; stroke-width:0;"></rect>
+    <text x="175" y="70" text-anchor="middle" style="font-family: Arial;">10-15</text>
+    <rect x="225" y="40" width="100" height="50" style="fill:#00FFFF80; stroke:none; stroke-width:0;"></rect>
+    <text x="275" y="70" text-anchor="middle" style="font-family: Arial;">15-20</text>
+    <rect x="325" y="40" width="100" height="50" style="fill:#00FF0080; stroke:none; stroke-width:0;"></rect>
+    <text x="375" y="70" text-anchor="middle" style="font-family: Arial;">20-25</text>
+    <rect x="425" y="40" width="100" height="50" style="fill:#FFFF0080; stroke:none; stroke-width:0;"></rect>
+    <text x="475" y="70" text-anchor="middle" style="font-family: Arial;">25-30</text>
+    <rect x="525" y="40" width="100" height="50" style="fill:#FF800080; stroke:none; stroke-width:0;"></rect>
+    <text x="575" y="70" text-anchor="middle" style="font-family: Arial;">30-35</text>
+    <rect x="625" y="40" width="100" height="50" style="fill:#FF000080; stroke:none; stroke-width:0;"></rect>
+    <text x="675" y="70" text-anchor="middle" style="font-family: Arial;">35-40</text>
+    <rect x="725" y="40" width="100" height="50" style="fill:#FF00FF80; stroke:none; stroke-width:0;"></rect>
+    <text x="775" y="70" text-anchor="middle" style="font-family: Arial;">40-45</text>
+    <rect x="825" y="40" width="100" height="50" style="fill:#00000080; stroke:none; stroke-width:0;"></rect>
+    <text x="875" y="70" text-anchor="middle" style="font-family: Arial;">&gt; 45</text>
+</svg>
