@@ -34,7 +34,7 @@ namespace CommuteTimeMapper.Pages
         private PolygonOptions Time45 = new PolygonOptions() { Stroke = false, FillOpacity = 0.5, FillColor = "#FF00FF" };  // Magenta
         private PolygonOptions Time50 = new PolygonOptions() { Stroke = false, FillOpacity = 0.5, FillColor = "#000000" }; // Black
 
-        private int density = 20;
+        private int density = 10;
 
         private bool exploring = false;
         private double progress = 100;
