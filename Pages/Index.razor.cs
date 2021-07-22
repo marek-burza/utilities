@@ -108,7 +108,7 @@ namespace CommuteTimeMapper.Pages
                             polygons.Add(polygon);
                             break;
                         }
-                        catch (Exception exception)
+                        catch (Exception)
                         {
                             continue;
                         }
