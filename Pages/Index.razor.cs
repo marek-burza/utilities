@@ -98,10 +98,21 @@ namespace CommuteTimeMapper.Pages
                     LatLng origin = new LatLng(
                         center.Lat + (height / 2) - (y + 0.5) * step,
                         center.Lng - (width / 2) + (x + 0.5) * (2 * step));
-                    int duration = await BingMapsHttp.QueryCommute(mode, origin, destination);
-                    Polygon polygon = await this.PolygonFactory.CreateAndAddToMap(Square(origin, step), this.mapRef);
-                    await polygon.SetStyle(Style(duration / 60));
-                    polygons.Add(polygon);
+                    for (int retry = 0; retry < 3; retry++)
+                    {
+                        try
+                        {
+                            int duration = await BingMapsHttp.QueryCommute(mode, origin, destination);
+                            Polygon polygon = await this.PolygonFactory.CreateAndAddToMap(Square(origin, step), this.mapRef);
+                            await polygon.SetStyle(Style(duration / 60));
+                            polygons.Add(polygon);
+                            break;
+                        }
+                        catch (Exception exception)
+                        {
+                            continue;
+                        }
+                    }
                     double index = y * width / (2 * step) + x;
                     progress = 100 * index / length;
                     StateHasChanged();
