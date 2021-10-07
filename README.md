@@ -378,7 +378,12 @@ docker run --rm -it -v $PWD:/w -w /w altermarkive/xpstopdf example.xps example.p
 | Win + I            | Windows: System settings                                         |
 | Alt + P            | Windows Explorer: Toggle preview panel                           |
 | Ctrl + Shift + E   | Visual Studio Code: Navigate between editor and file tree panels |
+| Ctrl + \[          | Visual Studio Code: Unindent selection                           |
+| Ctrl + \]          | Visual Studio Code: Indent selection                             |
+| Ctrl + Shift + L   | Visual Studio Code: Select all occurences                        |
 | Alt + D            | Edge: Select the URL in the address bar to edit                  |
+| Ctrl + W           | Edge: Close tab                                                  |
+| Ctrl + Shift + L   | Visual Studio Code: Select all occurences                        |
 
 ## git
 
