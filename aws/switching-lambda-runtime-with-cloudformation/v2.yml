@@ -1,0 +1,39 @@
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: EraseMe Python
+      FunctionName: eraseme
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import boto3
+          import os
+
+          logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
+
+          def handler(event, context):
+            logger.info('Hello Python!')
+            logger.info(event)
+            return '{}'
+
+      Handler: index.handler
+      MemorySize: 128
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.8

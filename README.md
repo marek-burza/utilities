@@ -22,3 +22,4 @@
 * [Serving files from S3 with Amazon API Gateway, Lambda and Python](aws/serving-files-s3-apigateway-lambda-python)
 * [Kraken Logger with Lambda, DynamoDB and Python](aws/kraken-logger-with-lambda-dynamodb-python)
 * [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
+* [Switching Lambda Runtime with CloudFormation](aws/switching-lambda-runtime-with-cloudformation)
