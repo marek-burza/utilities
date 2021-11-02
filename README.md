@@ -23,3 +23,8 @@
 * [Kraken Logger with Lambda, DynamoDB and Python](aws/kraken-logger-with-lambda-dynamodb-python)
 * [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
 * [Switching Lambda Runtime with CloudFormation](aws/switching-lambda-runtime-with-cloudformation)
+
+
+# Other Experiments
+
+* [Tailscale as a Sidecar Container](other/tailscale-as-sidecar)
