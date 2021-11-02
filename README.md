@@ -194,11 +194,16 @@ image.save('example.png')
 
 ## poppler
 
-Can be used to extract pages from a PDF file and to join PDF files:
+Can be used to extract pages from a PDF file:
 
 ```bash
 docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive/poppler example.pdf 1.pdf result.pdf
+```
+
+Or to join PDF files:
+
+```bash
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive/poppler 0.pdf 1.pdf result.pdf
 ```
 
 
