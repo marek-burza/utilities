@@ -1,9 +1,11 @@
-# Unofficial Docker image for Tailscale ![Build status](https://github.com/altermarkive/tailscale/workflows/Docker%20Build/badge.svg)
+# Tailscale as a sidecar
 
-Given that [Tailscale](https://tailscale.com/) does not yet publish their own Docker image (see [this issue](https://github.com/tailscale/tailscale/issues/504) for details) I decided to put together my own (and the outcome is partially inspired by https://github.com/function61/tailscale-dockerimage).
+Given that [Tailscale](https://tailscale.com/) finally published their own Docker image it is no longer necessary to put together own one.
 
-To run the Tailscale daemon and join it to your network run the following command:
+To run the Tailscale daemon as a "sidecar" on Kubernetes start reading [here](https://tailscale.com/blog/kubecon-21/).
+
+To run the Tailscale daemon as a "sidecar" to the services bound to the Docker host run the following command:
 
 ```bash
-docker run -d --name tailscaled --hostname $HOSTNAME -e TAILSCALE_AUTH_KEY=$TAILSCALE_AUTH_KEY -v $PWD/tailscale:/var/lib/tailscale --device /dev/net/tun --network host --cap-add=NET_ADMIN --restart unless-stopped altermarkive/tailscale
+docker run -d --name tailscaled --hostname fujitsu -e TAILSCALE_AUTH_KEY=$TAILSCALE_AUTH_KEY -v $HOME/.tailscale:/var/lib/tailscale --device /dev/net/tun --network host --cap-add=NET_ADMIN --restart unless-stopped --entrypoint /bin/sh -e TAILSCALE_AUTH_KEY=$TAILSCALE_AUTH_KEY tailscale/tailscale:latest -c '(([ ! -f "/var/lib/tailscale/tailscaled.state" ] && ( sleep 3; /usr/local/bin/tailscale up --authkey=$TAILSCALE_AUTH_KEY)) &); /usr/local/bin/tailscaled'
 ```
