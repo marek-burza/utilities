@@ -9,6 +9,7 @@
 * [Kraken Logger with Lambda, DynamoDB and Python](aws/kraken-logger-with-lambda-dynamodb-python)
 * [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
 * [Cross-region (cross-account) ECR replication for AWS Lambda](aws/ecr-replication-for-lambda)
+* [Kubernetes: EKS with Fargate, ECR and a simple ALB, using Terraform & Helm](aws/eks-fargate-ecr-terraform-helm)
 
 
 # Azure Experiments

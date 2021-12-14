@@ -1,0 +1,5 @@
+image_uri: "image_uri"
+image_tag: "image_tag"
+aws_secret_access_key: "aws_secret_access_key"
+aws_access_key_id: "aws_access_key_id"
+aws_default_region: "aws_default_region"
