@@ -5,20 +5,32 @@ on: [push]
 jobs:
   pipeline:
     name: Pipeline
-    runs-on: ubuntu-18.04
-    env:
-      DOCKERHUB_USER: ${{ github.actor }}
+    runs-on: ubuntu-20.04
     steps:
       - name: Initiating
-        uses: actions/checkout@v1
-      - name: Building
+        uses: actions/checkout@v2.4
+      - name: Tags
+        id: tags
         run: |
-          docker build -t $DOCKERHUB_USER/ssh-over-tor:amd64-$(git describe --tags) -f Dockerfile.amd64 .
-          docker build -t $DOCKERHUB_USER/ssh-over-tor:armv7hf-$(git describe --tags) -f Dockerfile.armv7hf .
-      - name: Publishing
-        env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USER --password-stdin
-          docker push $DOCKERHUB_USER/ssh-over-tor:amd64-$(git describe --tags)
-          docker push $DOCKERHUB_USER/ssh-over-tor:armv7hf-$(git describe --tags)
+          DOCKER_IMAGE='ghcr.io/${{ github.actor }}/ssh-over-tor'
+          TAGS="${DOCKER_IMAGE}:${{ github.ref }},${DOCKER_IMAGE}:latest"
+          echo ::set-output name=tags::${TAGS}
+      - name: QEMU
+        uses: docker/setup-qemu-action@v1.2
+      - name: Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.6
+      - name: Login
+        uses: docker/login-action@v1.10
+        with:
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+          registry: ghcr.io
+      - name: Build
+        uses: docker/build-push-action@v2.7
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: ${{ steps.tags.outputs.tags }}
