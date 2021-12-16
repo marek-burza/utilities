@@ -577,3 +577,80 @@ sudo reboot
 ### Chrome
 
 * To enable password import got to `chrome://flags/`
+
+### Alacritty
+
+```yaml
+window:
+  padding:
+    x: 6
+    y: 0
+  dynamic_padding: true
+  decorations: full
+  dynamic_title: true
+  startup_mode: Maximized
+
+scrolling:
+  history: 100000
+  multiplier: 1
+
+font:
+  normal:
+    family: JetBrains Mono
+    style: Regular
+  bold:
+    family: JetBrains Mono
+    style: Bold
+  italic:
+    family: JetBrains Mono
+    style: Italic
+  bold_italic:
+    family: JetBrains Mono
+    style: Bold Italic
+  size: 12.0
+  use_thin_strokes: true
+
+colors:
+  primary:
+    background: '#0C0C0C'
+    foreground: '#CCCCCC'
+  cursor:
+    cursor: '#FFFFFF'
+  selection:
+    background: '#FFFFFF'
+  normal:
+    black:   '#0C0C0C'
+    red:     '#C50F1F'
+    green:   '#13A10E'
+    yellow:  '#C19C00'
+    blue:    '#0037DA'
+    magenta: '#881798'
+    cyan:    '#3A96DD'
+    white:   '#CCCCCC'
+  bright:
+    black:   '#767676'
+    red:     '#E74856'
+    green:   '#16C60C'
+    yellow:  '#F9F1A5'
+    blue:    '#3B78FF'
+    magenta: '#B4009E'
+    cyan:    '#61D6D6'
+    white:   '#F2F2F2'
+
+selection:
+  save_to_clipboard: true
+
+cursor:
+  style:
+    shape: Beam
+    blinking: On
+
+shell:
+  program: 'C:/Program Files/Git/usr/bin/bash.exe'
+  args:
+    - -i
+    - -l
+
+mouse_bindings:
+  - { mouse: Middle, action: PasteSelection }
+```
