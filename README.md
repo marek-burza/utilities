@@ -562,6 +562,13 @@ diskutil list disk2
 diskutil partitionDisk disk2 1 MBR MS-DOS STICK R
 ```
 
+To make sure that fonts render well on the terminal:
+
+```bash
+defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
+defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
+```
+
 ### Raspberry Pi
 
 Quick and dirty script to expose USB disk from Raspberry Pi over a web server:
