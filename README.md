@@ -514,6 +514,10 @@ Pragma: no-cache
 
 * [Google Cloud Shell](https://shell.cloud.google.com/)
 
+### Other
+
+* [Import from CSV to draw.io](https://drawio-app.com/import-from-csv-to-drawio/)
+
 
 ## OS, web browser, etc.
 
