@@ -547,6 +547,12 @@ A command to set the default printer on Windows
 cscript C:\Windows\System32\Printing_Admin_Scripts\en-US\prnmngr.vbs -t -p "\\host\printer"
 ```
 
+Run Edge as an administrator (or any other user)
+
+```bash
+runas /user:"%ADMINISTRATOR%" /savecred "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+```
+
 Removing Dead Icons From Taskbar
 
 * See: https://www.tenforums.com/tutorials/3151-reset-clear-taskbar-pinned-apps-windows-10-a-3.html
