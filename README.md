@@ -575,7 +575,7 @@ gpg -o filename.tar.gz -d filename.tar.gz.gpg
 Basic tools:
 
 ```bash
-brew install meld
+brew install bash meld
 ```
 
 Completely disable sleep on any Mac:
@@ -616,6 +616,8 @@ sudo reboot
 
 ### Alacritty
 
+`$HOME/.alacritty.yml`:
+
 ```yaml
 window:
   padding:
@@ -643,7 +645,7 @@ font:
   bold_italic:
     family: JetBrains Mono
     style: Bold Italic
-  size: 12.0
+  size: 14.0
   use_thin_strokes: true
 
 colors:
@@ -682,7 +684,7 @@ cursor:
     blinking: On
 
 shell:
-  program: 'C:/Program Files/Git/usr/bin/bash.exe'
+  program: '/usr/local/bin/bash'
   args:
     - -i
     - -l
