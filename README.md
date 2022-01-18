@@ -563,7 +563,20 @@ List the password of a WiFi network:
 netsh wlan show profile name=$SSID key=clear
 ```
 
+File encryption/decryption with GPG
+
+```bash
+gpg --cipher-algo AES256 -c filename.tar.gz
+gpg -o filename.tar.gz -d filename.tar.gz.gpg
+```
+
 ### Mac
+
+Basic tools:
+
+```bash
+brew install meld
+```
 
 Completely disable sleep on any Mac:
 
