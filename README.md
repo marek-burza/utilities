@@ -575,7 +575,7 @@ gpg -o filename.tar.gz -d filename.tar.gz.gpg
 Basic tools:
 
 ```bash
-brew install bash meld jq
+brew install bash git jq p7zip python@3.10 meld
 ```
 
 Completely disable sleep on any Mac:
