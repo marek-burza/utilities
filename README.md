@@ -614,6 +614,12 @@ sudo reboot
 
 * To enable password import got to `chrome://flags/`
 
+### Visual Studio Code
+
+Extensions:
+
+* Docker, docs-markdown, docs-preview, docs-yaml, Pylance, Python, Remote - Containers, Remote - SSH, XML (RedHat), YAML (RedHat)
+
 ### Alacritty
 
 `$HOME/.alacritty.yml`:
