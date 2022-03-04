@@ -1,5 +1,12 @@
 # Data Science - Utilities
 
+Running Dask scheduler & worker:
+
+```bash
+docker run --name dask-scheduler --rm -d -p 8786:8786 -p 8787:8787 daskdev/dask:2022.2.1-py3.9 dask-scheduler
+docker run --name dask-worker --rm -d daskdev/dask:2022.2.1-py3.9 dask-worker host.docker.internal:8786
+```
+
 ## altermarkive/csv-aggregate
 
 This script statistically aggregates a CSV file.
