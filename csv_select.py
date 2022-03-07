@@ -4,33 +4,36 @@
 This script selects columns in CSV file.
 """
 
-import csv
-import operator
 import sys
+import dask.dataframe as dd
+import pandas as pd
 
-import pandas
 
-
-def main():
+def csv_select(in_file, columns):
     """
-    Main entry point into the script.
+    Selects columns in CSV file.
     """
-    if len(sys.argv) < 4:
-        print('USAGE: csv_select.py CSV_FILE_IN CSV_FILE_OUT COLUMN_1 COLUMN_2 ...')  # noqa: E501 pylint: disable=C0301
-    else:
-        with open(sys.argv[1], 'r') as handle_in:
-            reader = csv.DictReader(handle_in)
-            columns = sys.argv[3:]
-            values = operator.itemgetter(*columns)
-            with open(sys.argv[2], 'w') as handle_out:
-                writer = csv.DictWriter(handle_out, fieldnames=columns)
-                writer.writeheader()
-                for row in reader:
-                    writer.writerow(dict(zip(columns, values(row))))
-        data = pandas.read_csv(sys.argv[2])
-        data = data[columns].dropna(how='all')
-        data.to_csv(sys.argv[2], index=False)
+    data = pd.read_csv(in_file, usecols=columns, low_memory=False)
+    data = data[columns].dropna(how='all')
+    return data
+
+
+def csv_select_dask(in_file, columns):
+    """
+    Selects columns in CSV file (using Dask).
+    """
+    data = pd.read_csv(in_file, usecols=columns, low_memory=False)
+    data = dd.from_pandas(data, npartitions=1)
+    data = data[columns].dropna(how='all')
+    return data
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 4:
+        print('USAGE: csv_select.py CSV_FILE_IN CSV_FILE_OUT COLUMN_1 COLUMN_2 ...')  # noqa: E501 pylint: disable=C0301
+    else:
+        in_file = sys.argv[1]
+        out_file = sys.argv[2]
+        columns = sys.argv[3:]
+        data = csv_select(in_file, columns)
+        data.to_csv(sys.argv[2], index=False)
