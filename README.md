@@ -11,6 +11,8 @@
 * [Cross-region (cross-account) ECR replication for AWS Lambda](aws/ecr-replication-for-lambda)
 * [Kubernetes: EKS with Fargate, ECR and a simple ALB, using Terraform & Helm](aws/eks-fargate-ecr-terraform-helm)
 
+For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli).
+
 
 # Azure Experiments
 
@@ -24,6 +26,8 @@
 * [Azure IoT Edge: Module & service boilerplate example](azure/iot-edge-module)
 * [Azure IoT Edge: Provisioning with Ansible](azure/iot-edge-with-ansible)
 * [Apache-based reverse proxy with Let's Encrypt and Azure Active Directory authentication](azure/apache-reverse-proxy-lets-encrypt-aad)
+
+For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli).
 
 
 # Other Experiments
