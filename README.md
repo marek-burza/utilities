@@ -349,14 +349,6 @@ docker run --restart always -d --name veles -e ATLASSIAN_INSTANCE="$ATLASSIAN_IN
 ```
 
 
-## xpstopdf
-
-Can be used for conversion from XPS to PDF:
-
-```bash
-docker run --rm -it -v $PWD:/w -w /w altermarkive/xpstopdf example.xps example.pdf
-```
-
 # Cheat Sheet
 
 ## Keyboard Shortcuts
