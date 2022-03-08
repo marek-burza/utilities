@@ -195,15 +195,6 @@ docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive
 ```
 
 
-## python-linters
-
-Can be used for thorough Python linting of the current directory like this:
-
-```bash
-docker run -it -v $PWD:/w -w /w --entrypoint /bin/lint.sh altermarkive/python-linters
-```
-
-
 ## retroactive-git
 
 Can be used in the following way:
