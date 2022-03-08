@@ -175,17 +175,6 @@ docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive
 ```
 
 
-## retroactive-git
-
-Can be used in the following way:
-
-```bash
-docker run --rm -it -v $PWD:/w -w /w altermarkive/retroactive-git
-LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='1970-01-01 00:00:00' date
-LD_PRELOAD=/usr/local/lib/faketime/libfaketime.so.1 FAKETIME_NO_CACHE=1 FAKETIME='+365d' date
-```
-
-
 ## socat
 
 To expose Docker host ports on Docker networks it is often enough to use [`qoomon/docker-host`](https://github.com/qoomon/docker-host) (and it may be necessary to add `--network host`):
