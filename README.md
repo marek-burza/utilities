@@ -24,24 +24,6 @@ GatewayPorts yes
 ```
 
 
-## cli-aws
-
-Can be used to run AWS CLI in a bash shell like this:
-
-```bash
-docker run --rm -it -v $HOME/.aws:/root/.aws -v $PWD:/w -w /w altermarkive/cli-aws
-```
-
-
-## cli-azure
-
-Can be used to run Azure CLI in a bash shell like this:
-
-```bash
-docker run --rm -it -v $HOME/.azure:/root/.azure -v $PWD:/w -w /w altermarkive/cli-azure
-```
-
-
 ## cron-curl
 
 This Docker image allows to run `curl` commands on a schedule. For example,
@@ -575,7 +557,7 @@ gpg -o filename.tar.gz -d filename.tar.gz.gpg
 Basic tools:
 
 ```bash
-brew install bash git jq p7zip python@3.10 meld
+brew install bash git jq yq p7zip python@3.10 meld
 ```
 
 Completely disable sleep on any Mac:
