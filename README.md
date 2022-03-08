@@ -143,23 +143,6 @@ docker run --rm -v $PWD:/w -w /w altermarkive/imagemagick $FILE_IN $FILE_OUT
 ```
 
 
-## networking
-
-Contains nmap, netcat & tcpdump available for bash shell:
-
-```bash
-docker run --rm -it --network host altermarkive/networking
-```
-
-Here is the [link to ncat man page](http://man7.org/linux/man-pages/man1/ncat.1.html).
-
-Example 1: Send text "test" in a UDP packet over IPv4 with a connection time of 1 second from port 5000 to a broadcast address 172.17.255.255 and port 10000:
-
-```bash
-echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
-```
-
-
 ## poppler
 
 Can be used to extract pages from a PDF file:
@@ -188,7 +171,7 @@ it may be necessary to tunnel the traffic with [`socat`](https://www.redhat.com/
 here an example for `ssh`:
 
 ```bash
-docker run --restart always -d --name forwarder altermarkive/socat TCP4-LISTEN:22,fork,reuseaddr TCP4:host.docker.internal:22
+docker run --restart always -d --name forwarder alpine/socat TCP4-LISTEN:22,fork,reuseaddr TCP4:host.docker.internal:22
 ```
 
 Note: On Linux, the following option might be necessary to be added to the command above: `--add-host=host.docker.internal:host-gateway`
@@ -433,6 +416,14 @@ udp && (eth.addr == 00:11:22:33:44:55 || eth.addr == FF:FF:FF:FF:FF:FF)
 ```
 
 For more see [this link](https://wiki.wireshark.org/DisplayFilters).
+
+### netcat
+
+Send text "test" in a UDP packet over IPv4 with a connection time of 1 second from port 5000 to a broadcast address 172.17.255.255 and port 10000:
+
+```bash
+echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
+```
 
 ### HTTP
 
