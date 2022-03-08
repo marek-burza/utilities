@@ -160,26 +160,6 @@ echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
 ```
 
 
-## pillow
-
-Can be used like this:
-
-```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/local/bin/python altermarkive/pillow example.py
-```
-
-Where the `example.py` could look like this:
-
-```python
-from PIL import Image, ImageDraw
-
-image = Image.new('RGB', (128, 128))
-draw = ImageDraw.Draw(image)
-draw.text((10,10), 'Hello', fill=(255,255,255))
-image.save('example.png')
-```
-
-
 ## poppler
 
 Can be used to extract pages from a PDF file:
