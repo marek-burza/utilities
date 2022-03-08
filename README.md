@@ -72,10 +72,10 @@ find -type f -printf "mv %p \$ALBUM.\$(exiftool -CreateDate %p | cut -c 35- | se
 
 ## ffmpeg
 
-Can be used for AV conversion between formats:
+Can be used for AV conversion between formats ([`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)):
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w altermarkive/ffmpeg -i example.avi -c:a aac -c:v libx264 example.mp4
+docker run --rm -it -v $PWD:/w -w /w linuxserver/ffmpeg -i example.avi -c:a aac -c:v libx264 example.mp4
 ```
 
 To encode H.265:
