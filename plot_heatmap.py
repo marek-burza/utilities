@@ -6,18 +6,48 @@ This script creates a heatmap plot.
 
 import json
 import sys
-
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot
-import pandas
+import pandas as pd
 
 
-def heatmap(arguments):
+ARGUMENTS = {
+    'title': '',
+    'width': 12.80,
+    'height': 7.20,
+    'dpi': 100,
+    'cmap_n': 256,
+    'norm_vmin': None,
+    'norm_vmax': None,
+    'norm_clip': False,
+    'aspect': None,
+    'interpolation': None,
+    'alpha': None,
+    'vmin': None,
+    'vmax': None,
+    'origin': None,
+    'extent': None,
+    'filternorm': 1,
+    'filterrad': 4.0,
+    'resample': None,
+    'colorbar_extend': 'neither',
+    'colorbar_extendfrac': None,
+    'colorbar_extendrect': False,
+    'colorbar_spacing': 'uniform',
+    'colorbar_ticks': None,
+    'colorbar_format': None,
+    'colorbar_drawedges': None,
+}
+
+
+def heatmap(data, arguments):
     """
     Creates a heatmap
     """
-    data = pandas.read_csv(arguments['input_file'])
+    default = ARGUMENTS.copy()
+    default.update(arguments)
+    arguments = default
     figure, axes = matplotlib.pyplot.subplots()
     figure.set_figwidth(arguments['width'])
     figure.set_figheight(arguments['height'])
@@ -60,43 +90,13 @@ def heatmap(arguments):
     matplotlib.pyplot.close()
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
     if len(sys.argv) < 2:
         print('USAGE: plot_heatmap.py JSON_ARGUMENTS')
     else:
-        arguments = {
-            'title': '',
-            'width': 12.80,
-            'height': 7.20,
-            'dpi': 100,
-            'cmap_n': 256,
-            'norm_vmin': None,
-            'norm_vmax': None,
-            'norm_clip': False,
-            'aspect': None,
-            'interpolation': None,
-            'alpha': None,
-            'vmin': None,
-            'vmax': None,
-            'origin': None,
-            'extent': None,
-            'filternorm': 1,
-            'filterrad': 4.0,
-            'resample': None,
-            'colorbar_extend': 'neither',
-            'colorbar_extendfrac': None,
-            'colorbar_extendrect': False,
-            'colorbar_spacing': 'uniform',
-            'colorbar_ticks': None,
-            'colorbar_format': None,
-            'colorbar_drawedges': None
-            }
-        arguments.update(json.loads(sys.argv[1]))
-        heatmap(arguments)
-
-
-if __name__ == '__main__':
-    main()
+        arguments = json.loads(sys.argv[1])
+        data = pd.read_csv(arguments['input_file'], low_memory=False)
+        heatmap(data, arguments)

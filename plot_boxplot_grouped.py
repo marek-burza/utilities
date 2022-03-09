@@ -5,16 +5,14 @@ This script creates a box plot for the given value and group columns.
 """
 
 import sys
-
 import matplotlib.pyplot
-import pandas
+import pandas as pd
 
 
-def boxplot_grouped(file_in, column, column_groups, file_out):
+def boxplot_grouped(data, column, column_groups, file_out):
     """
     Creates a box plot for the given value and group columns
     """
-    data = pandas.read_csv(file_in)
     figure, axes = matplotlib.pyplot.subplots()
     figure.set_figwidth(12.80)
     figure.set_figheight(7.20)
@@ -37,7 +35,7 @@ def boxplot_grouped(file_in, column, column_groups, file_out):
     matplotlib.pyplot.close()
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
@@ -48,8 +46,5 @@ def main():
         file_out = sys.argv[2]
         column_values = sys.argv[3]
         column_groups = sys.argv[4]
-        boxplot_grouped(file_in, column_values, column_groups, file_out)
-
-
-if __name__ == '__main__':
-    main()
+        data = pd.read_csv(file_in, low_memory=False)
+        boxplot_grouped(data, column_values, column_groups, file_out)
