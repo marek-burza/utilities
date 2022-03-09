@@ -19,7 +19,7 @@ def data_join(data, delimiter, columns, column_joinded):
     """
     Joins columns
     """
-    columns = csv[columns]
+    columns = data[columns]
     data[column_joinded] = columns.apply(
         lambda item: join(item, delimiter), axis=1)
     return data
