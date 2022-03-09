@@ -7,16 +7,25 @@ This script creates a sampled pair plot for given columns.
 import json
 import re
 import sys
-
 import matplotlib.pyplot
-import pandas
+import pandas as pd
 
 
-def pairplot_sampled(arguments):
+ARGUMENTS = {
+    'title': '',
+    'width': 28.8,
+    'height': 28.8,
+    'dpi': 100,
+}
+
+
+def pairplot_sampled(data, arguments):
     """
     Creates a sampled pair plot for given columns
     """
-    data = pandas.read_csv(arguments['input_file'])
+    default = ARGUMENTS.copy()
+    default.update(arguments)
+    arguments = default
     if isinstance(arguments['feature_columns'], list):
         feature_columns = arguments['feature_columns']
     if isinstance(arguments['feature_columns'], str):
@@ -45,22 +54,13 @@ def pairplot_sampled(arguments):
     figure.savefig(arguments['output_file'])
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
     if len(sys.argv) < 2:
         print('USAGE: plot_pairplot_sampled.py JSON_ARGUMENTS')
     else:
-        arguments = {
-            'title': '',
-            'width': 28.8,
-            'height': 28.8,
-            'dpi': 100
-            }
-        arguments.update(json.loads(sys.argv[1]))
-        pairplot_sampled(arguments)
-
-
-if __name__ == '__main__':
-    main()
+        arguments = json.loads(sys.argv[1])
+        data = pd.read_csv(arguments['input_file'], low_memory=False)
+        pairplot_sampled(data, arguments)

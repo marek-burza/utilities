@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This script concatenates two CSV files.
+This script concatenates multiple CSV files.
 """
 
 import sys
+import pandas as pd
 
-import pandas
+
+def data_concatenate(data, concatenated):
+    """
+    Concatenates multiple data frames
+    """
+    for item in data:
+        concatenated = concatenated.append(item, sort=False)
+    return concatenated
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
     if len(sys.argv) <= 1:
         print('USAGE: csv_concatenate.py CSV_1 CSV_2 ... CSV_CONCATENATED')
     else:
-        concatenated = pandas.DataFrame()
+        concatenated = pd.DataFrame()
         separate = sys.argv[1:-1]
-        for csv in separate:
-            csv = pandas.read_csv(csv)
-            concatenated = concatenated.append(csv, sort=False)
-        concatenated.to_csv(sys.argv[-1], index=False)
-
-
-if __name__ == '__main__':
-    main()
+        data = [pd.read_csv(csv, low_memory=False) for csv in separate]
+        data = data_concatenate(data, concatenated)
+        data.to_csv(sys.argv[-1], index=False)

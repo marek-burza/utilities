@@ -7,23 +7,22 @@ This script creates a box plot for given columns.
 import sys
 
 import matplotlib.pyplot
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 
 
-def boxplot_versus(file_in, columns, file_out):
+def boxplot_versus(data, columns, file_out):
     """
     Creates a box plot for given columns
     """
-    data = pandas.read_csv(file_in)
     figure, axes = matplotlib.pyplot.subplots()
     figure.set_figwidth(12.80)
     figure.set_figheight(7.20)
     figure.set_dpi(100)
     data = data[columns]
-    data = data[~numpy.isnan(data).any(axis=1)]
+    data = data[~np.isnan(data).any(axis=1)]
     data.boxplot(column=columns, ax=axes)
-    counts = numpy.count_nonzero(~numpy.isnan(data), axis=0)
+    counts = np.count_nonzero(~np.isnan(data), axis=0)
     labels = []
     for i, label in enumerate(axes.get_xticklabels()):
         text = label.get_text()
@@ -36,7 +35,7 @@ def boxplot_versus(file_in, columns, file_out):
     matplotlib.pyplot.close()
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
@@ -46,8 +45,5 @@ def main():
         file_in = sys.argv[1]
         file_out = sys.argv[2]
         columns = sys.argv[3:]
-        boxplot_versus(file_in, columns, file_out)
-
-
-if __name__ == '__main__':
-    main()
+        data = pd.read_csv(file_in, low_memory=False)
+        boxplot_versus(data, columns, file_out)

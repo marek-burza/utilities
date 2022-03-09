@@ -8,16 +8,31 @@ import json
 import math
 import re
 import sys
-
 import matplotlib.pyplot
-import pandas
+import pandas as pd
 
 
-def violinplot(arguments):
+ARGUMENTS = {
+    'title': None,
+    'width': 12.80,
+    'height': 7.20,
+    'dpi': 100,
+    'font_size': 10,
+    'font_weight': 'normal',
+    'points': 100,
+    'bw_method': None,
+    'notch': False,
+    'sym': None,
+}
+
+
+def violinplot(data, arguments):
     """
     Creates a fiddle plot
     """
-    data = pandas.read_csv(arguments['input_file'])
+    default = ARGUMENTS.copy()
+    default.update(arguments)
+    arguments = default
     if isinstance(arguments['feature_columns'], list):
         feature_columns = arguments['feature_columns']
     if isinstance(arguments['feature_columns'], str):
@@ -66,28 +81,13 @@ def violinplot(arguments):
     matplotlib.pyplot.close()
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
     if len(sys.argv) < 2:
         print('USAGE: plot_violinplot_per_feature_per_class.py JSON_ARGUMENTS')
     else:
-        arguments = {
-            'title': None,
-            'width': 12.80,
-            'height': 7.20,
-            'dpi': 100,
-            'font_size': 10,
-            'font_weight': 'normal',
-            'points': 100,
-            'bw_method': None,
-            'notch': False,
-            'sym': None
-        }
-        arguments.update(json.loads(sys.argv[1]))
-        violinplot(arguments)
-
-
-if __name__ == '__main__':
-    main()
+        arguments = json.loads(sys.argv[1])
+        data = pd.read_csv(arguments['input_file'], low_memory=False)
+        violinplot(data, arguments)

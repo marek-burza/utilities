@@ -5,24 +5,22 @@ This script creates a scatter plot for given columns.
 """
 
 import sys
-
 import matplotlib.pyplot
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 
 
-def scatterplot(file_in, column_x, column_y, file_out):
+def scatterplot(data, column_x, column_y, file_out):
     """
     Creates a scatter plot for given columns
     """
-    data = pandas.read_csv(file_in)
     figure, axes = matplotlib.pyplot.subplots()
     figure.set_figwidth(12.80)
     figure.set_figheight(7.20)
     figure.set_dpi(100)
     columns = [column_x, column_y]
     data = data[columns]
-    data = data[~numpy.isnan(data).any(axis=1)]
+    data = data[~np.isnan(data).any(axis=1)]
     matplotlib.pyplot.scatter(data[column_x], data[column_y])
     axes.set_xlabel(column_x)
     axes.set_ylabel(column_y)
@@ -33,7 +31,7 @@ def scatterplot(file_in, column_x, column_y, file_out):
     matplotlib.pyplot.close()
 
 
-def main():
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
@@ -44,8 +42,5 @@ def main():
         file_out = sys.argv[2]
         column_x = sys.argv[3]
         column_y = sys.argv[4]
-        scatterplot(file_in, column_x, column_y, file_out)
-
-
-if __name__ == '__main__':
-    main()
+        data = pd.read_csv(file_in, low_memory=False)
+        scatterplot(data, column_x, column_y, file_out)

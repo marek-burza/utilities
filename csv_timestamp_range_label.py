@@ -6,8 +6,8 @@ This script labels a column depending on given timestamp ranges.
 
 import math
 import sys
-
-import pandas
+import numpy as np
+import pandas as pd
 
 
 # pylint: disable-msg=R0913
@@ -30,7 +30,7 @@ def prepare_labeling(column_from, column_label_default, column_to, data):
     Prepares the data for labeling
     """
     if column_label_default == '':
-        column_label_default = float('nan')
+        column_label_default = np.nan
     if column_from != '':
         data[column_to] = data[column_from]
     if column_to not in data:
@@ -50,7 +50,21 @@ def apply_labeling(timestamps, timestamps_begin, timestamps_end, column_label_fr
         axis=1)
 
 
-def main():
+def data_timestamp_range_label(data, timestamps, lut, timestamps_begin, timestamps_end, column_config):  # noqa: E501 pylint: disable=C0301
+    """
+    Labels a column depending on given timestamp ranges
+    """
+    for config in column_config:
+        col_from, col_label_default, col_label_from, col_to = config
+        prepare_labeling(
+            col_from, col_label_default, col_to, data)
+        apply_labeling(
+            timestamps, timestamps_begin, timestamps_end,
+            col_label_from, col_to, lut, data)
+    return data
+
+
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
@@ -63,20 +77,23 @@ def main():
         file_labels = sys.argv[4]
         timestamps_begin = sys.argv[5]
         timestamps_end = sys.argv[6]
-        lut = pandas.read_csv(file_labels)
-        data = pandas.read_csv(file_in)
+        lut = pd.read_csv(file_labels, low_memory=False)
+        data = pd.read_csv(file_in, low_memory=False)
+        column_config = []
         for offset in range(7, len(sys.argv), 4):
-            column_from = sys.argv[offset + 0]
-            column_label_default = sys.argv[offset + 1]
-            column_label_from = sys.argv[offset + 2]
-            column_to = sys.argv[offset + 3]
-            prepare_labeling(
-                column_from, column_label_default, column_to, data)
-            apply_labeling(
-                timestamps, timestamps_begin, timestamps_end,
-                column_label_from, column_to, lut, data)
+            col_from = sys.argv[offset + 0]
+            col_label_default = sys.argv[offset + 1]
+            col_label_from = sys.argv[offset + 2]
+            col_to = sys.argv[offset + 3]
+            column_config.append(
+                (col_from, col_label_default, col_label_from, col_to)
+            )
+        data = data_timestamp_range_label(
+            data,
+            timestamps,
+            lut,
+            timestamps_begin,
+            timestamps_end,
+            column_config
+        )
         data.to_csv(file_out, index=False)
-
-
-if __name__ == '__main__':
-    main()

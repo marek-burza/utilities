@@ -6,9 +6,8 @@ This script statistically aggregates a CSV file.
 
 import json
 import sys
-
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 
 
 def count(series):
@@ -24,7 +23,7 @@ def first(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
+        return np.nan
     return series.iloc[0]
 
 
@@ -34,7 +33,7 @@ def last(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
+        return np.nan
     return series.iloc[-1]
 
 
@@ -44,8 +43,8 @@ def minimum(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanmin(series)
+        return np.nan
+    return np.nanmin(series)
 
 
 def maximum(series):
@@ -54,8 +53,8 @@ def maximum(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanmax(series)
+        return np.nan
+    return np.nanmax(series)
 
 
 def mean(series):
@@ -64,8 +63,8 @@ def mean(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanmean(series)
+        return np.nan
+    return np.nanmean(series)
 
 
 def median(series):
@@ -74,8 +73,8 @@ def median(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanmedian(series)
+        return np.nan
+    return np.nanmedian(series)
 
 
 def std(series):
@@ -84,8 +83,8 @@ def std(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanstd(series)
+        return np.nan
+    return np.nanstd(series)
 
 
 def variance(series):
@@ -94,8 +93,8 @@ def variance(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nanvar(series)
+        return np.nan
+    return np.nanvar(series)
 
 
 def total(series):
@@ -104,8 +103,8 @@ def total(series):
     """
     series = series.dropna()
     if series.size == 0:
-        return numpy.nan
-    return numpy.nansum(series)
+        return np.nan
+    return np.nansum(series)
 
 
 def collect(series):
@@ -141,7 +140,6 @@ def translate_all_names_to_function(aggregation):
     """
     Parses the aggregation
     """
-    aggregation = json.loads(aggregation)
     for key in aggregation.keys():
         names = aggregation[key]
         functions = [translate_name_to_function(name) for name in names]
@@ -149,26 +147,32 @@ def translate_all_names_to_function(aggregation):
     return aggregation
 
 
-def main():
+def data_aggregate(data, index, aggregation):
+    """
+    Statistically aggregates data
+    """
+    values = list(data.columns)
+    values.remove(index)
+    aggregation = translate_all_names_to_function(aggregation)
+    data = pd.pivot_table(
+        data,
+        index=index,
+        values=values,
+        aggfunc=aggregation)
+    data.columns = data.columns.map(' '.join).str.strip()
+    data.reset_index(level=0, inplace=True)
+    return data
+
+
+if __name__ == '__main__':
     """
     Main entry point into the script.
     """
     if len(sys.argv) < 5:
         print('USAGE: csv_aggregate.py CSV_RAW CSV_AGGREGATED INDEX_COLUMN AGGREGATION_JSON')  # noqa: E501 pylint: disable=C0301
     else:
-        data = pandas.read_csv(sys.argv[1])
+        data = pd.read_csv(sys.argv[1], low_memory=False)
         index = sys.argv[3]
-        values = list(data.columns)
-        values.remove(index)
-        aggregation = translate_all_names_to_function(sys.argv[4])
-        data = pandas.pivot_table(
-            data,
-            index=index,
-            values=values,
-            aggfunc=aggregation)
-        data.columns = data.columns.map(' '.join).str.strip()
+        aggregation = json.loads(sys.argv[4])
+        data = data_aggregate(data, index, aggregation)
         data.to_csv(sys.argv[2])
-
-
-if __name__ == '__main__':
-    main()
