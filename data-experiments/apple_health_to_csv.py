@@ -200,6 +200,16 @@ def store_converted_csv(flat, path):
             store_converted_line(values, csv)
 
 
+def apple_health_to_csv(apple_health, csv):
+    """
+    Converts Apple Health data export to CSV
+    """
+    log = logger()
+    flat = []
+    load_apple_export(apple_health, flat, log)
+    store_converted_csv(flat, csv)
+
+
 def main():
     """
     Main entry point into the script.
@@ -207,10 +217,7 @@ def main():
     if len(sys.argv) < 3:
         print('USAGE: apple-health-to-csv.py APPLE_HEALTH_ZIP CONVERTED_CSV')
     else:
-        log = logger()
-        flat = []
-        load_apple_export(sys.argv[1], flat, log)
-        store_converted_csv(flat, sys.argv[2])
+        apple_health_to_csv(sys.argv[1], sys.argv[2])
 
 
 if __name__ == '__main__':
