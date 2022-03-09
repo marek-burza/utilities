@@ -5,25 +5,14 @@ This script selects columns in CSV file.
 """
 
 import sys
-import dask.dataframe as dd
 import pandas as pd
 
 
-def data_select_basic(in_file, columns):
+def data_select(in_file, columns):
     """
     Selects columns from CSV file.
     """
     data = pd.read_csv(in_file, usecols=columns, low_memory=False)
-    data = data[columns].dropna(how='all')
-    return data
-
-
-def data_select_dask(in_file, columns):
-    """
-    Selects columns from CSV file (using Dask).
-    """
-    data = pd.read_csv(in_file, usecols=columns, low_memory=False)
-    data = dd.from_pandas(data, npartitions=1)
     data = data[columns].dropna(how='all')
     return data
 
@@ -38,5 +27,5 @@ if __name__ == '__main__':
         in_file = sys.argv[1]
         out_file = sys.argv[2]
         columns = sys.argv[3:]
-        csv = data_select_basic(in_file, columns)
+        csv = data_select(in_file, columns)
         csv.to_csv(sys.argv[2], index=False)
