@@ -1,0 +1,17 @@
+---
+name: GitHub Super-Linter
+
+on: [push]
+
+jobs:
+  pipeline:
+    name: Pipeline
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Initiating
+        uses: actions/checkout@v3
+      - name: GitHub Super-Linter
+        uses: github/super-linter@v4
+        env:
+          DISABLE_ERRORS: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
