@@ -14,5 +14,3 @@ To use a pre-built Docker container image:
 ```bash
 docker run --rm -it -p 8080:80 altermarkive/gpx-to-svg
 ```
-
-Or just go [here](https://altermarkive.github.io/gpx-to-svg/).
