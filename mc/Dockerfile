@@ -1,7 +1,5 @@
-FROM ubuntu:jammy-20220428
+FROM alpine:3.15.4
 
-RUN apt-get -yq update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -yq install mc=3:4.8.27-1
+RUN apk add --update --no-cache curl
 
 CMD ["/usr/bin/mc"]
