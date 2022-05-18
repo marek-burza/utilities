@@ -3,6 +3,6 @@ flask==1.1.2
 itsdangerous==1.1.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1
-numpy==1.19.0
+numpy==1.21.0
 uwsgi==2.0.19.1
 werkzeug==1.0.1
