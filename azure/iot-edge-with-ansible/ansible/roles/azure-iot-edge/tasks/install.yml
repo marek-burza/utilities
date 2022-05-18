@@ -1,7 +1,7 @@
 - name: Azure IoT Edge
   docker_container:
     name: azure-iot-edge
-    image: altermarkive/azure-iot-edge
+    image: ghcr.io/altermarkive/azure-iot-edge
     restart_policy: always
     container_default_behavior: compatibility
     env:

@@ -224,7 +224,7 @@ for the reference to the modified container image (`apache-https.httpd.conf` ref
 the config file above):
 
 ```bash
-docker run -d --name apache-https -p 80:80 -v $PWD/apache-https.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro altermarkive/httpd-reloadable:2.4.48-alpine
+docker run -d --name apache-https -p 80:80 -v $PWD/apache-https.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro ghcr.io/altermarkive/httpd-reloadable:latest
 ```
 
 The configuration can be the verified online with this service:
@@ -355,5 +355,5 @@ is largely unchanged except for the reference to the modified container image
 (`apache-aad.httpd.conf` refers to the config file above):
 
 ```bash
-docker run -d --name apache-aad -p 80:80 -v $PWD/apache-aad.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro altermarkive/httpd-reloadable-openid:2.4.48-alpine
+docker run -d --name apache-aad -p 80:80 -v $PWD/apache-aad.httpd.conf:/usr/local/apache2/conf/httpd.conf:ro ghcr.io/altermarkive/httpd-reloadable-openid:latest
 ```
