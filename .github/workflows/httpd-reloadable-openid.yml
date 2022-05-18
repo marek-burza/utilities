@@ -6,35 +6,34 @@ jobs:
   pipeline:
     name: Pipeline
     runs-on: ubuntu-20.04
-    env:
-      DOCKERHUB_USER: ${{ github.actor }}
     steps:
-      - name: Version
-        id: version
+      - name: Tags
+        id: tags
         run: |
           VERSION=$(curl -L -s 'https://registry.hub.docker.com/v2/repositories/library/httpd/tags?page_size=1000000' | jq -r '."results"[]["name"]' | grep "2\..*\..*\-alpine" | sort | tail -1)
-          DOCKER_IMAGE=${{ github.actor }}/httpd-reloadable-openid
+          DOCKER_IMAGE='ghcr.io/${{ github.actor }}/httpd-reloadable-openid'
           TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:latest"
           echo ::set-output name=version::${VERSION}
           echo ::set-output name=tags::${TAGS}
       - name: Initiating
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3.0.2
       - name: QEMU
-        uses: docker/setup-qemu-action@v1.2.0
+        uses: docker/setup-qemu-action@v2.0.0
       - name: Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1.3.0
-      - name: Authorizing
-        uses: docker/login-action@v1
+        uses: docker/setup-buildx-action@v2.0.0
+      - name: Login
+        uses: docker/login-action@v2.0.0
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Building
-        uses: docker/build-push-action@v2.5.0
+          password: ${{ github.token }}
+          registry: ghcr.io
+      - name: Build
+        uses: docker/build-push-action@v3.0.0
         with:
           build-args: |
-            VERSION=${{ steps.version.outputs.version }}
+            VERSION=${{ steps.tags.outputs.version }}
           context: azure/apache-reverse-proxy-lets-encrypt-aad
           push: true
           platforms: linux/386,linux/amd64
-          tags: ${{ steps.version.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
