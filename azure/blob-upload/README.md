@@ -18,7 +18,7 @@ The first script will print a connection string for the storage account.
 
 To use the application to upload a file into Azure Blob Storage run:
 
-    docker run --rm --name azure-upload-blob -v [FILE PATH ON HOST]:[FILE PATH IN CONTAINER] -it altermarkive/azure-blob-upload [FILE PATH IN CONTAINER] [AZURE STORAGE CONTAINER NAME] [AZURE STORAGE ACCOUNT CONECTION STRING]
+    docker run --rm --name azure-upload-blob -v [FILE PATH ON HOST]:[FILE PATH IN CONTAINER] -it azure-blob-upload [FILE PATH IN CONTAINER] [AZURE STORAGE CONTAINER NAME] [AZURE STORAGE ACCOUNT CONECTION STRING]
 
 The application will print one line with the name of the blob, for example:
 
