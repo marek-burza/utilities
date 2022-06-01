@@ -305,13 +305,14 @@ docker run --restart always -d --name veles -e ATLASSIAN_INSTANCE="$ATLASSIAN_IN
 | Win + H            | Windows: Start dictation                                         |
 | Win + I            | Windows: System settings                                         |
 | Alt + P            | Windows Explorer: Toggle preview panel                           |
-| Ctrl + Shift + E   | Visual Studio Code: Navigate between editor and file tree panels |
-| Ctrl + \[          | Visual Studio Code: Unindent selection                           |
-| Ctrl + \]          | Visual Studio Code: Indent selection                             |
-| Ctrl + Shift + L   | Visual Studio Code: Select all occurences                        |
-| Alt + D            | Edge: Select the URL in the address bar to edit                  |
-| Ctrl + W           | Edge: Close tab                                                  |
-| Ctrl + Shift + L   | Visual Studio Code: Select all occurences                        |
+| ⌘ + Shift + E      | Visual Studio Code: Navigate between editor and file tree panels |
+| ⌘ + \[.            | Visual Studio Code: Unindent selection                           |
+| ⌘ + \]             | Visual Studio Code: Indent selection                             |
+| ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
+| ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
+| ⌘ + L              | Edge: Select the URL in the address bar to edit                  |
+| ⌘ + W              | Edge: Close tab                                                  |
+| Ctrl + K           | bash: Clear characters in line after cursor                      |
 
 ## git
 
@@ -402,6 +403,11 @@ if [ "$(id -u)" != "0" ]; then
     echo "This must be run as root!"
     exit 1
 fi
+```
+
+* Parameterize successive arguments:
+```bash
+cp {source,destination}.txt
 ```
 
 
