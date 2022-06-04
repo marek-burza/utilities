@@ -306,7 +306,7 @@ docker run --restart always -d --name veles -e ATLASSIAN_INSTANCE="$ATLASSIAN_IN
 | Win + I            | Windows: System settings                                         |
 | Alt + P            | Windows Explorer: Toggle preview panel                           |
 | ⌘ + Shift + E      | Visual Studio Code: Navigate between editor and file tree panels |
-| ⌘ + \[.            | Visual Studio Code: Unindent selection                           |
+| ⌘ + \[             | Visual Studio Code: Unindent selection                           |
 | ⌘ + \]             | Visual Studio Code: Indent selection                             |
 | ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
 | ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
