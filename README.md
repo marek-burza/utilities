@@ -8,13 +8,15 @@ Note: When using docker commands in git bash on Windows prefix them with `MSYS_N
 Can be used to forward a service on a local port to an SSH jump server:
 
 ```bash
-docker run --restart always -d --network host -v $HOME/.ssh:/keys:ro altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
+docker run --restart always -d --network host -v $HOME/.ssh:/keys:ro ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o 
+"StrictHostKeyChecking no" -i /keys/id_rsa -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
 ```
 
 The SSH key can be also passed via an environment variable:
 
 ```bash
-docker run --restart always -d --network host -e AUTOSSH_ID_KEY=$(cat $HOME/.ssh/id_key) altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
+docker run --restart always -d --network host -e AUTOSSH_ID_KEY=$(cat $HOME/.ssh/id_key) ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o 
+"PasswordAuthentication=no" -o "StrictHostKeyChecking no" -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
 ```
 
 When using `autossh` remember to include the following line in /etc/ssh/sshd_config file on the SSH jump server:
@@ -37,7 +39,7 @@ to download content from `http://from.a.com/download` and upload it to
 Then, run the following command:
 
 ```bash
-docker run --restart always -d -e CRONTAB="$(cat crontab)" altermarkive/cron-curl
+docker run --restart always -d -e CRONTAB="$(cat crontab)" ghcr.io/altermarkive/cron-curl
 ```
 
 
@@ -46,9 +48,9 @@ docker run --restart always -d -e CRONTAB="$(cat crontab)" altermarkive/cron-cur
 To run the tools included in exif image use these commands:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/jhead altermarkive/exif ...
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftime altermarkive/exif ...
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftool altermarkive/exif ...
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/jhead ghcr.io/altermarkive/exif ...
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftime ghcr.io/altermarkive/exif ...
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftool ghcr.io/altermarkive/exif ...
 ```
 
 To add EXIF:
@@ -129,11 +131,12 @@ done
 Can be used for conversion between formats:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick example.png example.pdf
-docker run --rm -it -v $PWD:/w -w /w altermarkive/imagemagick -density 600 example.pdf example.png
+docker run --rm -it -v $PWD:/w -w /w ghcr.io/altermarkive/imagemagick example.png example.pdf
+docker run --rm -it -v $PWD:/w -w /w ghcr.io/altermarkive/imagemagick -density 600 example.pdf example.png
 ```
 
-Or, in combination with the `altermarkive/exif` utility, one can run the following `compact.sh` (for example with this command - `find . -name "*.JPG" -exec /bin/sh compact.sh {} \;`):
+Or, in combination with the `ghcr.io/altermarkive/exif` utility, one can run the following `compact.sh` (for example with this command - `find . -name "*.JPG" -exec /bin/sh 
+compact.sh {} \;`):
 
 ```bash
 #!/bin/sh
@@ -148,13 +151,13 @@ docker run --rm -v $PWD:/w -w /w altermarkive/imagemagick $FILE_IN $FILE_OUT
 Can be used to extract pages from a PDF file:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate ghcr.io/altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
 ```
 
 Or to join PDF files:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite altermarkive/poppler 0.pdf 1.pdf result.pdf
+docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite ghcr.io/altermarkive/poppler 0.pdf 1.pdf result.pdf
 ```
 
 
@@ -256,14 +259,17 @@ kubectl describe services
 Forward the SSH:
 
 ```bash
-docker run --restart always -d --name forward22 --network host --add-host=host.docker.internal:host-gateway altermarkive/socat TCP4-LISTEN:10022,fork,reuseaddr TCP4:host.docker.internal:22
-docker run --restart always -d --name autossh22 --network host -v $HOME/.jump:/keys:ro altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:127.0.0.1:10022 -N user@${JUMP_SERVER_HOST}
+docker run --restart always -d --name forward22 --network host --add-host=host.docker.internal:host-gateway alpine/socat TCP4-LISTEN:10022,fork,reuseaddr 
+TCP4:host.docker.internal:22
+docker run --restart always -d --name autossh22 --network host -v $HOME/.jump:/keys:ro ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o 
+"PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:127.0.0.1:10022 -N user@${JUMP_SERVER_HOST}
 ```
 
 or shorter:
 
 ```bash
-docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
+docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway ghcr.io/altermarkive/autossh -M 0 -o 
+"PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
 ```
 
 Additional materials:
