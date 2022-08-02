@@ -65,6 +65,12 @@ To shift the date:
 exiftime -v-55M -fw -ta *.JPG
 ```
 
+To set an arbitrary date:
+
+```bash
+exiftool "-AllDates=20221131000000" example.jpg
+```
+
 Rename photos to feature album name and creation date:
 
 ```bash
