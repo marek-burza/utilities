@@ -141,14 +141,19 @@ docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/convert ghcr.io/alter
 docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/convert ghcr.io/altermarkive/imagemagick -density 600 example.pdf example.png
 ```
 
-Or, in combination with the `ghcr.io/altermarkive/exif` utility, one can run the following `compact.sh` (for example with this command - `find . -name "*.JPG" -exec /bin/sh 
-compact.sh {} \;`):
+Or, in combination with the `ghcr.io/altermarkive/exif` utility, one can run the following `compact.sh`:
 
 ```bash
 #!/bin/sh
-export FILE_IN=$1
-export FILE_OUT=$PREFIX.$(docker run --rm -v $PWD:/w -w /w --entrypoint /usr/bin/exiftool altermarkive/exif -CreateDate $1 | sed 's/[^0-9]*//g').heic
-docker run --rm -v $PWD:/w -w /w --entrypoint /usr/bin/convert altermarkive/imagemagick $FILE_IN $FILE_OUT
+EXTENSION=$1
+PREFIX=$2
+TEMPORARY_SCRIPT=./compact.$PREFIX.sh
+RENAME="echo -n convert {}; echo -n \ $PREFIX/$PREFIX.; /usr/bin/exiftool -CreateDate {} | sed s/[^0-9]*//g | sed -e 's/\$/\.heic/'"
+RENAME_ALL="find $PREFIX -name $EXTENSION -exec /bin/sh -c \"$RENAME\" \;"
+docker run -it --rm -v $PWD:/w -w /w --entrypoint /bin/sh ghcr.io/altermarkive/exif -c "$RENAME_ALL" | tr -d '\r' > $TEMPORARY_SCRIPT
+cat $TEMPORARY_SCRIPT
+docker run -it --rm -v $PWD:/w -w /w --entrypoint /bin/sh ghcr.io/altermarkive/imagemagick $TEMPORARY_SCRIPT
+rm $TEMPORARY_SCRIPT
 ```
 
 
