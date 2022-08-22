@@ -291,6 +291,11 @@ Additional materials:
 * [Kubernetes - Create an External Load Balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/)
 
 
+# Midnight Commander
+
+Use: `blackvoidclub/midnight-commander`
+
+
 # Cheat Sheet
 
 ## Keyboard Shortcuts
