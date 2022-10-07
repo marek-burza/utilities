@@ -4,10 +4,10 @@ click==8.1.3  # distributed
 cloudpickle==2.2.0  # dask, distributed
 contourpy==1.0.5  # matplotlib
 cycler==0.11.0  # matplotlib
-dask==2022.9.1  # distributed
+dask==2022.9.2  # distributed
 defusedxml==0.7.1
-distributed==2022.9.1
-fonttools==4.37.3  # matplotlib
+distributed==2022.9.2
+fonttools==4.37.4  # matplotlib
 fsspec==2022.8.2  # dask, distributed
 HeapDict==1.0.1  # distributed
 hydra-core==1.2.0
@@ -27,7 +27,7 @@ Pillow==9.2.0  # bokeh, matplotlib
 pyparsing==3.0.9  # bokeh, dask, distributed, hydra-core, matplotlib
 psutil==5.9.2  # distributed
 python-dateutil==2.8.2  # matplotlib, pandas
-pytz==2022.2.1  # pandas
+pytz==2022.4  # pandas
 PyYAML==6.0  # bokeh, dask, distributed, hydra-core
 scipy==1.9.1
 six==1.16.0  # matplotlib, pandas
@@ -35,6 +35,6 @@ sortedcontainers==2.4.0  # distributed
 tblib==1.7.0  # distributed
 toolz==0.12.0  # dask, distributed
 tornado==6.1  # bokeh, distributed
-typing_extensions==4.3.0  # bokeh
+typing-extensions==4.4.0  # bokeh
 urllib3==1.26.12  # distributed
 zict==2.2.0  # distributed
