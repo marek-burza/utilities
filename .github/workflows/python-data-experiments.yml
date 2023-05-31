@@ -9,12 +9,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.2
-      - name: Tags
+      - name: Tags  # To have versioned TAG add: ,${DOCKER_IMAGE}:${{ github.sha }}
         id: tags
         run: |
           DOCKER_IMAGE='ghcr.io/${{ github.actor }}/python-data-experiments'
           TAGS="${DOCKER_IMAGE}:latest"
-          echo ::set-output name=tags::${TAGS}
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
       - name: QEMU
         uses: docker/setup-qemu-action@v2.1.0
       - name: Buildx

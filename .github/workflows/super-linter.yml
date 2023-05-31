@@ -6,10 +6,10 @@ on: [push]
 jobs:
   pipeline:
     name: Pipeline
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Initiating
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.5.2
       - name: GitHub Super-Linter
         uses: github/super-linter@v4
         env:
