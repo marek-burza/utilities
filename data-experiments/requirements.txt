@@ -26,7 +26,7 @@ pyarrow==9.0.0
 python-dateutil==2.8.2  # matplotlib, pandas
 pytz==2022.7.1  # numerapi, pandas
 PyYAML==6.0  # bokeh, hydra-core
-requests==2.27.1
+requests==2.31.0
 scikit-learn==1.2.2  # lightgbm
 scipy==1.10.1  # lightgbm, scikit-learn
 six==1.16.0  # matplotlib, numerapi, pandas
