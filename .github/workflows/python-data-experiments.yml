@@ -1,4 +1,4 @@
-name: Build autossh
+name: Build python-data-experiments
 
 on: [push]
 
