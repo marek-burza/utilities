@@ -32,7 +32,7 @@ scipy==1.10.1  # lightgbm, scikit-learn
 six==1.16.0  # matplotlib, numerapi, pandas
 tabulate==0.8.10
 threadpoolctl==3.1.0  # lightgbm, scikit-learn
-tornado==6.3.1  # bokeh
+tornado==6.3.2  # bokeh
 tqdm==4.65.0  # numerapi
 typing_extensions==4.5.0  # bokeh
 urllib3==1.26.15  # numerapi
