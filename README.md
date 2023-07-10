@@ -363,6 +363,14 @@ git remote add origin <uri>
 git push -u --force origin master
 ```
 
+or
+
+```bash
+git switch example-branch
+git reset --soft $(git merge-base master HEAD)
+git commit -m "one commit on example branch"
+```
+
 ### Merging repository into another under a subdirectory
 
 ```bash
