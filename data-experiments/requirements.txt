@@ -40,3 +40,4 @@ tornado==6.3.2  # bokeh
 tqdm==4.65.0  # numerapi
 typing_extensions==4.5.0  # bokeh
 urllib3==1.26.15  # numerapi
+wandb==0.15.7
