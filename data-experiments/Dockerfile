@@ -17,6 +17,9 @@ RUN apt-get -yq update && \
 # pkg-config - matplotlib (older, non-wheel version)
 # zlib - Pillow (older, non-wheel version)
 
+# TODO:
+# * libopenblas-dev
+
 ADD requirements.txt /tmp/requirements.txt
 RUN pip3 install --disable-pip-version-check --no-cache-dir -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
