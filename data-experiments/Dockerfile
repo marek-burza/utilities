@@ -9,12 +9,14 @@ RUN apt-get -yq update && \
         libfreetype-dev=2.10.4+dfsg-1+deb11u1 \
         libjpeg-dev=1:2.0.6-4 \
         pkg-config=0.29.2-1 \
+        swig=4.0.2-1 \
         zlib1g-dev=1:1.2.11.dfsg-2+deb11u2
 # build-essential - tornado
 # cmake - lightgbm (older, non-wheel version)
 # libfreetype-dev - matplotlib (older, non-wheel version)
 # libjpeg-dev - Pillow (older, non-wheel version)
 # pkg-config - matplotlib (older, non-wheel version)
+# swig - auto-sklearn
 # zlib - Pillow (older, non-wheel version)
 
 # TODO:
