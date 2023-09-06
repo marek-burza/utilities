@@ -7,5 +7,5 @@ To run the Tailscale daemon as a "sidecar" on Kubernetes start reading [here](ht
 To run the Tailscale daemon as a "sidecar" to the services bound to the Docker host run the following command:
 
 ```bash
-docker run -d --name tailscaled --hostname $HOSTNAME -e TAILSCALE_AUTH_KEY=$TAILSCALE_AUTH_KEY -v $HOME/.tailscale:/var/lib/tailscale --device /dev/net/tun --network host --cap-add=NET_ADMIN --restart unless-stopped --entrypoint /bin/sh -e TAILSCALE_AUTH_KEY=$TAILSCALE_AUTH_KEY tailscale/tailscale:latest -c '(([ ! -f "/var/lib/tailscale/tailscaled.state" ] && ( sleep 3; /usr/local/bin/tailscale up --authkey=$TAILSCALE_AUTH_KEY)) &); /usr/local/bin/tailscaled'
+docker run -d --name tailscaled --hostname $HOSTNAME -e TS_AUTHKEY=$TS_AUTHKEY -v /var/lib:/var/lib -v /dev/net/tun:/dev/net/tun --network host --cap-add=NET_ADMIN --cap-add=NET_RAW --restart unless-stopped tailscale/tailscale
 ```
