@@ -2,6 +2,16 @@ FROM python:3.10.13-slim-bookworm
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Docker in Docker
+RUN apt-get update -qqy && apt-get install -qqy \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    lxc \
+    iptables
+RUN curl -sSL https://get.docker.com/ | sh
+
+# Python package dependencies
 RUN apt-get -yq update && \
     apt-get -yq install \
         build-essential=12.9 \
