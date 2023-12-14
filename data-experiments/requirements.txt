@@ -7,7 +7,7 @@ charset-normalizer>=3.1.0  # numerapi
 click>=8.1.3  # numerapi
 contourpy>=1.0.5  # matplotlib
 cycler>=0.11.0  # matplotlib
-Cython>=3.0.6  # fastFM
+Cython==0.29.36  # fastFM
 defusedxml>=0.7.1,<1
 fastFM>=0.2.10
 flake8>=6.0.0
