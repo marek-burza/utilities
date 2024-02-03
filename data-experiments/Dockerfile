@@ -56,7 +56,7 @@ ENV CLASSPATH="${CLASSPATH}:/home/user/weka-3-8-6/weka.jar"
 
 RUN java weka.core.WekaPackageManager -install-package netlibNativeLinux
 RUN find /home/user/wekafiles/packages/netlibNativeLinux/lib/
-RUN case ${TARGETARCH} in arm64) export ARCH="aarch64" ;; amd64) export ARCH="x86_64" ;; 386) export ARCH="i686" ;; esac
+RUN export ARCH=$(case ${TARGETARCH} in arm64) echo "aarch64" ;; amd64) echo "x86_64" ;; 386) echo "i686" ;; esac)
 RUN echo ${ARCH}
 ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/netlibNativeLinux/lib/jniloader-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_system-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_system-linux-${ARCH}-1.2-natives.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_ref-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_ref-linux-${ARCH}-1.2-natives.jar"
 RUN env
