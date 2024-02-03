@@ -45,7 +45,6 @@ RUN pip3 install --disable-pip-version-check --no-cache-dir -r /tmp/requirements
 
 # Auto-WEKA
 ARG TARGETARCH
-#RUN case ${TARGETARCH} in arm|arm/v7) ARCH="armhf" ;; arm/v6) ARCH="arm" ;; arm64|arm/v8) ARCH="aarch64" ;; 386) ARCH="x86" ;; amd64) ARCH="amd64" ;; esac
 RUN useradd -s /bin/bash -m -d /home/user user
 USER user
 WORKDIR /home/user
@@ -57,8 +56,10 @@ ENV CLASSPATH="${CLASSPATH}:/home/user/weka-3-8-6/weka.jar"
 
 RUN java weka.core.WekaPackageManager -install-package netlibNativeLinux
 RUN find /home/user/wekafiles/packages/netlibNativeLinux/lib/
+RUN case ${TARGETARCH} in arm64) export ARCH="aarch64" ;; amd64) export ARCH="x86_64" ;; 386) export ARCH="i686" ;; esac
+RUN echo ${ARCH}
+ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/netlibNativeLinux/lib/jniloader-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_system-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_system-linux-${ARCH}-1.2-natives.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_ref-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_ref-linux-${ARCH}-1.2-natives.jar"
 RUN env
-ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/netlibNativeLinux/lib/jniloader-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_system-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_system-linux-x86_64-1.2-natives.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_ref-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_ref-linux-x86_64-1.2-natives.jar"
 
 RUN java weka.core.WekaPackageManager -install-package Auto-WEKA
 ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/Auto-WEKA/autoweka.jar"
