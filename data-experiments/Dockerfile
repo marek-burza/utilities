@@ -44,6 +44,8 @@ RUN pip3 install --disable-pip-version-check --no-cache-dir -r /tmp/requirements
     rm /tmp/requirements.txt
 
 # Auto-WEKA
+ARG TARGETARCH
+#RUN case ${TARGETARCH} in arm|arm/v7) ARCH="armhf" ;; arm/v6) ARCH="arm" ;; arm64|arm/v8) ARCH="aarch64" ;; 386) ARCH="x86" ;; amd64) ARCH="amd64" ;; esac
 RUN useradd -s /bin/bash -m -d /home/user user
 USER user
 WORKDIR /home/user
