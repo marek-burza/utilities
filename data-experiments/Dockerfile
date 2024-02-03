@@ -21,7 +21,7 @@ RUN apt-get -yq update && \
         libatlas3-base \
         libfreetype-dev=2.12.1+dfsg-5 \
         libjpeg-dev=1:2.1.5-2 \
-        libopenblas-base \
+        libopenblas-dev \
         pkg-config=1.8.1-1 \
         swig=4.1.0-0.2 \
         unzip \
@@ -33,7 +33,7 @@ RUN apt-get -yq update && \
 # libatlas3-base - Auto-WEKA
 # libfreetype-dev - matplotlib (older, non-wheel version)
 # libjpeg-dev - Pillow (older, non-wheel version)
-# libopenblas-base - Auto-WEKA
+# libopenblas-dev - Auto-WEKA
 # pkg-config - matplotlib (older, non-wheel version)
 # swig - auto-sklearn
 # unzip - Auto-WEKA
