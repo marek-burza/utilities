@@ -82,6 +82,11 @@
         <a href="#" onclick="retry()">↻</a>
     </div>
     <script>
+        function urlParseHost(url){
+            var re = new RegExp("^(?:f|ht)tp(?:s)?\://([^/]+)", "im");
+            return(url.match(re)[1].toString());
+        }
+
         function set(id, text) {
             document.getElementById(id).innerHTML = text;
         }
@@ -132,7 +137,9 @@
             location.reload();
         }
 
-        request();
+        if (urlParseHost(window.location.href) == "altermarkive.github.io") {
+            request();
+        }
     </script>
 </body>
 
