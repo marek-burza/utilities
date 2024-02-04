@@ -55,9 +55,11 @@ RUN curl -L -O http://prdownloads.sourceforge.net/weka/weka-3-8-6.zip && \
 ENV CLASSPATH="${CLASSPATH}:/home/user/weka-3-8-6/weka.jar"
 
 RUN java weka.core.WekaPackageManager -install-package netlibNativeLinux
-RUN (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*aarch64*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/aarch64/arm64/")') && \
-    (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*x86_64*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/x86_64/amd64/")') && \
-    (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*i686*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/i686/386/")') && \
+RUN find /home/user/wekafiles/packages/netlibNativeLinux/lib/
+
+RUN (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*aarch64*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/aarch64/arm64/")"' && \
+    (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*x86_64*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/x86_64/amd64/")"' && \
+    (find /home/user/wekafiles/packages/netlibNativeLinux/lib/ -name "*i686*" -print0 | xargs -0 -I {} /bin/bash -c 'cp "{}" "$(echo "{}" | sed "s/i686/386/")"' && \
     find /home/user/wekafiles/packages/netlibNativeLinux/lib/ 
 ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/netlibNativeLinux/lib/jniloader-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_system-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_system-linux-${TARGETARCH}-1.2-natives.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/native_ref-java-1.2.jar:/home/user/wekafiles/packages/netlibNativeLinux/lib/netlib-native_ref-linux-${TARGETARCH}-1.2-natives.jar"
 RUN env
