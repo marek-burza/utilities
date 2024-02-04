@@ -82,9 +82,16 @@
         <a href="#" onclick="retry()">↻</a>
     </div>
     <script>
-        function urlParseHost(url){
+        function urlParseHost(url) {
             var re = new RegExp("^(?:f|ht)tp(?:s)?\://([^/]+)", "im");
             return(url.match(re)[1].toString());
+        }
+
+        function urlParseQuery(url) {
+            var re = new RegExp("[?&]+([^=&]+)=([^&]*)", "gi");
+            var map = {};
+            var parts = url.replace(re, function(ignore, key, value){map[key] = decodeURIComponent(value);});
+            return(map);
         }
 
         function set(id, text) {
@@ -139,6 +146,10 @@
 
         if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             request();
+            var arguments = urlParseQuery(window.location.href);
+            if ('dark' in arguments && parseInt(arguments['dark']) == 0) {
+                document.documentElement.classList.toggle('dark-mode');
+            }
         }
     </script>
 </body>
