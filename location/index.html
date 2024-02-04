@@ -99,8 +99,8 @@
             var latitude = position.coords.latitude.toFixed(5);
             var longitude = position.coords.longitude.toFixed(5);
             set("coordinates", `${latitude}°N<br/>${longitude}°E`);
-            set("accuracy", `±${safe(position.coords.accuracy, 0))}m`);
-            set("altitude", `${safe(position.coords.altitude, 0))}±${safe(position.coords.altitudeAccuracy, 0))}m`);
+            set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
+            set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
             set("status", `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`);
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
