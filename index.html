@@ -297,7 +297,6 @@
             // console.log(text);
             angle = event.alpha;
             if (!animated) {
-                set("status", `orientation ${angle}`);
                 draw();
             }
         }
@@ -306,18 +305,16 @@
             set("status", "sense");
             if (window.DeviceMotionEvent) {
                 if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    DeviceMotionEvent.requestPermission();
+                    DeviceMotionEvent.requestPermission().then(function(result){set("status", `motion ${result}`"); window.addEventListener("devicemotion", motion, true); return true;});
                 }
-                set("status", "motion before");
                 window.addEventListener("devicemotion", motion, true);
-                set("status", "motion after");
             } else {
                 set("status", "no motion");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission();
+                    DeviceOrientationEvent.requestPermission().then(function(result){set("status", `orientation ${result}`"); window.addEventListener("deviceorientation", motion, true); return true;});
                 }
                 set("status", "orientation before");
                 window.addEventListener("deviceorientation", orientation, true);
