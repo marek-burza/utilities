@@ -276,11 +276,10 @@
                 var width  = gfx.canvas.width  = window.innerWidth;
                 var height = gfx.canvas.height = window.innerHeight;
                 // Turn the angle into a dot position
-                var radians = (180.0 + angle) * Math.PI / 180.0;
+                var radians = (180.0 - angle) * Math.PI / 180.0;
                 var x = (1 + Math.sin(radians)) * width / 2;
                 var y = (1 + Math.cos(radians)) * height / 2;
                 var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect x="0" y="0" width="${width}" height="${height}" style="fill: ${background};"/><circle cx="${x}" cy="${y}" r="20" style="fill: ${foreground};"/></svg>`
-                console.log(svg)
                 image.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
                 gfx.drawImage(image, 0, 0, width, height);
             }
@@ -297,8 +296,8 @@
             // var text = `Magnetometer: ${event.alpha}, ${event.beta}, ${event.gama}`;
             // console.log(text);
             angle = event.alpha;
-            set("status", `orientation ${angle}`);
             if (!animated) {
+                set("status", `orientation ${angle}`);
                 draw();
             }
         }
