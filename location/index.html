@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+    
 <head>
     <meta charset="UTF-8" />
     <title>⤓</title>
@@ -51,10 +51,12 @@
             color: white;
         }
 
-        img {
-            width: 6vmin;
-            height: 6vmin;
-            filter: grayscale(100%);
+        .dark-mode {
+            filter: invert(100%);
+            -webkit-filter: invert(100%);
+            -moz-filter: invert(100%);
+            -o-filter: invert(100%);
+            -ms-filter: invert(100%);
         }
     </style>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.152.png" sizes="152x152"
@@ -65,9 +67,12 @@
         rel="apple-touch-icon" />
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.114.png" sizes="114x114"
         rel="apple-touch-icon" />
-    <link href="https://altermarkive.github.io/altermarkive/altermarkive.76.png" sizes="76x76" rel="apple-touch-icon" />
-    <link href="https://altermarkive.github.io/altermarkive/altermarkive.72.png" sizes="72x72" rel="apple-touch-icon" />
-    <link href="https://altermarkive.github.io/altermarkive/altermarkive.57.png" sizes="57x57" rel="apple-touch-icon" />
+    <link href="https://altermarkive.github.io/altermarkive/altermarkive.76.png" sizes="76x76"
+        rel="apple-touch-icon" />
+    <link href="https://altermarkive.github.io/altermarkive/altermarkive.72.png" sizes="72x72"
+        rel="apple-touch-icon" />
+    <link href="https://altermarkive.github.io/altermarkive/altermarkive.57.png" sizes="57x57"
+        rel="apple-touch-icon" />
 
 </head>
 
@@ -92,6 +97,22 @@
             var map = {};
             var parts = url.replace(re, function(ignore, key, value){map[key] = decodeURIComponent(value);});
             return(map);
+        }
+
+        function domInjectInvisible(html) {
+            var parent = null;
+            try {
+                parent = document.getElementsByTagName("body")[0];
+            } catch(exception) {
+                parent = document.getElementsByTagName("head")[0];
+            }
+            var div = document.createElement("div");
+            div.style.width  = "0";
+            div.style.height = "0";
+            div.style.display = "block";
+            div.style.overflow = "hidden";
+            div.innerHTML = html;
+            parent.appendChild(div);
         }
 
         function set(id, text) {
@@ -147,8 +168,9 @@
         if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             request();
             var arguments = urlParseQuery(window.location.href);
-            if ('dark' in arguments && parseInt(arguments['dark']) == 0) {
-                document.documentElement.classList.toggle('dark-mode');
+            if ("dark" in arguments && parseInt(arguments["dark"]) == 0) {
+                document.documentElement.classList.toggle("dark-mode");
+                // domInjectInvisible("<style>html {filter: invert(100%); -webkit-filter: invert(100%); -moz-filter: invert(100%); -o-filter: invert(100%); -ms-filter: invert(100%);}</style>");
             }
         }
     </script>
