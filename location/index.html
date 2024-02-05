@@ -166,6 +166,30 @@
             location.reload();
         }
 
+        // Remember the original keyboard event handlers
+        var keyDown = document.onkeydown;
+        var keyUp = document.onkeyup;
+
+        // Capture keyboar) key down events
+        document.onkeydown = function(event){
+            // Call the original handler if there was one
+            if(null != keyDown){
+                keyDown(event);
+            }
+        }
+
+        // Capture keyboard key up events
+        document.onkeyup = function(event){
+            // Catch only the direction/arrow keys
+            if (event.keyCode === 13) {
+                retry();
+            }
+            // Call the original handler if there was one
+            if (null != keyUp) {
+                keyUp(event);
+            }
+        }
+
         if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             request();
             var arguments = urlParseQuery(window.location.href);
