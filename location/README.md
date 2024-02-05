@@ -90,24 +90,12 @@ The Geolocation API returns a rich set of values and I decided to show them on i
 
 ```html
 <div id="card">
-    <div id="coordinates" class="field">&nbsp;</div>
-    <div>°N,°E</div>
+    <a id="openstreetmap" href="https://www.openstreetmap.org/">
+        <div id="coordinates" class="field">&nbsp;</div>
+    </a>
     <div id="accuracy" class="field">&nbsp;</div>
-    <div>±meters</div>
     <div id="altitude" class="field">&nbsp;</div>
-    <div>meters</div>
-    <div id="altitude-accuracy" class="field">&nbsp;</div>
-    <div>±meters</div>
-    <div id="heading" class="field">&nbsp;</div>
-    <div>°</div>
-    <div id="speed" class="field">&nbsp;</div>
-    <div>meters/second</div>
     <div id="status" class="field">&nbsp;</div>
-    <div>
-        <a id="google" href="https://maps.google.com/"><img src="data:image/x-icon;base64,..." /></a>
-        <a id="openstreetmap" href="https://www.openstreetmap.org/"><img src="data:image/png;base64,..." /></a>
-        <a id="microsoft" href="https://www.bing.com/maps/"><img src="data:image/x-icon;base64,..." /></a>
-    </div>
 </div>
 ```
 
@@ -142,16 +130,11 @@ function updated(position) {
     var timestamp = new Date(position.timestamp);
     var latitude = position.coords.latitude.toFixed(5);
     var longitude = position.coords.longitude.toFixed(5);
-    set("coordinates", `${latitude},${longitude}`);
-    set("accuracy", safe(position.coords.accuracy, 0));
-    set("altitude", safe(position.coords.altitude, 0));
-    set("altitude-accuracy", safe(position.coords.altitudeAccuracy, 0));
-    set("heading", safe(position.coords.heading, 0));
-    set("speed", safe(position.coords.speed, 1));
+    set("coordinates", `${latitude}°N<br/>${longitude}°E`);
+    set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
+    set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
     set("status", `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`);
-    link("google", `https://maps.google.com/maps?z=17&q=${latitude},${longitude}`);
-    link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}`);
-    link("microsoft", `https://www.bing.com/maps/?v=2&lvl=17&cp=${latitude}~${longitude}`);
+    link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
 }
 
 function failed(error) {
@@ -216,17 +199,12 @@ Though the form factors that the app can be rendered on can differ wildly, I sti
 ```css
 body {
 
-    font-size: 4vmin;
+    font-size: 10vmin;
 }
 
 a {
 
     font-size: 10vmin;
-}
-
-img {
-    width: 6vmin;
-    height: 6vmin;
 }
 ```
 
@@ -236,11 +214,6 @@ I also decided to stick to the black-and-white looks so the "Retry" button and t
 a {
 
     color: white;
-}
-
-img {
-
-    filter: grayscale(100%);
 }
 ```
 
