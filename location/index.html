@@ -150,8 +150,8 @@
             set("coordinates", `${latitude}°N<br/>${longitude}°E`);
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
-            set("status", "");
-            console.log(httpGet("https://ipapi.co/json/"));
+            var response = JSON.parse(httpGet("https://ipapi.co/json/").text);
+            set("status", `${response.latitude}°N<br/>${response.longitude}°E`);
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
 
