@@ -116,6 +116,20 @@
             parent.appendChild(div);
         }
 
+        function httpGet(url) {
+            http = new XMLHttpRequest();
+            http.open("GET", url, false);
+            http.send(null);
+            return({status: http.status, text: http.responseText});
+        }
+
+        function httpPost(url, data){
+            http = new XMLHttpRequest();
+            http.open("POST", url, false);
+            http.send(data);
+            return({status: http.status, text: http.responseText});
+        }
+
         function set(id, text) {
             document.getElementById(id).innerHTML = text;
         }
@@ -137,6 +151,7 @@
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
             set("status", "");
+            set("status", JSON.parse(httpGet("http://ip-api.com/json/")).lat);
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
 
