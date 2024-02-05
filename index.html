@@ -305,6 +305,9 @@
         function sense() {
             set("status", "sense");
             if (window.DeviceMotionEvent) {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    DeviceMotionEvent.requestPermission();
+                }
                 set("status", "motion before");
                 window.addEventListener("devicemotion", motion, true);
                 set("status", "motion after");
@@ -313,6 +316,9 @@
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission();
+                }
                 set("status", "orientation before");
                 window.addEventListener("deviceorientation", orientation, true);
                 set("status", "orientation after");
