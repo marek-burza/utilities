@@ -309,18 +309,14 @@
                 }
                 window.addEventListener("devicemotion", motion, true);
             } else {
-                set("status", "no motion");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                     DeviceOrientationEvent.requestPermission().then(function(result){set("status", `orientation ${result}`); window.addEventListener("deviceorientation", motion, true); return true;});
                 }
-                set("status", "orientation before");
                 window.addEventListener("deviceorientation", orientation, true);
-                set("status", "orientation after");
             } else {
-                set("status", "no orientation");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
         }
