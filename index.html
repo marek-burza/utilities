@@ -229,11 +229,9 @@
             var arguments = urlParseQuery(window.location.href);
             var dark = "dark" in arguments && parseInt(arguments["dark"]) == 0;
             if (true) {
-                console.log("dark");
                 background = "black";
                 foreground = "white";
             } else {
-                console.log("light");
                 background = "white";
                 foreground = "black";
             }
@@ -241,6 +239,8 @@
                 document.documentElement.classList.toggle("dark-mode");
             }
         }
+
+        var animated = false;
 
         // Ancient and most browser-compatible way of animating
         function ancientAnimator(frame){
@@ -276,7 +276,7 @@
                 var width  = gfx.canvas.width  = window.innerWidth;
                 var height = gfx.canvas.height = window.innerHeight;
                 // Turn the angle into a dot position
-                var radians = angle * Math.PI / 180.0;
+                var radians = (180.0 + angle) * Math.PI / 180.0;
                 var x = (1 + Math.sin(radians)) * width / 2;
                 var y = (1 + Math.cos(radians)) * height / 2;
                 var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect x="0" y="0" width="${width}" height="${height}" style="fill: ${background};"/><circle cx="${x}" cy="${y}" r="20" style="fill: ${foreground};"/></svg>`
@@ -297,6 +297,9 @@
             // var text = `Magnetometer: ${event.alpha}, ${event.beta}, ${event.gama}`;
             // console.log(text);
             angle = event.alpha;
+            if (!animated) {
+                draw();
+            }
         }
 
         function sense() {
@@ -316,10 +319,13 @@
             theme()
             request();
             sense();
+            draw();
         // }
 
         // Trigger the animation with help of the animating script included earlier
-        //animate(draw);
+        if (animated) {
+            animate(draw);
+        }
     </script>
 </body>
 
