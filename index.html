@@ -304,14 +304,14 @@
 
         function sense() {
             if (window.DeviceMotionEvent) {
-                window.addEventListener("devicemotion", motion, false);
+                window.addEventListener("devicemotion", motion, true);
             } else {
-                console.error("http://www.w3.org/TR/orientation-event/ is not supported");
+                alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
-                window.addEventListener("deviceorientation", orientation, false);
+                window.addEventListener("deviceorientation", orientation, true);
             } else {
-                console.error("http://www.w3.org/TR/orientation-event/ is not supported");
+                alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
         }
 
