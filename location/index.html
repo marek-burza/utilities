@@ -100,6 +100,7 @@
         }
 
         function domInjectInvisible(html) {
+            // You can use it like this: domInjectInvisible("You should not see this text. <audio src=\"./beep.mp3\" autoplay=\"true\"/>");
             var parent = null;
             try {
                 parent = document.getElementsByTagName("body")[0];
