@@ -150,8 +150,7 @@
             set("coordinates", `${latitude}°N<br/>${longitude}°E`);
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
-            var response = JSON.parse(httpGet("https://ipapi.co/json/").text);
-            set("status", `${response.latitude}°N<br/>${response.longitude}°E`);
+            set("status", "");
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
 
@@ -170,6 +169,8 @@
                     error = `Error: ${error.code}`;
             }
             set("status", error);
+            var response = JSON.parse(httpGet("https://ipapi.co/json/").text);
+            set("coordinates", `${response.latitude}°N<br/>${response.longitude}°E`);
         }
 
         function request() {
