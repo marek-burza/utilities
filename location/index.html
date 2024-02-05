@@ -151,7 +151,7 @@
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
             set("status", "");
-            set("status", JSON.parse(httpGet("http://ip-api.com/json/")).lat);
+            set("status", JSON.parse(httpGet("https://ip-api.com/json/")).lat);
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
 
