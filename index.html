@@ -165,7 +165,7 @@
             set("coordinates", `${latitude}°N<br/>${longitude}°E`);
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
-            set("status", "");
+            //set("status", "");
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
         }
 
@@ -297,6 +297,7 @@
             // var text = `Magnetometer: ${event.alpha}, ${event.beta}, ${event.gama}`;
             // console.log(text);
             angle = event.alpha;
+            set("status", `orientation ${angle}`);
             if (!animated) {
                 draw();
             }
@@ -306,11 +307,13 @@
             if (window.DeviceMotionEvent) {
                 window.addEventListener("devicemotion", motion, true);
             } else {
+                set("status", "no orientation");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
                 window.addEventListener("deviceorientation", orientation, true);
             } else {
+                set("status", "no orientation");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
         }
