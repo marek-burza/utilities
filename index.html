@@ -261,6 +261,7 @@
             animator(function(){animate(draw);});
         }
         
+        var angle = 0;
         var image = new Image();
 
         // This will draw a frame of the animation with a dot spinning along an ellipse.
@@ -276,7 +277,7 @@
                 var width  = gfx.canvas.width  = window.innerWidth;
                 var height = gfx.canvas.height = window.innerHeight;
                 // Turn the angle into a dot position
-                var radians = (180.0 - angle) * Math.PI / 180.0;
+                var radians = angle * Math.PI / 180.0;
                 var x = (1 + Math.sin(radians)) * width / 2;
                 var y = (1 + Math.cos(radians)) * height / 2;
                 var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect x="0" y="0" width="${width}" height="${height}" style="fill: ${background};"/><circle cx="${x}" cy="${y}" r="20" style="fill: ${foreground};"/></svg>`
@@ -285,43 +286,34 @@
             }
         }
 
-        var angle = 0;
-
-        function motion(event){
-            var text = `Accelerometer: ${event.accelerationIncludingGravity.x}, ${event.accelerationIncludingGravity.y}, ${event.accelerationIncludingGravity.z}`;
-            set("status", text);
-            // console.log(text);
-        }
-
         function orientation(event){
-            // var text = `Magnetometer: ${event.alpha}, ${event.beta}, ${event.gama}`;
-            // console.log(text);
-            angle = event.alpha;
+            angle = event.webkitCompassHeading || (180.0 - event.alpha);
             if (!animated) {
                 draw();
             }
         }
 
+        function apple() {
+            return !(navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/));
+        }
+        
         function sense() {
-            try{
-            if (window.DeviceMotionEvent) {
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    DeviceMotionEvent.requestPermission().then(function(result){window.addEventListener("devicemotion", motion, true); return true;});
-                }
-                window.addEventListener("devicemotion", motion, true);
+            if (apple()) {
+                DeviceOrientationEvent.requestPermission().then(
+                    function(response) {
+                        if (response === "granted") {
+                            window.addEventListener("deviceorientation", orientation, true);
+                        } else {
+                            console.error("Orientation not granted!");
+                        }
+                    }
+                ).catch(
+                    function() {
+                        console.error("Orientation not supported")
+                    }
+                );
             } else {
-                alert("http://www.w3.org/TR/orientation-event/ is not supported");
-            }
-            if (window.DeviceOrientationEvent) {
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(function(result){window.addEventListener("deviceorientation", motion, true); return true;});
-                }
-                window.addEventListener("deviceorientation", orientation, true);
-            } else {
-                alert("http://www.w3.org/TR/orientation-event/ is not supported");
-            }
-            }catch(exception){
-                alert(exception);
+                window.addEventListener("deviceorientationabsolute", orientation, true);
             }
         }
 
