@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-This experiment started with a simple need for quickly looking up my current geographical coordinates (latitude & longitude) on my iPhone. Surely, there's an app for that, but it felt like an overkill - I just wanted something disposable, light-weight, self-contained. There's barely anything fitting the bill better than a single-file Progressive Web Aapp which can be added to the home screen. If that's all you'd like to know about it, you can go ahead and click [here](https://altermarkive.github.io/web-experiments/location/).
+This experiment started with a simple need for quickly looking up my current geographical coordinates (latitude & longitude) on my iPhone. Surely, there's an app for that, but it felt like an overkill - I just wanted something disposable, light-weight, self-contained. There's barely anything fitting the bill better than a single-file Progressive Web App which can be added to the home screen. If that's all you'd like to know about it, you can go ahead and click [here](https://altermarkive.github.io/web-experiments/location/).
 
 ## 1. Progressive Web App Template
 
