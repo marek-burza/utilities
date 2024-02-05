@@ -2,25 +2,32 @@
 <html lang="en">
     
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <title>⤓</title>
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="⤓" />
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="apple-mobile-web-app-title" content="⤓"/>
     <meta name="viewport"
-        content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1" />
+        content="width=device-width, initial-scale=1, user-scalable=no"/>
     <style>
+        /* Make sure we span the full viewport within the browser window */
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
         html {
             -webkit-text-size-adjust: 100%;
         }
 
         body {
-            background-color: black;
-            color: white;
             font-family: sans-serif;
             font-size: 10vmin;
+            color: white;
+            /* background-color: black; */
         }
-
+        
         html {
             height: 100%;
             width: 100%;
@@ -39,6 +46,7 @@
             flex-direction: column;
             justify-content: space-evenly;
             align-items: center;
+            z-index: 1;
         }
 
         .field {
@@ -52,33 +60,40 @@
         }
 
         .dark-mode {
-            filter: invert(100%);
             -webkit-filter: invert(100%);
             -moz-filter: invert(100%);
             -o-filter: invert(100%);
             -ms-filter: invert(100%);
+            filter: invert(100%);
+        }
+
+        /* Prevent the scrollbars from appearing */
+        canvas {
+            display: block;
+            z-index: 0;
         }
     </style>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.152.png" sizes="152x152"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.144.png" sizes="144x144"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.120.png" sizes="120x120"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.114.png" sizes="114x114"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.76.png" sizes="76x76"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.72.png" sizes="72x72"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
     <link href="https://altermarkive.github.io/altermarkive/altermarkive.57.png" sizes="57x57"
-        rel="apple-touch-icon" />
+        rel="apple-touch-icon"/>
 
 </head>
 
 <body>
+    <canvas id="gfx" width="100%" height="100%"></canvas>
     <div id="card">
-        <a id="openstreetmap" href="https://www.openstreetmap.org/">
+        <a id="openstreetmap" href="https://www.openstreetmap.org/" title="coordinates">
             <div id="coordinates" class="field">&nbsp;</div>
         </a>
         <div id="accuracy" class="field">&nbsp;</div>
@@ -206,15 +221,105 @@
                 keyUp(event);
             }
         }
-
-        if (urlParseHost(window.location.href) == "altermarkive.github.io") {
-            request();
+        
+        var background = null;
+        var foreground = null;
+        
+        function theme() {
             var arguments = urlParseQuery(window.location.href);
-            if ("dark" in arguments && parseInt(arguments["dark"]) == 0) {
+            var dark = "dark" in arguments && parseInt(arguments["dark"]) == 0;
+            if (true) {
+                console.log("dark");
+                background = "black";
+                foreground = "white";
+            } else {
+                console.log("light");
+                background = "white";
+                foreground = "black";
+            }
+            if (dark) {
                 document.documentElement.classList.toggle("dark-mode");
-                // domInjectInvisible("<style>html {filter: invert(100%); -webkit-filter: invert(100%); -moz-filter: invert(100%); -o-filter: invert(100%); -ms-filter: invert(100%);}</style>");
             }
         }
+
+        // Ancient and most browser-compatible way of animating
+        function ancientAnimator(frame){
+            window.setTimeout(frame, 1000.0 / 25.0);
+        }
+        
+        // Holds function which requests animation for a specific web browser
+        var animator =  window.requestAnimationFrame
+        || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame
+        || window.oRequestAnimationFrame
+        || window.msRequestAnimationFrame
+        || ancientAnimator;
+        
+        // Function which will trigger the animation
+        function animate(draw){
+            draw();
+            animator(function(){animate(draw);});
+        }
+        
+        var image = new Image();
+
+        // This will draw a frame of the animation with a dot spinning along an ellipse.
+        // The dot will make a full spin in one second.
+        function draw(){
+            // Get the handle on the HTML5 canvas element
+            var canvas = document.getElementById("gfx");
+            // Check if HTML5 2D graphics is supported
+            if(canvas.getContext){
+                // Get the 2D graphics context
+                var gfx = canvas.getContext("2d");
+                // Make sure we have the same width for the window & HTML5 canvas
+                var width  = gfx.canvas.width  = window.innerWidth;
+                var height = gfx.canvas.height = window.innerHeight;
+                // Turn the angle into a dot position
+                var radians = angle * Math.PI / 180.0;
+                var x = (1 + Math.sin(radians)) * width / 2;
+                var y = (1 + Math.cos(radians)) * height / 2;
+                var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect x="0" y="0" width="${width}" height="${height}" style="fill: ${background};"/><circle cx="${x}" cy="${y}" r="20" style="fill: ${foreground};"/></svg>`
+                console.log(svg)
+                image.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+                gfx.drawImage(image, 0, 0, width, height);
+            }
+        }
+
+        var angle = 0;
+
+        function motion(event){
+            // var text = `Accelerometer: ${event.accelerationIncludingGravity.x}, ${event.accelerationIncludingGravity.y}, ${event.accelerationIncludingGravity.z}`;
+            // console.log(text);
+        }
+
+        function orientation(event){
+            // var text = `Magnetometer: ${event.alpha}, ${event.beta}, ${event.gama}`;
+            // console.log(text);
+            angle = event.alpha;
+        }
+
+        function sense() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener("devicemotion", motion, false);
+            } else {
+                console.error("http://www.w3.org/TR/orientation-event/ is not supported");
+            }
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener("deviceorientation", orientation, false);
+            } else {
+                console.error("http://www.w3.org/TR/orientation-event/ is not supported");
+            }
+        }
+
+        // if (urlParseHost(window.location.href) == "altermarkive.github.io") {
+            theme()
+            request();
+            sense();
+        // }
+
+        // Trigger the animation with help of the animating script included earlier
+        //animate(draw);
     </script>
 </body>
 
