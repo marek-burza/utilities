@@ -303,14 +303,19 @@
         }
 
         function sense() {
+            set("status", "sense");
             if (window.DeviceMotionEvent) {
+                set("status", "motion before");
                 window.addEventListener("devicemotion", motion, true);
+                set("status", "motion after");
             } else {
-                set("status", "no orientation");
+                set("status", "no motion");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
             }
             if (window.DeviceOrientationEvent) {
+                set("status", "orientation before");
                 window.addEventListener("deviceorientation", orientation, true);
+                set("status", "orientation after");
             } else {
                 set("status", "no orientation");
                 alert("http://www.w3.org/TR/orientation-event/ is not supported");
