@@ -100,7 +100,7 @@
         <div id="altitude" class="field">&nbsp;</div>
         <div id="status" class="field">&nbsp;</div>
         <div id="stuff" class="field"><textarea id="debug">DEBUG:</textarea></div>
-        <a href="#" onclick="sense()"></a>
+        <a href="#" onclick="sense()">☼</a>
         <a href="#" onclick="retry()">↻</a>
     </div>
     <script>
@@ -169,7 +169,6 @@
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
             set("status", "");
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
-            sense();
         }
 
         function failed(error) {
