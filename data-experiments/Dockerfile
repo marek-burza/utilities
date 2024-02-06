@@ -64,3 +64,5 @@ ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/netlibNativeLinux/lib/
 
 RUN java weka.core.WekaPackageManager -install-package Auto-WEKA
 ENV CLASSPATH="${CLASSPATH}:/home/user/wekafiles/packages/Auto-WEKA/autoweka.jar"
+
+USER root
