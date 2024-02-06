@@ -99,7 +99,6 @@
         <div id="accuracy" class="field">&nbsp;</div>
         <div id="altitude" class="field">&nbsp;</div>
         <div id="status" class="field">&nbsp;</div>
-        <div id="stuff" class="field"><textarea id="debug">DEBUG:</textarea></div>
         <a href="#" onclick="sense()">☼</a>
         <a href="#" onclick="retry()">↻</a>
     </div>
@@ -267,7 +266,6 @@
         var image = new Image();
 
         // This will draw a frame of the animation with a dot spinning along an ellipse.
-        // The dot will make a full spin in one second.
         function draw(){
             // Get the handle on the HTML5 canvas element
             var canvas = document.getElementById("gfx");
@@ -289,7 +287,7 @@
         }
 
         function orientation(event){
-            angle = 180.0 - (event.webkitCompassHeading || event.alpha);
+            angle = 180.0 + (event.webkitCompassHeading || event.alpha);
             if (!animated) {
                 draw();
             }
@@ -300,39 +298,30 @@
         }
         
         function sense() {
-            document.getElementById("debug").value += "\nSENSE";
             if (apple()) {
                 // Requesting device orientation access requires a user gesture to prompt
-                document.getElementById("debug").value += `\nAPPLE`;
                 DeviceOrientationEvent.requestPermission().then(
                     function(response) {
-                        document.getElementById("debug").value += `\nPERMISSION BEGIN`;
                         if (response === "granted") {
-                            document.getElementById("debug").value += `\nGRANTED`;
                             window.addEventListener("deviceorientation", orientation, true);
                         } else {
-                            document.getElementById("debug").value += `\nDENIED ${response}`;
                             console.error(`Orientation not granted! (${response})`);
                         }
-                        document.getElementById("debug").value += `\nPERMISSION END`;
                     }
                 ).catch(
                     function(error) {
-                        document.getElementById("debug").value += `\nERROR ${error}`;
                         console.error(`Orientation not supported! (${error})`);
                     }
                 );
             } else {
-                document.getElementById("debug").value += `\nNO APPLE`;
                 window.addEventListener("deviceorientationabsolute", orientation, true);
-                document.getElementById("debug").value += `\nNO APPLE OK`;
             }
         }
 
-        // if (urlParseHost(window.location.href) == "altermarkive.github.io") {
+        if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             theme()
             request();
-        // }
+        }
 
         // Trigger the animation with help of the animating script included earlier
         if (animated) {
