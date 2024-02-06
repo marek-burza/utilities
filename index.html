@@ -99,6 +99,7 @@
         <div id="accuracy" class="field">&nbsp;</div>
         <div id="altitude" class="field">&nbsp;</div>
         <div id="status" class="field">&nbsp;</div>
+        <div id="stuff" class="field"><textarea id="debug">DEBUG:</textarea></div>
         <a href="#" onclick="retry()">↻</a>
     </div>
     <script>
@@ -165,8 +166,9 @@
             set("coordinates", `${latitude}°N<br/>${longitude}°E`);
             set("accuracy", `±${safe(position.coords.accuracy, 0)}m`);
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
-            //set("status", "");
+            set("status", "");
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
+            // sense();
         }
 
         function failed(error) {
@@ -294,26 +296,41 @@
         }
 
         function apple() {
-            return !(navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/));
+            return navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/);
         }
         
+        var sensing = false;
+
         function sense() {
+            if (sensing) {
+                return;
+            }
+            sensing = true;
+            document.getElementById("debug").text += "\nSENSE";
             if (apple()) {
+                document.getElementById("debug").value += `\nAPPLE`;
                 DeviceOrientationEvent.requestPermission().then(
                     function(response) {
+                        document.getElementById("debug").value += `\nPERMISSION BEGIN`;
                         if (response === "granted") {
+                            document.getElementById("debug").value += `\nGRANTED`;
                             window.addEventListener("deviceorientation", orientation, true);
                         } else {
+                            document.getElementById("debug").value += `\nDENIED ${response}`;
                             console.error("Orientation not granted!");
                         }
+                        document.getElementById("debug").value += `\nPERMISSION END`;
                     }
                 ).catch(
                     function() {
+                        document.getElementById("debug").value += `\nERROR`;
                         console.error("Orientation not supported")
                     }
                 );
             } else {
+                document.getElementById("debug").value += `\nNO APPLE`;
                 window.addEventListener("deviceorientationabsolute", orientation, true);
+                document.getElementById("debug").value += `\nNO APPLE OK`;
             }
         }
 
