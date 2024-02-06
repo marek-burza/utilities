@@ -168,7 +168,7 @@
             set("altitude", `${safe(position.coords.altitude, 0)}±${safe(position.coords.altitudeAccuracy, 0)}m`);
             set("status", "");
             link("openstreetmap", `https://www.openstreetmap.org/?zoom=17&mlat=${latitude}&mlon=${longitude}&layers=P`);
-            // sense();
+            sense();
         }
 
         function failed(error) {
@@ -306,7 +306,7 @@
                 return;
             }
             sensing = true;
-            document.getElementById("debug").text += "\nSENSE";
+            document.getElementById("debug").value += "\nSENSE";
             if (apple()) {
                 document.getElementById("debug").value += `\nAPPLE`;
                 DeviceOrientationEvent.requestPermission().then(
@@ -322,8 +322,8 @@
                         document.getElementById("debug").value += `\nPERMISSION END`;
                     }
                 ).catch(
-                    function() {
-                        document.getElementById("debug").value += `\nERROR`;
+                    function(error) {
+                        document.getElementById("debug").value += `\nERROR ${error}`;
                         console.error("Orientation not supported")
                     }
                 );
@@ -337,7 +337,7 @@
         // if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             theme()
             request();
-            sense();
+            // sense();
             draw();
         // }
 
