@@ -100,6 +100,7 @@
         <div id="altitude" class="field">&nbsp;</div>
         <div id="status" class="field">&nbsp;</div>
         <div id="stuff" class="field"><textarea id="debug">DEBUG:</textarea></div>
+        <a href="#" onclick="sense()"></a>
         <a href="#" onclick="retry()">↻</a>
     </div>
     <script>
@@ -299,15 +300,10 @@
             return navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/);
         }
         
-        var sensing = false;
-
         function sense() {
-            if (sensing) {
-                return;
-            }
-            sensing = true;
             document.getElementById("debug").value += "\nSENSE";
             if (apple()) {
+                // Requesting device orientation access requires a user gesture to prompt
                 document.getElementById("debug").value += `\nAPPLE`;
                 DeviceOrientationEvent.requestPermission().then(
                     function(response) {
@@ -317,14 +313,14 @@
                             window.addEventListener("deviceorientation", orientation, true);
                         } else {
                             document.getElementById("debug").value += `\nDENIED ${response}`;
-                            console.error("Orientation not granted!");
+                            console.error(`Orientation not granted! (${response})`);
                         }
                         document.getElementById("debug").value += `\nPERMISSION END`;
                     }
                 ).catch(
                     function(error) {
                         document.getElementById("debug").value += `\nERROR ${error}`;
-                        console.error("Orientation not supported")
+                        console.error(`Orientation not supported! (${error})`);
                     }
                 );
             } else {
@@ -337,8 +333,6 @@
         // if (urlParseHost(window.location.href) == "altermarkive.github.io") {
             theme()
             request();
-            // sense();
-            draw();
         // }
 
         // Trigger the animation with help of the animating script included earlier
