@@ -52,7 +52,7 @@ WORKDIR /home/user
 RUN curl -L -O http://prdownloads.sourceforge.net/weka/weka-3-8-6.zip && \
     unzip weka-3-8-6.zip && \
     rm weka-3-8-6.zip && \
-    unzip /home/user/weka-3-9-6/weka.jar arpack_combined.jar core.jar mtj.jar
+    unzip /home/user/weka-3-8-6/weka.jar arpack_combined.jar core.jar mtj.jar
 ENV CLASSPATH="${CLASSPATH}:/home/user/weka-3-8-6/weka.jar:/home/user/arpack_combined.jar:/home/user/core.jar:/home/user/mtj.jar"
 
 RUN java weka.core.WekaPackageManager -install-package netlibNativeLinux
