@@ -1,8 +1,5 @@
 # Tools
 
-Note: When using docker commands in git bash on Windows prefix them with `MSYS_NO_PATHCONV=1` and wrap environment variables like so `$(cygpath -w $HOME)`.
-
-
 ## autossh
 
 Can be used to forward a service on a local port to an SSH jump server:
