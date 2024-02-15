@@ -545,18 +545,6 @@ defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
 defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
 ```
 
-### Raspberry Pi
-
-Quick and dirty script to expose USB disk from Raspberry Pi over a web server:
-
-```bash
-sudo apt-get install apache2 -y
-sudo rm -R /var/www
-sudo ln -s /mnt /var/www
-echo "/dev/sda1 /mnt ntfs ro,user,umask=000 0 0" | sudo tee --append /etc/fstab
-sudo reboot
-```
-
 ### Chrome
 
 * To enable password import got to `chrome://flags/`
