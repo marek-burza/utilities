@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Initiating
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4
       - name: GitHub Super-Linter
-        uses: github/super-linter@v4
+        uses: github/super-linter@v6
         env:
           DISABLE_ERRORS: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
