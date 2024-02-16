@@ -278,6 +278,10 @@ docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1
 * [Smappen](https://www.smappen.com/)
 * [OpenRouteService](https://maps.openrouteservice.org/)
 
+### Static Topographic Map with GPX
+
+* [OpenTopoMap](https://opentopomap.org/) - upload a GPX file and take a screen shot
+
 ### Other
 
 * [Import from CSV to draw.io](https://drawio-app.com/import-from-csv-to-drawio/)
