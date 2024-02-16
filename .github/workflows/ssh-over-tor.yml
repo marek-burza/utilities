@@ -9,11 +9,11 @@ jobs:
     steps:
       - name: Initiating
         uses: actions/checkout@v2.4.0
-      - name: Tags
+      - name: Tags  # To have versioned TAG add: ,${DOCKER_IMAGE}:${{ github.sha }}
         id: tags
         run: |
           DOCKER_IMAGE='ghcr.io/${{ github.actor }}/ssh-over-tor'
-          TAGS="${DOCKER_IMAGE}:${{ github.sha }},${DOCKER_IMAGE}:latest"
+          TAGS="${DOCKER_IMAGE}:latest"
           echo ::set-output name=tags::${TAGS}
       - name: QEMU
         uses: docker/setup-qemu-action@v1.2.0
