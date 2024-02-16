@@ -37,5 +37,6 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 * [Bypassing firewall rules with socat and an SSH jump server](other/socat)
 * [SSH over Tor](other/ssh-over-tor)
 * [Tailscale as a Sidecar Container](other/tailscale-as-sidecar)
+* [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
 * [API-to-API pump with cron & curl](other/cron-curl)
 * [Nexus server](other/nexus)
