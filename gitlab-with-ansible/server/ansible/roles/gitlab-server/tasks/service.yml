@@ -1,0 +1,8 @@
+---
+
+- name: GitLab Server - Start service
+  systemd: name=gitlab-server state=started enabled=yes daemon_reload=yes
+
+- name: GitLab Server - Restart service
+  systemd: name=gitlab-server state=restarted enabled=yes daemon_reload=yes
+  when: gitlab_server_systemd_unit | changed
