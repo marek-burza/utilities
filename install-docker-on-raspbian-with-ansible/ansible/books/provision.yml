@@ -1,0 +1,4 @@
+- hosts: all
+  gather_facts: False
+
+- import_playbook: provision-docker.yml
