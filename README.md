@@ -127,28 +127,6 @@ docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite ghcr.io/alte
 Use: `blackvoidclub/midnight-commander`
 
 
-# Cheat Sheet
-
-## Keyboard Shortcuts
-
-| Shortcut           | Function                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
-| Win + B            | Windows: Go to System Tray                                       |
-| Shift + F10        | Windows: Right-click in System Tray                              |
-| Win + V            | Windows: Paste from Clipboard history                            |
-| Win + H            | Windows: Start dictation                                         |
-| Win + I            | Windows: System settings                                         |
-| Alt + P            | Windows Explorer: Toggle preview panel                           |
-| ⌘ + Shift + E      | Visual Studio Code: Navigate between editor and file tree panels |
-| ⌘ + \[             | Visual Studio Code: Unindent selection                           |
-| ⌘ + \]             | Visual Studio Code: Indent selection                             |
-| ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
-| ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
-| ⌘ + L              | Edge: Select the URL in the address bar to edit                  |
-| ⌘ + W              | Edge: Close tab                                                  |
-| Ctrl + K           | bash: Clear characters in line after cursor                      |
-
 ## git
 
 ### Get latest tag with current "distance"
@@ -224,7 +202,13 @@ git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-
 See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit).
 
 
-## Bash
+## Ubuntu / Bash
+
+Keyboard shortcuts:
+
+| Shortcut           | Function                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| Ctrl + K           | bash: Clear characters in line after cursor                      |
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
@@ -294,35 +278,44 @@ docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1
 * [Import from CSV to draw.io](https://drawio-app.com/import-from-csv-to-drawio/)
 
 
-## OS, web browser, etc.
+## Windows
 
-### Windows
+Keyboard shortcuts:
 
-Beep
+| Shortcut           | Function                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
+| Win + B            | Windows: Go to System Tray                                       |
+| Shift + F10        | Windows: Right-click in System Tray                              |
+| Win + V            | Windows: Paste from Clipboard history                            |
+| Win + H            | Windows: Start dictation                                         |
+| Win + I            | Windows: System settings                                         |
+
+Beep:
 
 ```bash
 powershell -c (New-Object Media.SoundPlayer "C:\beep.wav").PlaySync();
 ```
 
-Lock the screen
+Lock the screen:
 
 ```bash
 rundll32 user32.dll, LockWorkStation
 ```
 
-A command to set the default printer on Windows
+A command to set the default printer on Windows:
 
 ```bash
 cscript C:\Windows\System32\Printing_Admin_Scripts\en-US\prnmngr.vbs -t -p "\\host\printer"
 ```
 
-Run Edge as an administrator (or any other user)
+Run Edge as an administrator (or any other user):
 
 ```bash
 runas /user:"%ADMINISTRATOR%" /savecred "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 ```
 
-Removing Dead Icons From Taskbar
+Removing Dead Icons From Taskbar:
 
 * See: https://www.tenforums.com/tutorials/3151-reset-clear-taskbar-pinned-apps-windows-10-a-3.html
 
@@ -332,14 +325,24 @@ List the password of a WiFi network:
 netsh wlan show profile name=$SSID key=clear
 ```
 
-File encryption/decryption with GPG
+File encryption/decryption with GPG:
 
 ```bash
 gpg --cipher-algo AES256 -c filename.tar.gz
 gpg -o filename.tar.gz -d filename.tar.gz.gpg
 ```
 
-### Mac
+## Mac
+
+Keyboard shortcuts:
+
+| Shortcut           | Function                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| ⌘ + Shift + E      | Visual Studio Code: Navigate between editor and file tree panels |
+| ⌘ + \[             | Visual Studio Code: Unindent selection                           |
+| ⌘ + \]             | Visual Studio Code: Indent selection                             |
+| ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
+| ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
 
 Basic tools:
 
@@ -367,11 +370,18 @@ defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
 defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
 ```
 
-### Chrome
+## Chrome / Edge
+
+Keyboard shortcuts:
+
+| Shortcut           | Function                                                         |
+| ------------------ | ---------------------------------------------------------------- |
+| ⌘ + L              | Edge: Select the URL in the address bar to edit                  |
+| ⌘ + W              | Edge: Close tab                                                  |
 
 * To enable password import got to `chrome://flags/`
 
-### Visual Studio Code
+## Visual Studio Code
 
 Extensions:
 
