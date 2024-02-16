@@ -1,28 +1,5 @@
 # Utilities
 
-## autossh
-
-Can be used to forward a service on a local port to an SSH jump server:
-
-```bash
-docker run --restart always -d --network host -v $HOME/.ssh:/keys:ro ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o 
-"StrictHostKeyChecking no" -i /keys/id_rsa -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
-```
-
-The SSH key can be also passed via an environment variable:
-
-```bash
-docker run --restart always -d --network host -e AUTOSSH_ID_KEY=$(cat $HOME/.ssh/id_key) ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o 
-"PasswordAuthentication=no" -o "StrictHostKeyChecking no" -R ${JUMP_SERVER_PORT}:127.0.0.1:${LOCAL_PORT_FORWARDED} -N ${JUMP_SERVER_USER}@${JUMP_SERVER_HOST}
-```
-
-When using `autossh` remember to include the following line in /etc/ssh/sshd_config file on the SSH jump server:
-
-```
-GatewayPorts yes
-```
-
-
 ## Editing Photos (jhead, exiftime, exiftool)
 
 To run the tools included install following packages on Ubuntu: `jhead`, `exiftags`, `libimage-exiftool-perl`.
@@ -106,7 +83,7 @@ done
 ```
 
 
-## imagemagick
+## Image Conversion (imagemagick)
 
 Can be used for conversion between formats:
 
@@ -131,7 +108,7 @@ rm $TEMPORARY_SCRIPT
 ```
 
 
-## poppler
+## PDF Conversion (poppler)
 
 Can be used to extract pages from a PDF file:
 
@@ -145,127 +122,7 @@ Or to join PDF files:
 docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite ghcr.io/altermarkive/poppler 0.pdf 1.pdf result.pdf
 ```
 
-
-## socat
-
-To expose Docker host ports on Docker networks it is often enough to use [`qoomon/docker-host`](https://github.com/qoomon/docker-host) (and it may be necessary to add `--network host`):
-
-```bash
-docker run --restart always -d --name forwarder --cap-add=NET_ADMIN --cap-add=NET_RAW qoomon/docker-host
-```
-
-However, if an another image is interfering with firewall rules (or cannot grant `NET_ADMIN` or `NET_RAW` cabilities)
-it may be necessary to tunnel the traffic with [`socat`](https://www.redhat.com/sysadmin/getting-started-socat),
-here an example for `ssh`:
-
-```bash
-docker run --restart always -d --name forwarder alpine/socat TCP4-LISTEN:22,fork,reuseaddr TCP4:host.docker.internal:22
-```
-
-Note: On Linux, the following option might be necessary to be added to the command above: `--add-host=host.docker.internal:host-gateway`
-
-
-## ssh-jump-server
-
-Prepare the SSH keys:
-
-```bash
-mkdir computer
-ssh-keygen -t rsa -b 4096 -C "nobody@nowhere" -f computer/id_rsa
-touch authorized_keys
-cat computer/id_rsa.pub >> authorized_keys
-ssh user@computer mkdir /home/user/.jump
-scp computer/id_rsa user@computer:/home/user/.jump/id_rsa
-scp computer/id_rsa.pub user@computer:/home/user/.jump/id_rsa.pub
-kubectl create secret generic authorized-keys --from-file=authorized_keys=authorized_keys
-```
-
-Create `ssh-jump-server.yml` file:
-
-```
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ssh-jump-server
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ssh-jump-server
-  template:
-    metadata:
-      labels:
-        app: ssh-jump-server
-    spec:
-      nodeSelector:
-        "beta.kubernetes.io/os": linux
-      restartPolicy: Always
-      containers:
-      - name: ssh-jump-server
-        image: altermarkive/ssh-jump-server
-        ports:
-        - containerPort: 22
-        - containerPort: 22000
-        volumeMounts:
-          - name: authorized-keys-volume
-            readOnly: true
-            mountPath: "/home/user/.ssh"
-      volumes:
-      - name: authorized-keys-volume
-        secret:
-          secretName: authorized-keys
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ssh-jump-server
-spec:
-  type: LoadBalancer
-  ports:
-  - port: 22
-    targetPort: 22
-    name: ssh
-    protocol: TCP
-  - port: 22000
-    targetPort: 22000
-    name: ssh0
-    protocol: TCP
-  selector:
-    app: ssh-jump-server
-```
-
-Deploy the jump server to Kubernetes cluster:
-
-```bash
-kubectl apply -f ssh-jump-server.yml
-kubectl describe services
-```
-
-Forward the SSH:
-
-```bash
-docker run --restart always -d --name forward22 --network host --add-host=host.docker.internal:host-gateway alpine/socat TCP4-LISTEN:10022,fork,reuseaddr 
-TCP4:host.docker.internal:22
-docker run --restart always -d --name autossh22 --network host -v $HOME/.jump:/keys:ro ghcr.io/altermarkive/autossh -M 0 -o "PubkeyAuthentication=yes" -o 
-"PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:127.0.0.1:10022 -N user@${JUMP_SERVER_HOST}
-```
-
-or shorter:
-
-```bash
-docker run --restart always -d --name autossh22 -v $HOME/.jump:/keys:ro --add-host=host.docker.internal:host-gateway ghcr.io/altermarkive/autossh -M 0 -o 
-"PubkeyAuthentication=yes" -o "PasswordAuthentication=no" -o "StrictHostKeyChecking no" -i /keys/id_rsa -R 22002:host.docker.internal:22 -N user@${JUMP_SERVER_HOST}
-```
-
-Additional materials:
-
-* [How to SSH Into a Kubernetes Pod From Outside the Cluster](https://betterprogramming.pub/how-to-ssh-into-a-kubernetes-pod-from-outside-the-cluster-354b4056c42b)
-* [Kubernetes - Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
-* [Kubernetes - Get a Shell to a Running Container](https://kubernetes.io/docs/tasks/debug-application-cluster/get-shell-running-container/)
-* [Kubernetes - Create an External Load Balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/)
-
-
-# Midnight Commander
+## Midnight Commander
 
 Use: `blackvoidclub/midnight-commander`
 
@@ -365,18 +222,6 @@ git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-
 ### Correcting author for selected commits
 
 See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit).
-
-
-## Docker
-
-### Nexus 3
-
-Quick start with Nexus 3:
-
-```bash
-mkdir /tmp/nexus-data && sudo chown -R 200 /tmp/nexus-data
-docker run -p 8081:8081 -p 8082:8082 --name nexus -v /tmp/nexus-data:/nexus-data -it sonatype/nexus3:3.4.0
-```
 
 
 ## Bash
