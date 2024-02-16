@@ -1,4 +1,4 @@
-# Tools
+# Utilities
 
 ## autossh
 
@@ -23,15 +23,9 @@ GatewayPorts yes
 ```
 
 
-## exif
+## Editing Photos (jhead, exiftime, exiftool)
 
-To run the tools included in exif image use these commands:
-
-```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/jhead ghcr.io/altermarkive/exif ...
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftime ghcr.io/altermarkive/exif ...
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/exiftool ghcr.io/altermarkive/exif ...
-```
+To run the tools included install following packages on Ubuntu: `jhead`, `exiftags`, `libimage-exiftool-perl`.
 
 To add EXIF:
 
@@ -58,7 +52,7 @@ find -type f -printf "mv %p \$ALBUM.\$(exiftool -CreateDate %p | cut -c 35- | se
 ```
 
 
-## ffmpeg
+## Editing Videos (ffmpeg)
 
 Can be used for AV conversion between formats ([`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)):
 
