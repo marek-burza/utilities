@@ -8,10 +8,10 @@ on:
 jobs:
   pipeline:
     name: Pipeline
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Initiating
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
       - name: Building
         run: |
           git config user.name $GITHUB_ACTOR
@@ -29,7 +29,6 @@ jobs:
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 76x76 altermarkive.76.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 72x72 altermarkive.72.png
           docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick altermarkive.svg -resize 57x57 altermarkive.57.png
-          docker run --rm -v $PWD/dist:/dist -w /dist altermarkive/imagemagick tools.svg tools.png
           git --work-tree dist add --all
           git --work-tree dist commit -m gh-pages
           git remote add github "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"

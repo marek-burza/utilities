@@ -1,6 +1,0 @@
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
-<path d="M296,0 L296,25 L360,25 L360,110 L296,110 L296,512 L216,512 L216,110 L102,110 L172,25 L216,25 L216,0 Z" fill="#000000" transform="rotate(-45 256 256)" stroke="#FFFFFF" stroke-width="5"/>
-<path d="M286,0 C356,95 336,95 296,130 286,140 286,140 286,150 L286,362 C286,372 286,372 296,382 336,417 356,417 286,512 L286,430 C266,415 246,415 226,430 L226,512 C156,417 176,417 216,382 226,372 226,372 226,362 L226,150 C226,140 226,140 216,130 176,95 156,95 226,0 L226,82 C246,97 266,97 286,82 Z" fill="#000000" transform="translate(-256 -256) scale(1.1) translate(210 210) rotate(45 256 256)" stroke="#FFFFFF" stroke-width="5"/>
-</svg>
