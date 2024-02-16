@@ -1,0 +1,59 @@
+Port 22
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+RekeyLimit default none
+
+SyslogFacility AUTH
+LogLevel INFO
+
+LoginGraceTime 10
+PermitRootLogin no
+StrictModes no
+MaxAuthTries 5
+MaxSessions 10
+
+PubkeyAuthentication yes
+
+AuthorizedKeysFile .ssh/authorized_keys
+
+AuthorizedPrincipalsFile none
+
+AuthorizedKeysCommand none
+AuthorizedKeysCommandUser nobody
+
+HostbasedAuthentication no
+IgnoreUserKnownHosts no
+IgnoreRhosts yes
+
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+ChallengeResponseAuthentication no
+
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+GatewayPorts yes
+X11Forwarding no
+PermitTTY yes
+PrintMotd no
+TCPKeepAlive yes
+PermitUserEnvironment no
+Compression yes
+ClientAliveInterval 0
+ClientAliveCountMax 3
+UseDNS no
+PidFile /var/run/sshd.pid
+MaxStartups 10:30:100
+PermitTunnel no
+ChrootDirectory none
+VersionAddendum none
+
+Banner none
+
+Subsystem       sftp    /usr/lib/ssh/sftp-server
