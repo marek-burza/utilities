@@ -32,4 +32,9 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 
 # Other Experiments
 
+* [SSH jump server on Kubernetes](other/ssh-jump-server)
+* [Forwarding service on a local socket to an SSH jump server](other/autossh)
+* [Bypassing firewall rules with socat and an SSH jump server](other/socat)
 * [Tailscale as a Sidecar Container](other/tailscale-as-sidecar)
+* [API-to-API pump with cron & curl](other/cron-curl)
+* [Nexus server](other/nexus)
