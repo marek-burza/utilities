@@ -1,10 +1,12 @@
+️**WARNING: Written in 2017 - most likely outdated now**
+
 # Introduction
 
 This document describes how to deploy a Kubernetes 1.9 cluster with `kubespray`.
 
 It is assumed here that the cluster is deployed on bare-metal with `kubespray` on machines running CentOS 7.
 
-⚠️ **WARNING: The purpose of the cluster is not to run any internet-facing services but computational jobs instead and therefore security measures are ignored here.**
+️**WARNING: The purpose of the cluster is not to run any internet-facing services but computational jobs instead and therefore security measures are ignored here.**
 
 
 # Prerequisites
