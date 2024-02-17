@@ -88,38 +88,38 @@ done
 Can be used for conversion between formats:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint convert dpokidov/imagemagick example.png example.pdf
-docker run --rm -it -v $PWD:/w -w /w --entrypoint convert dpokidov/imagemagick -density 600 example.pdf example.png
+convert example.png example.pdf
+convert -density 600 example.pdf example.png
 ```
 
-Or, in combination with the `ghcr.io/altermarkive/exif` utility, one can run the following `compact.sh`:
+Or, in combination with the `exif` utility, one can run the following `compact.sh`:
 
 ```bash
 #!/bin/sh
 EXTENSION=$1
 PREFIX=$2
 TEMPORARY_SCRIPT=./compact.$PREFIX.sh
-RENAME="echo -n convert {}; echo -n \ $PREFIX/$PREFIX.; /usr/bin/exiftool -CreateDate {} | sed s/[^0-9]*//g | sed -e 's/\$/\.heic/'"
+RENAME="echo -n convert {}; echo -n \ $PREFIX/$PREFIX.; exiftool -CreateDate {} | sed s/[^0-9]*//g | sed -e 's/\$/\.heic/'"
 RENAME_ALL="find $PREFIX -name $EXTENSION -exec /bin/sh -c \"$RENAME\" \;"
-docker run -it --rm -v $PWD:/w -w /w --entrypoint /bin/sh ghcr.io/altermarkive/exif -c "$RENAME_ALL" | tr -d '\r' > $TEMPORARY_SCRIPT
+/bin/sh -c "$RENAME_ALL" | tr -d '\r' > $TEMPORARY_SCRIPT
 cat $TEMPORARY_SCRIPT
-docker run -it --rm -v $PWD:/w -w /w --entrypoint /bin/sh dpokidov/imagemagick $TEMPORARY_SCRIPT
+/bin/sh $TEMPORARY_SCRIPT
 rm $TEMPORARY_SCRIPT
 ```
 
 
-## PDF Conversion (poppler)
+## PDF Conversion (brew: poppler; Ubuntu: poppler-tools)
 
 Can be used to extract pages from a PDF file:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfseparate ghcr.io/altermarkive/poppler -f 1 -l 1 example.pdf %d.pdf
+pdfseparate -f 1 -l 1 example.pdf %d.pdf
 ```
 
 Or to join PDF files:
 
 ```bash
-docker run --rm -it -v $PWD:/w -w /w --entrypoint /usr/bin/pdfunite ghcr.io/altermarkive/poppler 0.pdf 1.pdf result.pdf
+pdfunite 0.pdf 1.pdf result.pdf
 ```
 
 ## Midnight Commander
