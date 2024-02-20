@@ -197,9 +197,14 @@ git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
 git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-tree --no-commit-id --name-only -r | sort | uniq
 ```
 
-### Correcting author for selected commits
+### Correcting author for all commits
 
-See details [here](https://stackoverflow.com/questions/3042437/how-to-change-the-commit-author-for-one-specific-commit).
+```bash
+git config user.name "Corrected Name"
+git config user.email corrected.name@somewhere.com
+git rebase --root --exec 'git commit --amend --no-edit --reset-author'
+git push -f
+```
 
 
 ## Ubuntu / Bash
