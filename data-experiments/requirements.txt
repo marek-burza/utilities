@@ -22,6 +22,7 @@ kiwisolver>=1.4.4  # matplotlib
 lightgbm>=3.3.5,<4
 MarkupSafe>=2.1.2  # bokeh, matplotlib
 matplotlib>=3.7.1,<4
+git+https://github.com/DmitryUlyanov/Multicore-TSNE.git@c1dbf84eb550980876d8ed822af4e9dfd21c5e05
 myfm>=0.3.6
 mypy>=1.4.1
 numerapi>=2.14.0,<3
