@@ -22,12 +22,12 @@ kiwisolver>=1.4.4  # matplotlib
 lightgbm>=3.3.5,<4
 MarkupSafe>=2.1.2  # bokeh, matplotlib
 matplotlib>=3.7.1,<4
-git+https://github.com/DmitryUlyanov/Multicore-TSNE.git@c1dbf84eb550980876d8ed822af4e9dfd21c5e05
 myfm>=0.3.6
 mypy>=1.4.1
 numerapi>=2.14.0,<3
 numpy>=1.22.4  # lightgbm, matplotlib, numerapi, pandas, pyarrow, scikit-learn, scipy
 omegaconf>=2.3.0  # hydra-core
+openTSNE>=1.0.1
 pandas>=1.5.3  # numerapi
 packaging>=23.1  # bokeh, hydra-core, matplotlib
 Pillow>=10.0.1  # bokeh, matplotlib
