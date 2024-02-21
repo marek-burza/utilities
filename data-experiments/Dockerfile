@@ -18,7 +18,7 @@ RUN apt-get -yq update && \
         cmake=3.25.1-1 \
         curl=7.88.1-10+deb12u5 \
         default-jdk=2:1.17-74 \
-        git-lfs \
+        git-lfs=3.3.0-1+b5 \
         libatlas3-base=3.10.3-13 \
         libfreetype-dev=2.12.1+dfsg-5 \
         libjpeg-dev=1:2.1.5-2 \
