@@ -1,42 +1,51 @@
 antlr4-python3-runtime>=4.9.3  # hydra-core
 # auto-sklearn==0.15.0  # relies on outdated scikit-learn
 black>=23.3.0
-certifi>=2023.7.22  # numerapi
-charset-normalizer>=3.1.0  # numerapi
+certifi>=2023.7.22  # numerapi, TPOT
+cffi  # Multicore-TSNE
+charset-normalizer>=3.1.0  # numerapi, TPOT
 click>=8.1.3  # black, numerapi
+cmake  # Multicore-TSNE
 contourpy>=1.0.5  # matplotlib
 # cudf-cu12>=23.12.0  # Making this work in Google Colab requires a more involved process: https://docs.rapids.ai/deployment/stable/platforms/colab/#colab-quick
 # cuml-cu12>=23.12.0  # Making this work in Google Colab requires a more involved process: https://docs.rapids.ai/deployment/stable/platforms/colab/#colab-quick
 cycler>=0.11.0  # matplotlib
 defusedxml>=0.7.1,<1
+deap  # TPOT
 dm-tree  # keras
+filelock  # torch
 flake8>=6.0.0
 fonttools>=4.39.3  # matplotlib
+fsspec  # torch
 h5py  # keras
 hydra-core>=1.3.2,<2
 isort>=5.12.0
-idna>=3.4  # numerapi
-joblib>=1.2.0  # lightgbm, scikit-learn, SOMPY
+idna>=3.4  # numerapi, TPOT
+jinja2  # torch
+joblib>=1.2.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
 keras>=3.0.1
 kiwisolver>=1.4.4  # matplotlib
 lightgbm>=3.3.5,<4
 markdown-it-py  # keras
+MarkupSafe  # torch
 matplotlib>=3.7.1,<4
 mccabe  # flake8
 mdurl  # keras
 ml-dtypes  # keras
+mpmath  # torch
 git+https://github.com/DmitryUlyanov/Multicore-TSNE.git@c1dbf84eb550980876d8ed822af4e9dfd21c5e05
 myfm>=0.3.6
 mypy>=1.4.1
-mypy-extensions  # black
+mypy-extensions  # black, mypy
 namex  # keras
+networkx  # torch
 numerapi>=2.14.0,<3
 numexpr  # SOMPY
-numpy>=1.22.4  # keras, lightgbm, matplotlib, numerapi, pandas, pyarrow, scikit-learn, scipy
+numpy>=1.22.4  # keras, lightgbm, matplotlib, Multicore-TSNE, numerapi, openTSNE, pandas, pyarrow, scikit-learn, scipy, TPOT, xgboost
 omegaconf>=2.3.0  # hydra-core
 openTSNE>=1.0.1
-pandas>=1.5.3  # numerapi
-packaging>=23.1  # black, hydra-core, matplotlib
+pandas>=1.5.3  # numerapi, TPOT
+packaging>=23.1  # black, hydra-core, matplotlib, plotly
 pathspec  # black
 pillow>=10.0.1  # matplotlib
 platformdirs  # black
@@ -46,23 +55,28 @@ pyflakes  # flake8
 pygments  # keras
 pyparsing>=3.0.9  # matplotlib
 pyarrow>=9.0.0
-python-dateutil>=2.8.2  # matplotlib, pandas
-pytz>=2022.7.1  # numerapi, pandas
+pycparser  # Multicore-TSNE
+python-dateutil>=2.8.2  # matplotlib, numerapi, pandas, TPOT
+pytz>=2022.7.1  # numerapi, pandas, TPOT
 PyYAML>=6.0  # hydra-core
-requests>=2.31.0,<3
+requests>=2.31.0,<3  # numerapi, TPOT
 rich  # keras
-scikit-learn>=1.2.2  # lightgbm, SOMPY
-scipy>=1.10.1  # lightgbm, scikit-learn, SOMPY
-six>=1.16.0  # matplotlib, numerapi, pandas
+scikit-learn>=1.2.2  # lightgbm, openTSNE, SOMPY, TPOT
+scipy>=1.10.1  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT, xgboost
+six>=1.16.0  # matplotlib, numerapi, pandas, TPOT
 git+https://github.com/sevamoo/SOMPY.git@6aca604b06e5eea1391ecf507810c7aabafc3f8b
-tabulate>=0.8.10,<1
+stopit  # TPOT
+sympy  # torch
 tenacity>=8.2.3  # plotly
-threadpoolctl>=3.1.0  # lightgbm, scikit-learn, SOMPY
-tomli  # black
+threadpoolctl>=3.1.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
+tomli  # black, mypy
 torch>=2.1.2
 TPOT>=0.12.0,<1
-tqdm>=4.65.0  # numerapi
+tqdm>=4.65.0  # numerapi, TPOT
 types-requests>=2.31.0.2  # linting
-typing-extensions>=4.5.0  # black
-urllib3>=1.26.17  # numerapi
+typing-extensions>=4.5.0  # black, mypy, torch
+tzdata  # numerapi, TPOT
+update-checker  # TPOT
+urllib3>=1.26.17  # numerapi, TPOT
 wandb>=0.15.7,<1
+xgboost  # TPOT
