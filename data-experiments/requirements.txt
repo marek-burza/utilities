@@ -1,91 +1,91 @@
 antlr4-python3-runtime>=4.9.3  # hydra-core
-appdirs  # wandb
+appdirs>=1.4.4  # wandb
 # auto-sklearn==0.15.0  # relies on outdated scikit-learn
-black>=23.3.0
-certifi>=2023.7.22  # numerapi, TPOT, wandb
-cffi  # Multicore-TSNE
-charset-normalizer>=3.1.0  # numerapi, TPOT, wandb
-click>=8.1.3  # black, numerapi, wandb
-cmake  # Multicore-TSNE
-contourpy>=1.0.5  # matplotlib
+black>=24.2.0
+certifi>=2024.2.2  # numerapi, TPOT, wandb
+cffi>=1.16.0  # Multicore-TSNE
+charset-normalizer>=3.3.2  # numerapi, TPOT, wandb
+click>=8.1.7  # black, numerapi, wandb
+cmake>=3.28.3  # Multicore-TSNE
+contourpy>=1.2.0  # matplotlib
 # cudf-cu12>=23.12.0  # Making this work in Google Colab requires a more involved process: https://docs.rapids.ai/deployment/stable/platforms/colab/#colab-quick
 # cuml-cu12>=23.12.0  # Making this work in Google Colab requires a more involved process: https://docs.rapids.ai/deployment/stable/platforms/colab/#colab-quick
-cycler>=0.11.0  # matplotlib
+cycler>=0.12.1  # matplotlib
+deap>=1.4.1  # TPOT
 defusedxml>=0.7.1,<1
-deap  # TPOT
-dm-tree  # keras
-docker-pycreds  # wandb
-filelock  # torch
-flake8>=6.0.0
-fonttools>=4.39.3  # matplotlib
-fsspec  # torch
-gitdb  # wandb
-GitPython  # wandb
-h5py  # keras
+dm-tree>=0.1.8  # keras
+docker-pycreds>=0.4.0  # wandb
+filelock>=3.13.1  # torch
+flake8>=7.0.0
+fonttools>=4.49.0  # matplotlib
+fsspec>=2024.2.0  # torch
+gitdb>=4.0.11  # wandb
+GitPython>=3.1.42  # wandb
+h5py>=3.10.0  # keras
 hydra-core>=1.3.2,<2
-isort>=5.12.0
-idna>=3.4  # numerapi, TPOT, wandb
-jinja2  # torch
-joblib>=1.2.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
-keras>=3.0.1
-kiwisolver>=1.4.4  # matplotlib
+idna>=3.6  # numerapi, TPOT, wandb
+isort>=5.13.2
+Jinja2>=3.1.3  # torch
+joblib>=1.3.2  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
+keras>=3.0.5
+kiwisolver>=1.4.5  # matplotlib
 lightgbm>=3.3.5,<4
-markdown-it-py  # keras
-MarkupSafe  # torch
-matplotlib>=3.7.1,<4
-mccabe  # flake8
-mdurl  # keras
-ml-dtypes  # keras
-mpmath  # torch
+markdown-it-py>=3.0.0  # keras
+MarkupSafe>=2.1.5  # torch
+matplotlib>=3.8.3,<4
+mccabe>=0.7.0  # flake8
+mdurl>=0.1.2  # keras
+ml-dtypes>=0.3.2  # keras
+mpmath>=1.3.0  # torch
 git+https://github.com/DmitryUlyanov/Multicore-TSNE.git@c1dbf84eb550980876d8ed822af4e9dfd21c5e05
 myfm>=0.3.6
-mypy>=1.4.1
-mypy-extensions  # black, mypy
-namex  # keras
-networkx  # torch
-numerapi>=2.14.0,<3
-numexpr  # SOMPY
-numpy>=1.22.4  # keras, lightgbm, matplotlib, Multicore-TSNE, myfm, numerapi, openTSNE, pandas, pyarrow, scikit-learn, scipy, TPOT, xgboost
+mypy>=1.8.0
+mypy-extensions>=1.0.0  # black, mypy
+namex>=0.0.7  # keras
+networkx>=3.2.1  # torch
+numerapi>=2.17.0,<3
+numexpr>=2.9.0  # SOMPY
+numpy>=1.26.4  # keras, lightgbm, matplotlib, Multicore-TSNE, myfm, numerapi, openTSNE, pandas, pyarrow, scikit-learn, scipy, TPOT, xgboost
 omegaconf>=2.3.0  # hydra-core
 openTSNE>=1.0.1
-pandas>=1.5.3  # myfm, numerapi, TPOT
-packaging>=23.1  # black, hydra-core, matplotlib, plotly
-pathspec  # black
-pillow>=10.0.1  # matplotlib
-platformdirs  # black
+packaging>=23.2  # black, hydra-core, matplotlib, plotly
+pandas>=2.2.1  # myfm, numerapi, TPOT
+pathspec>=0.12.1  # black
+pillow>=10.2.0  # matplotlib
+platformdirs>=4.2.0  # black
 plotly>=5.19.0
-protobuf  # wandb
-psutil  # wandb
-pycodestyle  # flake8
-pyflakes  # flake8
-pygments  # keras
-pyparsing>=3.0.9  # matplotlib
-pyarrow>=9.0.0
-pycparser  # Multicore-TSNE
+protobuf>=4.25.3  # wandb
+psutil>=5.9.8  # wandb
+pyarrow>=15.0.0
+pycodestyle>=2.11.1  # flake8
+pycparser>=2.21  # Multicore-TSNE
+pyflakes>=3.2.0  # flake8
+Pygments>=2.17.2  # keras
+pyparsing>=3.1.1  # matplotlib
 python-dateutil>=2.8.2  # matplotlib, myfm, numerapi, pandas, TPOT
-pytz>=2022.7.1  # myfm, numerapi, pandas, TPOT
-PyYAML>=6.0  # hydra-core, wandb
+pytz>=2024.1  # myfm, numerapi, pandas, TPOT
+PyYAML>=6.0.1  # hydra-core, wandb
 requests>=2.31.0,<3  # numerapi, TPOT, wandb
-rich  # keras
-scikit-learn>=1.2.2  # lightgbm, openTSNE, SOMPY, TPOT
-scipy>=1.10.1  # lightgbm, myfm, openTSNE, scikit-learn, SOMPY, TPOT, xgboost
-sentry-sdk  # wandb
-setproctitle  # wandb
+rich>=13.7.1  # keras
+scikit-learn>=1.4.0  # lightgbm, openTSNE, SOMPY, TPOT
+scipy>=1.11.4  # lightgbm, myfm, openTSNE, scikit-learn, SOMPY, TPOT, xgboost
+sentry-sdk>=1.40.6  # wandb
+setproctitle>=1.3.3  # wandb
 six>=1.16.0  # matplotlib, myfm, numerapi, pandas, TPOT, wandb
-smmap  # wandb
+smmap>=5.0.1  # wandb
 git+https://github.com/sevamoo/SOMPY.git@6aca604b06e5eea1391ecf507810c7aabafc3f8b
-stopit  # TPOT
-sympy  # torch
+stopit>=1.1.2  # TPOT
+sympy>=1.12  # torch
 tenacity>=8.2.3  # plotly
-threadpoolctl>=3.1.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
-tomli  # black, mypy
-torch>=2.1.2
-TPOT>=0.12.0,<1
-tqdm>=4.65.0  # myfm, numerapi, TPOT
-types-requests>=2.31.0.2  # linting
-typing-extensions>=4.5.0  # black, myfm, mypy, torch
-tzdata  # myfm, numerapi, TPOT
-update-checker  # TPOT
-urllib3>=1.26.17  # numerapi, TPOT, wandb
-wandb>=0.15.7,<1
-xgboost  # TPOT
+threadpoolctl>=3.3.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
+tomli>=2.0.1  # black, mypy
+torch>=2.2.1
+TPOT>=0.12.2,<1
+tqdm>=4.66.2  # myfm, numerapi, TPOT
+types-requests>=2.31.0.20240218  # linting
+typing-extensions>=4.10.0  # black, myfm, mypy, torch
+tzdata>=2024.1  # myfm, numerapi, TPOT
+update-checker>=0.18.0  # TPOT
+urllib3>=2.2.1  # numerapi, TPOT, wandb
+wandb>=0.16.3,<1
+xgboost>=2.0.3  # TPOT
