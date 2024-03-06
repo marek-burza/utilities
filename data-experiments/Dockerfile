@@ -20,6 +20,7 @@ RUN apt-get -yq update && \
         default-jdk=2:1.17-74 \
         git-lfs=3.3.0-1+b5 \
         libatlas3-base=3.10.3-13 \
+        libblas-dev=3.11.0-2 \
         libfreetype-dev=2.12.1+dfsg-5 \
         libjpeg-dev=1:2.1.5-2 \
         libopenblas-dev=0.3.21+ds-4 \
@@ -32,6 +33,7 @@ RUN apt-get -yq update && \
 # curl - Auto-WEKA
 # default-jdk - Auto-WEKA
 # libatlas3-base - Auto-WEKA
+# libblas-dev - N/A
 # libfreetype-dev - matplotlib (older, non-wheel version)
 # libjpeg-dev - Pillow (older, non-wheel version)
 # libopenblas-dev - Auto-WEKA
