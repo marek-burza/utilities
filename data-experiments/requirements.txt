@@ -35,6 +35,7 @@ lightgbm>=3.3.5,<4
 markdown-it-py>=3.0.0  # keras
 MarkupSafe>=2.1.5  # torch
 matplotlib>=3.8.3,<4
+MiniSom>=2.3.2
 mccabe>=0.7.0  # flake8
 mdurl>=0.1.2  # keras
 ml-dtypes>=0.3.2  # keras
