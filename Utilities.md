@@ -399,4 +399,13 @@ Keyboard shortcuts:
 
 Extensions:
 
-* Docker, docs-markdown, docs-preview, docs-yaml, Pylance, Python, Remote - Containers, Remote - SSH, XML (RedHat), YAML (RedHat)
+* [Dev Containers (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+* [Docker (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
+* [GitLens (GitKraken)](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
+* [Prettier (prettier.io)](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+* [learn-markdown (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-markdown)
+* [learn-preview (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-preview)
+* [Pylance (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+* [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+* [Remote - SSH (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
+* [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
