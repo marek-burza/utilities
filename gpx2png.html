@@ -18,14 +18,23 @@ html,body {
 <body>
 <script>
 function extract(gpx) {
-  const rtes = gpx.getElementsByTagName("rte");
   const paths = [];
+  const rtes = gpx.getElementsByTagName("rte");
   for (var i = 0; i < rtes.length; i++) {
     const rtepts = rtes[i].getElementsByTagName("rtept");
     const path = [];
     paths.append(path);
-    for (var j = 0; ) < rtepts.length; j++) {
-      path.append([rtepts[j].getAttribute["lat"], rtepts[j].getAttribute["lon"]]);
+    for (var j = 0; j < rtepts.length; j++) {
+      path.append([rtepts[j].getAttribute["lon"], rtepts[j].getAttribute["lat"]]);
+    }
+  }
+  const trksegs = gpx.getElementsByTagName("trkseg");
+  for (var i = 0; i < trksegs.length; i++) {
+    const trkpts = trksegs[i].getElementsByTagName("trkpt");
+    const path = [];
+    paths.append(path);
+    for (var j = 0; j < trkpts.length; j++) {
+      path.append([trkpts[j].getAttribute["lon"], trkpts[j].getAttribute["lat"]]);
     }
   }
   alert(paths[0]);
