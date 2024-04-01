@@ -2,17 +2,43 @@
 <head>
 <style type="text/css">
 html,body {
+  background-color: black;
+  color: white;
+  font-family: sans-serif;
   height: 100%;
   margin: 0px;
   padding: 0px;
 }
 #panel {
-  background: #0f0;
+  background: black;
   height: 100%;
 }
 </style>
 </head>
 <body>
-<div id="panel"></div>
+<script>
+function convert(content) {
+  alert(content);
+}
+
+function extract(file) {
+  if (file) {
+    var reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (event) {
+      convert(event.target.result);
+    }
+    reader.onerror = function (event) {
+      alert(event);
+    }
+  }
+}
+
+function trigger() {
+  document.getElementById("gpx").click();
+}
+</script>
+<input type="file" id="gpx" style="display: none;" onchange="extract(this.files[0]);"></input>
+<div id="panel" onclick="trigger();"></div>
 </body>
 </html>
