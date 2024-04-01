@@ -17,7 +17,18 @@ html,body {
 </head>
 <body>
 <script>
-function convert(gpx) {
+function extract(gpx) {
+  const rtes = gpx.getElementsByTagName("rte");
+  const paths = [];
+  for (var i = 0; i < rtes.length; i++) {
+    const rtepts = rtes[i].getElementsByTagName("rtept");
+    const path = [];
+    paths.append(path);
+    for (var j = 0; ) < rtepts.length; j++) {
+      path.append([rtepts[j].getAttribute["lat"], rtepts[j].getAttribute["lon"]]);
+    }
+  }
+  alert(paths[0]);
 }
 
 function parse(content) {
@@ -27,7 +38,7 @@ function parse(content) {
   if (error) {
     alert(error);
   } else {
-    console.log(doc.documentElement.nodeName);
+    extract(gpx);
   }
 }
 
