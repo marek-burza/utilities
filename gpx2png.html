@@ -17,7 +17,7 @@ html,body {
 </head>
 <body>
 <script>
-function extract(gpx) {
+function collect(gpx) {
   const paths = [];
   const rtes = gpx.getElementsByTagName("rte");
   for (var i = 0; i < rtes.length; i++) {
@@ -47,7 +47,7 @@ function parse(content) {
   if (error) {
     alert(error);
   } else {
-    extract(gpx);
+    collect(gpx);
   }
 }
 
