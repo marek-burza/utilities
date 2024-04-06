@@ -17,6 +17,137 @@ html,body {
 </head>
 <body>
 <script>
+function lon2x(lon, level) {
+  if (!(-180.0 <= lon && lon <= 180.0)) {
+    lon = (lon + 180.0) % 360.0 - 180.0;
+  }
+  ((-71.107628) / 360.0)
+  const x = ((lon + 180.0) / 360.0) * (1 << level);
+  return x;
+}
+
+function lat2y(lat, level) {
+  if (!(-90.0 <= lat && lat <= 90.0)) {
+    lat = (lat + 90.0) % 180.0 - 90.0;
+  }
+  const y = (1.0 - Math.log(Math.tan(lat * Math.PI / 180.0) + 1.0 / Math.cos(lat * Math.PI / 180.0)) / Math.PI) / 2.0 * (1 << level);
+  return y;
+}
+
+function x2pixels(x, centerX, tile, width) {
+  const px = (x - centerX) * tile + (width >> 1);
+  return Math.round(px);
+}
+
+function y2pixels(y, centerY, tile, height) {
+  const px = (y - centerY) * tile + (height >> 1);
+  return Math.round(px);
+}
+
+function zoom(bounds, width, height, padding, tile) {
+  for (var level = 17; level >= 0; level--) {
+    const horizontal = (lon2x(bounds.maximum.lon, level) - lon2x(bounds.minimum.lon, level)) * tile;
+    if (horizontal > (width - padding * 2)) {
+      continue;
+    }
+    const vertical = (lat2y(bounds.minimum.lat, level) - lat2y(bounds.maximum.lat, level)) * tile;
+    if (vertical > (height - padding * 2)) {
+      continue;
+    }
+    return level;
+  }
+  return 0;
+}
+
+function overlay(paths, width, height, tile, center, level) {
+  var features = "";
+  for (var i = 0; i < paths.length; i++) {
+    const path = paths[i];
+    var d = "";
+    for (var j = 0; j < path.length; j++) {
+      const place = path[j];
+      console.log(place.lon);
+      console.log(lon2x(place.lon, level));
+      const x = x2pixels(lon2x(place.lon, level), center.x, tile, width);
+      const y = y2pixels(lat2y(place.lat, level), center.y, tile, height);
+      if (d.length == 0){
+        d += `M ${x},${y} L`;
+      } else {
+        d += ` ${x},${y}`;
+      }
+    }
+    features += `<path d=\"${d}\" stroke=\"#FF0000\" stroke-width=\"2\" fill=\"none\"/>`;
+  }
+  return features;
+}
+
+function base(width, height, tile, center, level, flip) {
+  const min = {
+    x: Math.floor(center.x - (0.5 * width / tile)),
+    y: Math.floor(center.y - (0.5 * height / tile)),
+  };
+  const max = {
+    x: Math.ceil(center.x + (0.5 * width / tile)),
+    y: Math.ceil(center.y + (0.5 * height / tile)),
+  };
+  var tiles = "";
+  for (var x = min.x; x < max.x; x++) {
+    for (var y = min.y; y < max.y; y++) {
+      const tileMax = 1 << level;
+      const tileX = (x + tileMax) % tileMax;
+      const tileY = (y + tileMax) % tileMax;
+      if (flip) {
+        tileY = ((1 << level) - tileY) - 1;
+      }
+      const image = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
+      const xPixel = x2pixels(x, center.x, tile, width);
+      const yPixel = y2pixels(y, center.y, tile, height);
+      tiles += `<image href=\"${image}\" x=\"${xPixel}\" y=\"${yPixel}\" width=\"${tile}\" height=\"${tile}\"/>`;
+    }
+  }
+  return tiles;
+}
+
+function span(paths) {
+  const minimum = {
+    lon: 180.0,
+    lat: 90.0,
+  };
+  const maximum = {
+    lon: -180.0,
+    lat: -90.0,
+  };
+  for (var i = 0; i < paths.length; i++) {
+    for (var j = 0; j < paths[i].length; j++) {
+      minimum.lon = Math.min(paths[i][j].lon, minimum.lon);
+      maximum.lon = Math.max(paths[i][j].lon, maximum.lon);
+      minimum.lat = Math.min(paths[i][j].lat, minimum.lat);
+      maximum.lat = Math.max(paths[i][j].lat, maximum.lat);
+    }
+  }
+  const bounds = {minimum, maximum};
+  return bounds;
+}
+
+function render(paths) {
+  const tile = 256;
+  const width = 1080;
+  const height = 1080;
+  const bounds = span(paths);
+  console.log(bounds);
+  const level = zoom(bounds, width, height, 0, tile);
+  const center = {
+    x: lon2x((bounds.minimum.lon + bounds.maximum.lon) / 2.0, level),
+    y: lat2y((bounds.minimum.lat + bounds.maximum.lat) / 2.0, level),
+  };
+  console.log(center);
+  var svg = `<svg width=\"${width}\" height=\"${height}\" viewBox=\"0 0 ${width} ${height}\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\">`;
+  svg += base(width, height, tile, center, level, false);
+  svg += overlay(paths, width, height, tile, center, level);
+  svg += "</svg>";
+  console.log(svg);
+}
+
 function collect(gpx) {
   const paths = [];
   const rtes = gpx.getElementsByTagName("rte");
@@ -25,7 +156,7 @@ function collect(gpx) {
     const path = [];
     paths.push(path);
     for (var j = 0; j < rtepts.length; j++) {
-      path.push([rtepts[j].getAttribute["lon"], rtepts[j].getAttribute["lat"]]);
+      path.push({lon: rtepts[j].getAttribute("lon"), lat: rtepts[j].getAttribute("lat")});
     }
   }
   const trksegs = gpx.getElementsByTagName("trkseg");
@@ -34,10 +165,10 @@ function collect(gpx) {
     const path = [];
     paths.push(path);
     for (var j = 0; j < trkpts.length; j++) {
-      path.push([trkpts[j].getAttribute["lon"], trkpts[j].getAttribute["lat"]]);
+      path.push({lon: trkpts[j].getAttribute("lon"), lat: trkpts[j].getAttribute("lat")});
     }
   }
-  alert(paths[0]);
+  render(paths);
 }
 
 function parse(content) {
