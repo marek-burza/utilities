@@ -10,7 +10,11 @@ html,body {
   padding: 0px;
 }
 #panel {
+  display: flex;
   background: black;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   height: 100%;
 }
 </style>
@@ -21,7 +25,6 @@ function lon2x(lon, level) {
   if (!(-180.0 <= lon && lon <= 180.0)) {
     lon = (lon + 180.0) % 360.0 - 180.0;
   }
-  ((-71.107628) / 360.0)
   const x = ((lon + 180.0) / 360.0) * (1 << level);
   return x;
 }
@@ -42,6 +45,13 @@ function x2pixels(x, centerX, tile, width) {
 function y2pixels(y, centerY, tile, height) {
   const px = (y - centerY) * tile + (height >> 1);
   return Math.round(px);
+}
+
+function show(svg) {
+  console.log(svg);
+  const base64 = window.btoa(svg);
+  const image = `<img src="data:image/svg+xml;base64,${base64}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
+  document.getElementById("panel").innerHTML = image;
 }
 
 function zoom(bounds, width, height, padding, tile) {
@@ -145,7 +155,7 @@ function render(paths) {
   svg += base(width, height, tile, center, level, false);
   svg += overlay(paths, width, height, tile, center, level);
   svg += "</svg>";
-  console.log(svg);
+  show(svg);
 }
 
 function collect(gpx) {
@@ -200,6 +210,6 @@ function trigger() {
 }
 </script>
 <input type="file" id="gpx" style="display: none;" onchange="extract(this.files[0]);"></input>
-<div id="panel" onclick="trigger();"></div>
+<div id="panel" onclick="trigger();">GPX → PNG</div>
 </body>
 </html>
