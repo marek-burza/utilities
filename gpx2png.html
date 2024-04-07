@@ -81,7 +81,6 @@ function overlay(paths, width, height, tile, center, level, tiles) {
     context.lineWidth = 2
     for (var j = 0; j < path.length; j++) {
       const place = path[j];
-      console.log(`${place.lon} ${place.lat} ${lon2x(place.lon, level)} ${lat2y(place.lat, level)}`);
       const x = x2pixels(lon2x(place.lon, level), center.x, tile, width);
       const y = y2pixels(lat2y(place.lat, level), center.y, tile, height);
       if (j == 0){
@@ -90,6 +89,7 @@ function overlay(paths, width, height, tile, center, level, tiles) {
         context.lineTo(x, y);
       }
     }
+    context.stroke();
   }
 }
 
@@ -163,13 +163,11 @@ function render(paths) {
   const width = 1080;
   const height = 1080;
   const bounds = span(paths);
-  console.log(bounds);
   const level = zoom(bounds, width, height, 0, tile);
   const center = {
     x: lon2x((bounds.minimum.lon + bounds.maximum.lon) / 2.0, level),
     y: lat2y((bounds.minimum.lat + bounds.maximum.lat) / 2.0, level),
   };
-  console.log(center);
   base(paths, width, height, tile, center, level);
 }
 
@@ -181,7 +179,7 @@ function collect(gpx) {
     const path = [];
     paths.push(path);
     for (var j = 0; j < rtepts.length; j++) {
-      path.push({lon: rtepts[j].getAttribute("lon"), lat: rtepts[j].getAttribute("lat")});
+      path.push({lon: parseFloat(rtepts[j].getAttribute("lon")), lat: parseFloat(rtepts[j].getAttribute("lat"))});
     }
   }
   const trksegs = gpx.getElementsByTagName("trkseg");
@@ -190,7 +188,7 @@ function collect(gpx) {
     const path = [];
     paths.push(path);
     for (var j = 0; j < trkpts.length; j++) {
-      path.push({lon: trkpts[j].getAttribute("lon"), lat: trkpts[j].getAttribute("lat")});
+      path.push({lon: parseFloat(trkpts[j].getAttribute("lon")), lat: parseFloat(trkpts[j].getAttribute("lat"))});
     }
   }
   render(paths);
