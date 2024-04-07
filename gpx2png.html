@@ -67,7 +67,7 @@ function zoom(bounds, width, height, padding, tile) {
 }
 
 function overlay(paths, width, height, tile, center, level, tiles) {
-  const canvas = document.getElementById("canvas");
+  const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   canvas.width = width;
   canvas.height = height;
@@ -91,6 +91,9 @@ function overlay(paths, width, height, tile, center, level, tiles) {
     }
     context.stroke();
   }
+  const data = canvas.toDataURL();
+  const image = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
+  document.getElementById("panel").innerHTML = image;
 }
 
 function base(paths, width, height, tile, center, level) {
@@ -109,6 +112,7 @@ function base(paths, width, height, tile, center, level) {
       const tileX = (x + tileMax) % tileMax;
       const tileY = (y + tileMax) % tileMax;
       const image = new Image(tile, tile);
+      image.setAttribute('crossOrigin', 'anonymous');
       image.loaded = false;
       image.url = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
       image.xp = x2pixels(x, center.x, tile, width);
