@@ -17,6 +17,10 @@ html,body {
   width: 100%;
   height: 100%;
 }
+#canvas {
+  width: 100vmin;
+  height: 100vmin;
+}
 </style>
 </head>
 <body>
@@ -43,15 +47,8 @@ function x2pixels(x, centerX, tile, width) {
 }
 
 function y2pixels(y, centerY, tile, height) {
-  const px = (y - centerY) * tile + (height >> 1);
-  return Math.round(px);
-}
-
-function show(svg) {
-  console.log(svg);
-  const base64 = window.btoa(svg);
-  const image = `<img src="data:image/svg+xml;base64,${base64}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
-  document.getElementById("panel").innerHTML = image;
+  const py = (y - centerY) * tile + (height >> 1);
+  return Math.round(py);
 }
 
 function zoom(bounds, width, height, padding, tile) {
@@ -69,29 +66,34 @@ function zoom(bounds, width, height, padding, tile) {
   return 0;
 }
 
-function overlay(paths, width, height, tile, center, level) {
-  var features = "";
+function overlay(paths, width, height, tile, center, level, tiles) {
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = width;
+  canvas.height = height;
+  for (var i = 0; i < tiles.length; i++) {
+    context.drawImage(tiles[i], tiles[i].xp, tiles[i].yp, tile, tile);
+  }
   for (var i = 0; i < paths.length; i++) {
     const path = paths[i];
-    var d = "";
+    context.beginPath();
+    context.strokeStyle = "#FF0000";
+    context.lineWidth = 2
     for (var j = 0; j < path.length; j++) {
       const place = path[j];
-      console.log(place.lon);
-      console.log(lon2x(place.lon, level));
+      console.log(`${place.lon} ${place.lat} ${lon2x(place.lon, level)} ${lat2y(place.lat, level)}`);
       const x = x2pixels(lon2x(place.lon, level), center.x, tile, width);
       const y = y2pixels(lat2y(place.lat, level), center.y, tile, height);
-      if (d.length == 0){
-        d += `M ${x},${y} L`;
+      if (j == 0){
+        context.moveTo(x, y);
       } else {
-        d += ` ${x},${y}`;
+        context.lineTo(x, y);
       }
     }
-    features += `<path d=\"${d}\" stroke=\"#FF0000\" stroke-width=\"2\" fill=\"none\"/>`;
   }
-  return features;
 }
 
-function base(width, height, tile, center, level, flip) {
+function base(paths, width, height, tile, center, level) {
   const min = {
     x: Math.floor(center.x - (0.5 * width / tile)),
     y: Math.floor(center.y - (0.5 * height / tile)),
@@ -100,22 +102,38 @@ function base(width, height, tile, center, level, flip) {
     x: Math.ceil(center.x + (0.5 * width / tile)),
     y: Math.ceil(center.y + (0.5 * height / tile)),
   };
-  var tiles = "";
+  const tiles = [];
   for (var x = min.x; x < max.x; x++) {
     for (var y = min.y; y < max.y; y++) {
       const tileMax = 1 << level;
       const tileX = (x + tileMax) % tileMax;
       const tileY = (y + tileMax) % tileMax;
-      if (flip) {
-        tileY = ((1 << level) - tileY) - 1;
-      }
-      const image = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
-      const xPixel = x2pixels(x, center.x, tile, width);
-      const yPixel = y2pixels(y, center.y, tile, height);
-      tiles += `<image href=\"${image}\" x=\"${xPixel}\" y=\"${yPixel}\" width=\"${tile}\" height=\"${tile}\"/>`;
+      const image = new Image(tile, tile);
+      image.loaded = false;
+      image.url = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
+      image.xp = x2pixels(x, center.x, tile, width);
+      image.yp = y2pixels(y, center.y, tile, height);
+      tiles.push(image);
     }
   }
-  return tiles;
+  for (var i = 0; i < tiles.length; i++) {
+    const image = tiles[i];
+    const url = image.url;
+    image.onload = function (stuff) {
+      image.loaded = true;
+      var loaded = true;
+      for (var j = 0; j < tiles.length; j++) {
+        if (!tiles[j].loaded) {
+          loaded = false;
+          break;
+        }
+      }
+      if (loaded) {
+        overlay(paths, width, height, tile, center, level, tiles);
+      }
+    }
+    image.src = url;
+  }
 }
 
 function span(paths) {
@@ -141,6 +159,7 @@ function span(paths) {
 
 function render(paths) {
   const tile = 256;
+  const canvas = document.getElementById("canvas");
   const width = 1080;
   const height = 1080;
   const bounds = span(paths);
@@ -151,11 +170,7 @@ function render(paths) {
     y: lat2y((bounds.minimum.lat + bounds.maximum.lat) / 2.0, level),
   };
   console.log(center);
-  var svg = `<svg width=\"${width}\" height=\"${height}\" viewBox=\"0 0 ${width} ${height}\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\">`;
-  svg += base(width, height, tile, center, level, false);
-  svg += overlay(paths, width, height, tile, center, level);
-  svg += "</svg>";
-  show(svg);
+  base(paths, width, height, tile, center, level);
 }
 
 function collect(gpx) {
@@ -210,6 +225,6 @@ function trigger() {
 }
 </script>
 <input type="file" id="gpx" style="display: none;" onchange="extract(this.files[0]);"></input>
-<div id="panel" onclick="trigger();">GPX → PNG</div>
+<div id="panel" onclick="trigger();"><canvas id="canvas"></canvas></div>
 </body>
 </html>
