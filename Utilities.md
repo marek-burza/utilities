@@ -206,6 +206,19 @@ git rebase --root --exec 'git commit --amend --no-edit --reset-author'
 git push -f
 ```
 
+### Scheduled Prefetch
+
+```bash
+git maintenance start
+```
+
+### Accelerate Status
+
+```bash
+git config core.fsmonitor true
+git config core.untrackedcache true
+```
+
 
 ## Ubuntu / Bash
 
