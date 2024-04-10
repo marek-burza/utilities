@@ -126,6 +126,10 @@ pdfunite 0.pdf 1.pdf result.pdf
 
 Use: `blackvoidclub/midnight-commander`
 
+```bash
+docker run -it --name=mc -v $PWD:/w -w /w blackvoidclub/midnight-commander -S dark
+```
+
 
 ## git
 
