@@ -80,6 +80,7 @@ smmap>=5.0.1  # wandb
 git+https://github.com/sevamoo/SOMPY.git@6aca604b06e5eea1391ecf507810c7aabafc3f8b
 stopit>=1.1.2  # TPOT
 sympy>=1.12  # torch
+tabulate>=0.9.0
 tenacity>=8.2.3  # plotly
 threadpoolctl>=3.3.0  # lightgbm, openTSNE, scikit-learn, SOMPY, TPOT
 tifffile>=2024.2.12  # SOMPY
