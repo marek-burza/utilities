@@ -22,6 +22,7 @@ RUN apt-get -yq update && \
         libatlas3-base=3.10.3-13 \
         libblas-dev=3.11.0-2 \
         libfreetype-dev=2.12.1+dfsg-5 \
+        libhdf5-dev \
         libjpeg-dev=1:2.1.5-2 \
         libopenblas-dev=0.3.21+ds-4 \
         pkg-config=1.8.1-1 \
