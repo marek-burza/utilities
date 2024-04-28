@@ -36,7 +36,7 @@ RUN apt-get -yq update && \
 # libatlas3-base - Auto-WEKA
 # libblas-dev - N/A
 # libfreetype-dev - matplotlib (older, non-wheel version)
-# libhdf5-dev - N/A
+# libhdf5-dev - Keras
 # libjpeg-dev - Pillow (older, non-wheel version)
 # libopenblas-dev - Auto-WEKA
 # pkg-config - matplotlib (older, non-wheel version)
