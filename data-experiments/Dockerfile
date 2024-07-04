@@ -16,7 +16,7 @@ RUN apt-get -yq update && \
     apt-get -yq install \
         build-essential=12.9 \
         cmake=3.25.1-1 \
-        curl=7.88.1-10+deb12u5 \
+        curl \
         default-jdk=2:1.17-74 \
         git-lfs=3.3.0-1+b5 \
         libatlas3-base=3.10.3-13 \
