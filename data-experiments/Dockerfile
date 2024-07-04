@@ -1,6 +1,6 @@
 FROM python:3.10-slim-bookworm
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Docker in Docker
 RUN apt-get update -qqy && apt-get install -qqy \
@@ -21,7 +21,7 @@ RUN apt-get -yq update && \
         git-lfs=3.3.0-1+b5 \
         libatlas3-base=3.10.3-13 \
         libblas-dev=3.11.0-2 \
-        libfreetype-dev=2.12.1+dfsg-5 \
+        libfreetype-dev \
         libhdf5-dev=1.10.8+repack1-1 \
         libjpeg-dev=1:2.1.5-2 \
         libopenblas-dev=0.3.21+ds-4 \
