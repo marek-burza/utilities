@@ -16,12 +16,12 @@ RUN apt-get -yq update && \
     apt-get -yq install \
         build-essential=12.9 \
         cmake=3.25.1-1 \
-        curl \
+        curl=7.88.1-10+deb12u6 \
         default-jdk=2:1.17-74 \
         git-lfs=3.3.0-1+b5 \
         libatlas3-base=3.10.3-13 \
         libblas-dev=3.11.0-2 \
-        libfreetype-dev \
+        libfreetype-dev=2.12.1+dfsg-5+deb12u3 \
         libhdf5-dev=1.10.8+repack1-1 \
         libjpeg-dev=1:2.1.5-2 \
         libopenblas-dev=0.3.21+ds-4 \
