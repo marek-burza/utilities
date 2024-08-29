@@ -122,6 +122,14 @@ Or to join PDF files:
 pdfunite 0.pdf 1.pdf result.pdf
 ```
 
+## PDF Optimization
+
+Use this command to rescale images in a PDF file (screen = 75dpi, ebook = 150dpi, printer = 300dpi):
+
+```bash
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
+```
+
 ## Midnight Commander
 
 Use: `blackvoidclub/midnight-commander`
