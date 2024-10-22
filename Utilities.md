@@ -130,6 +130,14 @@ Use this command to rescale images in a PDF file (screen = 75dpi, ebook = 150dpi
 gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
 ```
 
+## PDF Encryption
+
+Use this command to encrypt a PDF file:
+
+```bash
+qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
+```
+
 ## Midnight Commander
 
 Use: `blackvoidclub/midnight-commander`
