@@ -442,3 +442,7 @@ Extensions:
 * [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 * [Remote - SSH (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
 * [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+
+# Linux
+
+- Disable CUPS: https://securityonline.info/severe-unauthenticated-rce-flaw-cvss-9-9-in-gnu-linux-systems-awaiting-full-disclosure/
