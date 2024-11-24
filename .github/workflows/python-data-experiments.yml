@@ -7,6 +7,8 @@ jobs:
     name: Pipeline
     runs-on: ubuntu-latest
     steps:
+      - name: Free
+        uses: jlumbroso/free-disk-space@main
       - name: Checkout
         uses: actions/checkout@v4
       - name: Tags  # To have versioned TAG add: ,${DOCKER_IMAGE}:${{ github.sha }}
