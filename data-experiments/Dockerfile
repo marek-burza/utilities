@@ -30,6 +30,8 @@ RUN apt-get -yq update && \
         libopenblas-dev \
         pkg-config \
         python3-full \
+        python3-dev \
+        python3-pip \
         swig \
         unzip \
         zlib1g-dev
