@@ -51,7 +51,7 @@ RUN apt-get -yq update && \
 # zlib - Pillow (older, non-wheel version)
 
 ADD requirements.txt /tmp/requirements.txt
-RUN pip3 install --disable-pip-version-check --no-cache-dir -r /tmp/requirements.txt && \
+RUN pip3 install --disable-pip-version-check --no-cache-dir --break-system-packages -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
 
 # Auto-WEKA
