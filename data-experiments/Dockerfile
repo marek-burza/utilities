@@ -1,4 +1,7 @@
-FROM python:3.10-slim-bookworm
+FROM nvidia/cuda:12.6.2-devel-ubuntu24.04
+
+# 1. NVIDIA CUDA Installation Guide for Linux (Ubuntu): https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#ubuntu
+# 2. Installing the NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,21 +17,24 @@ RUN curl -sSL https://get.docker.com/ | sh
 # Python package dependencies
 RUN apt-get -yq update && \
     apt-get -yq install \
-        build-essential=12.9 \
-        cmake=3.25.1-1 \
-        curl=7.88.1-10+deb12u6 \
-        default-jdk=2:1.17-74 \
-        git-lfs=3.3.0-1+b5 \
-        libatlas3-base=3.10.3-13 \
-        libblas-dev=3.11.0-2 \
-        libfreetype-dev=2.12.1+dfsg-5+deb12u3 \
-        libhdf5-dev=1.10.8+repack1-1 \
-        libjpeg-dev=1:2.1.5-2 \
-        libopenblas-dev=0.3.21+ds-4 \
-        pkg-config=1.8.1-1 \
-        swig=4.1.0-0.2 \
-        unzip=6.0-28 \
-        zlib1g-dev=1:1.2.13.dfsg-1
+        build-essential \
+        cmake \
+        curl \
+        default-jdk \
+        git-lfs \
+        libatlas3-base \
+        libblas-dev \
+        libfreetype-dev \
+        libhdf5-dev \
+        libjpeg-dev \
+        libopenblas-dev \
+        pkg-config \
+        python3 \
+        python3-dev \
+        python3-pip \
+        swig \
+        unzip \
+        zlib1g-dev
 # build-essential - tornado
 # cmake - lightgbm (older, non-wheel version)
 # curl - Auto-WEKA
