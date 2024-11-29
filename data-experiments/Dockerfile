@@ -29,7 +29,6 @@ RUN apt-get -yq update && \
         libjpeg-dev \
         libopenblas-dev \
         pkg-config \
-        pocl-opencl-icd \
         python3-full \
         python3-dev \
         python3-pip \
@@ -47,7 +46,6 @@ RUN apt-get -yq update && \
 # libjpeg-dev - Pillow (older, non-wheel version)
 # libopenblas-dev - Auto-WEKA
 # pkg-config - matplotlib (older, non-wheel version)
-# pocl-opencl-icd - lightgbm
 # swig - auto-sklearn
 # unzip - Auto-WEKA
 # zlib - Pillow (older, non-wheel version)
