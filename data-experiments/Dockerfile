@@ -27,6 +27,7 @@ RUN apt-get -yq update && \
         libfreetype-dev \
         libhdf5-dev \
         libjpeg-dev \
+        libnvidia-compute-550-server \
         libopenblas-dev \
         pkg-config \
         python3-full \
@@ -44,6 +45,7 @@ RUN apt-get -yq update && \
 # libfreetype-dev - matplotlib (older, non-wheel version)
 # libhdf5-dev - Keras
 # libjpeg-dev - Pillow (older, non-wheel version)
+# libnvidia-compute-550-server - lightgbm
 # libopenblas-dev - Auto-WEKA
 # pkg-config - matplotlib (older, non-wheel version)
 # swig - auto-sklearn
