@@ -36,9 +36,7 @@ def main() -> None:
         for group in api.groups.list(get_all=True):
             group_name = group.name.lower()
             if group_name not in gitlab_groups:
-                logging.info(f"Skipping {group_name}")
                 continue
-            logging.info(f"Checking {group_name}")
             for mr in api.groups.get(group_name).mergerequests.list(created_after=created_after, get_all=True):
                 title = mr.title
                 if gitlab_skip in title:
