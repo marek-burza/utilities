@@ -1,3 +1,0 @@
-# This will run the task every minute
-
-*/1 * * * * /bin/task.py

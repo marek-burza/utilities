@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Periodically checks if user is a watcher of queried Jira issues
+Checks if user is a watcher of queried Jira issues
 and adds the user if not watching.
 """
 
 import base64
+import fcntl
 import json
 import logging
 import os
-import time
 import urllib.parse
 import urllib.request
+import sys
 
 
 def init_logging():
     """
     Initiates logging
     """
-    pattern = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    pattern = "%(asctime)s - %(levelname)s - %(message)s"
     logging.basicConfig(format=pattern, level=logging.INFO)
-    return logging.getLogger('svetovid')
 
 
-def http(logger, url, method, headers, data=None):
+def http(url, method, headers, data=None):
     """
     Fetches the given URL (with reply caching & optional authorization)
     """
-    result = '{}'
+    result = "{}"
     while True:
         if headers is None:
             request = urllib.request.Request(url, method=method, data=data)
@@ -37,11 +37,11 @@ def http(logger, url, method, headers, data=None):
         try:
             reply = urllib.request.urlopen(request)  # nosec
             if reply.getcode() in [200, 204]:
-                result = reply.read().decode('utf-8')
+                result = reply.read().decode("utf-8")
                 break
         except urllib.error.HTTPError as exception:
-            logger.error(f'{method} {url} {data}')
-            logger.exception(exception)
+            logging.error(f"{method} {url} {data}")
+            logging.exception(exception)
             break
     return result
 
@@ -50,8 +50,8 @@ def authorization_credentials():
     """
     Reads authorization credentials from environment variables
     """
-    user = os.environ.get('ATLASSIAN_USER')
-    token = os.environ.get('ATLASSIAN_TOKEN')
+    user = os.environ.get("SVETOVIT_ATLASSIAN_USER")
+    token = os.environ.get("SVETOVIT_ATLASSIAN_TOKEN")
     return (user, token)
 
 
@@ -61,9 +61,9 @@ def authorization_headers(user, token):
     """
     if None in [user, token]:
         return None
-    credentials = '%s:%s' % (user, token)
-    auth = base64.b64encode(credentials.encode('utf-8'))
-    headers = {'Authorization': 'Basic %s' % auth.decode('utf-8')}
+    credentials = f"{user}:{token}"
+    auth = base64.b64encode(credentials.encode("utf-8"))
+    headers = {"Authorization": "Basic %s" % auth.decode("utf-8")}
     return headers
 
 
@@ -73,8 +73,8 @@ def prepare_headers():
     """
     credentials = authorization_credentials()
     headers = authorization_headers(*credentials)
-    headers['Content-Type'] = 'application/json'
-    headers['Accept'] = 'application/json'
+    headers["Content-Type"] = "application/json"
+    headers["Accept"] = "application/json"
     return headers
 
 
@@ -82,30 +82,29 @@ def prepare_parameters():
     """
     Prepare the operational parameters
     """
-    instance = os.environ.get('ATLASSIAN_INSTANCE')
-    query = urllib.parse.quote(os.environ.get('ATLASSIAN_QUERY'))
-    watcher = os.environ.get('ATLASSIAN_WATCHER')
-    sleep = int(os.environ.get('SVETOVID_SLEEP'))
-    return (instance, query, watcher, sleep)
+    instance = os.environ.get("SVETOVIT_ATLASSIAN_INSTANCE")
+    query = urllib.parse.quote(os.environ.get("SVETOVIT_ATLASSIAN_QUERY"))
+    watcher = os.environ.get("SVETOVIT_ATLASSIAN_WATCHER")
+    return (instance, query, watcher)
 
 
-def query_issues(instance, query, headers, logger):
+def query_issues(instance, query, headers):
     """
     Queries for issues and aggregates over paging
     """
-    template = 'https://%s.atlassian.net/rest/api/2/search?&jql=%s&startAt=%d'
+    template = "https://%s.atlassian.net/rest/api/2/search?&jql=%s&startAt=%d"
     issues = []
     index = 0
     while True:
         url = template % (instance, query, index)
-        reply = http(logger, url, 'GET', headers)
+        reply = http(url, "GET", headers)
         reply = json.loads(reply)
-        if 'issues' not in reply:
+        if "issues" not in reply:
             break
-        issues.extend(reply['issues'])
-        if reply['total'] == len(issues):
+        issues.extend(reply["issues"])
+        if reply["total"] == len(issues):
             break
-        index += len(reply['issues'])
+        index += len(reply["issues"])
     return issues
 
 
@@ -115,39 +114,43 @@ def filter_issues(issues):
     """
     not_watching = []
     for issue in issues:
-        watching = issue['fields']['watches']['isWatching']
+        watching = issue["fields"]["watches"]["isWatching"]
         if not watching:
             not_watching.append(issue)
     return not_watching
 
 
-def watch_issues(not_watching, instance, watcher, headers, logger):
+def watch_issues(not_watching, instance, watcher, headers):
     """
     Watch the unwatched issues
     """
-    template = 'https://%s.atlassian.net/rest/api/2/issue/%s/watchers'
-    watcher = f'"{watcher}"'.encode('utf-8')
+    template = "https://%s.atlassian.net/rest/api/2/issue/%s/watchers"
+    watcher = f"\"{watcher}\"".encode("utf-8")
     for issue in not_watching:
-        issue_key = issue['key']
-        issue_summary = issue['fields']['summary']
+        issue_key = issue["key"]
+        issue_summary = issue["fields"]["summary"]
         url = template % (instance, issue_key)
-        http(logger, url, 'POST', headers, watcher)
-        logger.info(f'{issue_key} {issue_summary}')
+        http(url, "POST", headers, watcher)
+        logging.info(f"{issue_key} {issue_summary}")
 
 
 def main():
     """
     Main function of the script
     """
-    logger = init_logging()
-    headers = prepare_headers()
-    instance, query, watcher, sleep = prepare_parameters()
-    while True:
-        issues = query_issues(instance, query, headers, logger)
+    with open("/tmp/atlassian.lock", "w") as lock:
+        try:
+            fcntl.lockf(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except IOError:
+            # The task is already running
+            sys.exit()
+        init_logging()
+        headers = prepare_headers()
+        instance, query, watcher = prepare_parameters()
+        issues = query_issues(instance, query, headers)
         not_watching = filter_issues(issues)
-        watch_issues(not_watching, instance, watcher, headers, logger)
-        time.sleep(sleep)
+        watch_issues(not_watching, instance, watcher, headers)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
