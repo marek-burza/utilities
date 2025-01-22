@@ -11,8 +11,10 @@ import logging
 import os
 import sys
 import time
+import warnings
+warnings.filterwarnings("ignore", module="urllib3")
 
-import gitlab
+import gitlab  # noqa: E402
 
 
 def main() -> None:
