@@ -13,7 +13,7 @@ sudo apt-get -yq install ansible-core openssh-server
 test -f ~/.ssh/id_ed25519.pub || ssh-keygen -t ed25519 -C "$USER@localhost"
 ssh-copy-id -i ~/.ssh/id_ed25519.pub $USER@localhost
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/$USER
-install 0700 -d $HOME/.ansible/tmp
+install -m 0700 -d $HOME/.ansible/tmp
 ```
 
 # Installation
