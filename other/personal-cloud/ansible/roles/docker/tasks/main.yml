@@ -1,0 +1,59 @@
+- name: Docker - Prerequisites
+  apt:
+    pkg:
+      - ca-certificates
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Docker - Keyring
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Docker - GPG
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0664'
+  become: yes
+
+- name: Docker - Architecture
+  command: dpkg --print-architecture
+  register: dpkg_architecture_output
+
+- name: Docker - Release
+  command: lsb_release -cs 2> /dev/null
+  register: lsb_release_output
+
+- name: Docker - Repository
+  apt_repository:
+    repo: "deb [arch={{ dpkg_architecture_output.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ lsb_release_output.stdout }} stable"
+    state: present
+  become: yes
+
+- name: Docker - Engine
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Docker - Group
+  group: name=docker
+  become: yes
+
+- name: Docker - User
+  user: name={{ ansible_user }} groups=docker append=yes
+  become: yes
+
+- name: Docker - Service
+  systemd: name=docker state=started enabled=yes
+  become: yes

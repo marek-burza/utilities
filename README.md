@@ -38,7 +38,7 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 * [SSH over Tor](other/ssh-over-tor)
 * [Tailscale as a Sidecar Container](other/tailscale-as-sidecar)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
-* [Ansible: Install Docker on Ubuntu](other/cloud)
+* [Personal Cloud](other/personal-cloud)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
 * [API-to-API pump with cron & curl](other/cron-curl)
 * [Nexus server](other/nexus)
