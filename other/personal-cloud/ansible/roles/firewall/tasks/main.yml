@@ -1,4 +1,14 @@
-- hosts: all
-  gather_facts: False
+- name: Firewall - Package
+  apt:
+    pkg:
+      - ufw
+    state: latest
+    update_cache: yes
+  become: yes
 
-- import_playbook: provision-docker.yml
+- name: Firewall - Enabled
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+  become: yes

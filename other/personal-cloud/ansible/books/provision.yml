@@ -4,3 +4,7 @@
 - hosts: all
   roles:
     - role: docker
+
+- hosts: all
+  roles:
+    - role: firewall
