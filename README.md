@@ -41,5 +41,4 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 * [Personal Cloud](other/personal-cloud)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
 * [API-to-API pump with cron & curl](other/cron-curl)
-* [Nexus server](other/nexus)
 * [BitTorrent over VPN](other/bittorrent-over-vpn)
