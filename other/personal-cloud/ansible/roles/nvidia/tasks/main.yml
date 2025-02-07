@@ -1,0 +1,65 @@
+- name: NVIDIA - Kernel
+  command: uname -r
+  register: uname_kernel_version_output
+
+- name: NVIDIA - Prerequisites
+  apt:
+    pkg:
+      - build-essential
+      - gnupg
+      - linux-headers-{{ uname_kernel_version_output.stdout }}
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: NVIDIA - Architecture
+  command: uname -m
+  register: uname_architecture_output
+
+- name: NVIDIA - Release
+  command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
+  register: os_release_output
+
+- name: NVIDIA - Keyring
+  apt:
+    deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/cuda-keyring_1.1-1_all.deb
+    state: present
+  become: yes
+
+- name: NVIDIA - Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+  become: yes
+
+- name: NVIDIA - Drivers
+  apt:
+    pkg:
+      - nvidia-open
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: NVIDIA - GPG
+  get_url:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    dest: /tmp/nvidia.gpg
+    force: true
+
+- name: NVIDIA - Dearmor
+  command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/nvidia.gpg
+  become: yes
+
+- name: NVIDIA - Repository
+  apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
+    state: present
+  become: yes
+
+- name: NVIDIA - Container Toolkit
+  apt:
+    pkg:
+      - nvidia-container-toolkit
+    state: latest
+    update_cache: yes
+  become: yes
