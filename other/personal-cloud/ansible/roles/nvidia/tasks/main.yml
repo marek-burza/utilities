@@ -40,6 +40,10 @@
     update_cache: yes
   become: yes
 
+- name: NVIDIA - Ubuntu
+  command: ubuntu-drivers install
+  become: yes
+
 - name: NVIDIA - GPG
   get_url:
     url: https://nvidia.github.io/libnvidia-container/gpgkey
@@ -62,4 +66,12 @@
       - nvidia-container-toolkit
     state: latest
     update_cache: yes
+  become: yes
+
+- name: NVIDIA - Docker
+  command: nvidia-ctk runtime configure --runtime=docker
+  become: yes
+
+- name: NVIDIA - Reload
+  systemd: name=docker state=reloaded
   become: yes
