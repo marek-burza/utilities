@@ -15,4 +15,8 @@
 
 - hosts: all
   roles:
+    - role: key
+
+- hosts: all
+  roles:
     - role: k3s
