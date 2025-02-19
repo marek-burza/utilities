@@ -1,3 +1,0 @@
-- name: k3s - Placeholder
-  debug:
-    msg: Placeholder for k3s

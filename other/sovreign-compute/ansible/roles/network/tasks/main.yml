@@ -1,0 +1,6 @@
+---
+- name: Network - Docker
+  community.docker.docker_network:
+    name: sovreign_network
+
+# Network isolated from the host

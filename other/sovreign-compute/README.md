@@ -21,5 +21,5 @@ install -m 0700 -d $HOME/.ansible/tmp
 
 ```shell
 cd ansible
-ANSIBLE_ROLES_PATH=$PWD/roles ansible-playbook -u $USER -i ../inventory --extra-vars "ansible_dir=$PWD ansible_ssh_user=$USER" books/provision.yml
+ANSIBLE_ROLES_PATH=$PWD/roles ansible-playbook -u $USER -i ../inventory --extra-vars "ansible_dir=$PWD ansible_ssh_user=$USER tailscale_auth_key=$TS_AUTHKEY" books/provision.yml
 ```

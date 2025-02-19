@@ -1,0 +1,37 @@
+---
+- name: Tailscale - Hostname
+  command: hostname
+  register: hostname_output
+
+- name: Tailscale - Directory
+  file:
+    path: /home/{{ ansible_user }}/.sovreign.tailscaled
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0700'
+  become: yes
+
+- name: Tailscale - Container
+  community.docker.docker_container:
+    name: tailscaled
+    image: tailscale/tailscale
+    state: started
+    restart_policy: always
+    hostname: "{{ hostname_output.stdout }}"
+    networks:
+      - name: sovreign_network
+    env:
+      TS_AUTHKEY: "{{ tailscale_auth_key }}"
+      TS_STATE_DIR: /var/lib/tailscale
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+    volumes:
+      - "/home/{{ ansible_user }}/.sovreign.tailscaled:/var/lib/tailscale"
+    capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+      # - NET_RAW  # When binding to the host network
+    # cap_drop:
+    #   - all
+
+# In case necessary for Kubernetes, read: https://tailscale.com/blog/kubecon-21/
