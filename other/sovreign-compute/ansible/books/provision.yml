@@ -9,9 +9,9 @@
   roles:
     - role: firewall
 
-- hosts: all
-  roles:
-    - role: nvidia
+# - hosts: all
+#   roles:
+#     - role: nvidia
 
 - hosts: all
   roles:
@@ -19,4 +19,8 @@
 
 - hosts: all
   roles:
-    - role: k3s
+    - role: network
+
+- hosts: all
+  roles:
+    - role: tailscale
