@@ -14,7 +14,7 @@
 - name: Tailscale - Container
   community.docker.docker_container:
     name: tailscaled
-    image: tailscale/tailscale
+    image: tailscale/tailscale:latest
     state: started
     restart_policy: always
     hostname: "{{ hostname_output.stdout }}"

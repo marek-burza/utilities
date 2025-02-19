@@ -24,3 +24,11 @@
 - hosts: all
   roles:
     - role: tailscale
+
+- hosts: all
+  roles:
+    - role: volume
+
+- hosts: all
+  roles:
+    - role: coder
