@@ -1,0 +1,24 @@
+---
+- name: Coder - Directory
+  file:
+    path: /home/{{ ansible_user }}/.sovreign.coder
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0700'
+
+- name: Coder - Container
+  community.docker.docker_container:
+    name: coder
+    image: codercom/code-server:latest
+    state: started
+    restart_policy: always
+    networks:
+      - name: sovreign_network
+    user:
+      - "{{ ansible_user }}"
+    env:
+      DOCKER_USER: "{{ ansible_user }}"
+    volumes:
+      - "/home/{{ ansible_user }}/.sovreign.local:/home/coder/.local"
+      - "/home/{{ ansible_user }}/.sovreign.config:/home/coder/.config"
+      - "/home/{{ ansible_user }}/.sovreign.volume:/home/coder/project"

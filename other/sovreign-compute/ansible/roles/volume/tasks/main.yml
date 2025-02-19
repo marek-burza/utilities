@@ -1,0 +1,7 @@
+- name: Volume - Directory
+  file:
+    path: /home/{{ ansible_user }}/.sovreign.volume
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0700'
+
