@@ -17,6 +17,7 @@
     image: tailscale/tailscale:latest
     state: started
     restart_policy: always
+    recreate: true
     hostname: "{{ hostname_output.stdout }}"
     networks:
       - name: sovreign_network
@@ -30,7 +31,7 @@
     capabilities:
       - NET_ADMIN
       - SYS_MODULE
-      # - NET_RAW  # When binding to the host network
+      - NET_RAW  # When binding to the host network
     # cap_drop:
     #   - all
 

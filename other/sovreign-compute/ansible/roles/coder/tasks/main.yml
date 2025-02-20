@@ -1,10 +1,22 @@
 ---
 - name: Coder - Directory
   file:
-    path: /home/{{ ansible_user }}/.sovreign.coder
+    path: "/home/{{ ansible_user }}/.sovreign.coder/{{ item }}"
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0700'
+  loop:
+    - ""
+    - "config"
+    - "local"
+
+- name: Coder - User
+  command: id -u
+  register: user_output
+
+- name: Coder - Group
+  command: id -g
+  register: group_output
 
 - name: Coder - Container
   community.docker.docker_container:
@@ -12,13 +24,17 @@
     image: codercom/code-server:latest
     state: started
     restart_policy: always
+    recreate: true
     networks:
       - name: sovreign_network
-    user:
-      - "{{ ansible_user }}"
+    exposed_ports:
+      - 8080
+    user: "{{ user_output.stdout }}:{{ group_output.stdout }}"
     env:
       DOCKER_USER: "{{ ansible_user }}"
+      PASSWORD: "{{ coder_password }}"
+    command: ["--auth", "none"]
     volumes:
-      - "/home/{{ ansible_user }}/.sovreign.local:/home/coder/.local"
-      - "/home/{{ ansible_user }}/.sovreign.config:/home/coder/.config"
+      - "/home/{{ ansible_user }}/.sovreign.coder/local:/home/coder/.local"
+      - "/home/{{ ansible_user }}/.sovreign.coder/config:/home/coder/.config"
       - "/home/{{ ansible_user }}/.sovreign.volume:/home/coder/project"
