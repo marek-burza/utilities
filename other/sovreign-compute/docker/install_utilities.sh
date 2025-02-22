@@ -8,4 +8,5 @@ apt-get install -yq \
   build-essential \
   git \
   jq \
-  sudo
+  sudo \
+  supervisor

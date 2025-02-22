@@ -1,40 +1,75 @@
 ---
-- name: Tailscale - Hostname
+- name: Utilities - Hostname
   command: hostname
   register: hostname_output
 
-- name: Tailscale - Directory
+- name: Utilities - Directories
   file:
-    path: /home/{{ ansible_user }}/.sovreign.tailscaled
+    path: "/home/{{ ansible_user }}/.sovreign.{{ item }}"
     state: directory
     owner: "{{ ansible_user }}"
-    mode: '0700'
-  become: yes
+    mode: 0700
+  loop:
+    - "tailscale"
+    - "coder"
+    - "coder/config"
+    - "coder/local"
 
-- name: Tailscale - Container
+- name: Utilities - User
+  command: id -u
+  register: user_output
+
+- name: Utilities - Group
+  command: id -g
+  register: group_output
+
+- name: Utilities - Config
+  copy:
+    src: supervisord.conf
+    dest: "/home/{{ ansible_user }}/.sovreign.supervisord.conf"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+
+- name: Utilities - Container
   community.docker.docker_container:
-    name: tailscaled
-    image: tailscale/tailscale:latest
+    name: sovreign
+    image: ghcr.io/altermarkive/sovreign-compute-utilities:latest
     state: started
     restart_policy: always
     recreate: true
     hostname: "{{ hostname_output.stdout }}"
-    # network_mode: "none"
-    networks:
-      - name: sovreign_network
+    network_mode: "none"
     env:
+      USER_ID: "{{ user_output.stdout }}"
+      GROUP_ID: "{{ group_output.stdout }}"
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
       TS_STATE_DIR: /var/lib/tailscale
-      TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
-    devices:
-      - "/dev/net/tun:/dev/net/tun"
+      PASSWORD: "{{ utilities_password }}"
+      # TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
+    # devices:
+    #   - "/dev/net/tun:/dev/net/tun"
+    command: ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
     volumes:
-      - "/home/{{ ansible_user }}/.sovreign.tailscaled:/var/lib/tailscale"
-    capabilities:
-      - NET_ADMIN
-      - SYS_MODULE
-      - NET_RAW  # When binding to the host network
+      - "/home/{{ ansible_user }}/.sovreign.supervisord.conf:/etc/supervisord.conf"
+      - "/home/{{ ansible_user }}/.sovreign.tailscale:/var/lib/tailscale"
+      - "/home/{{ ansible_user }}/.sovreign.coder/local:/home/user/.local"
+      - "/home/{{ ansible_user }}/.sovreign.coder/config:/home/user/.config"
+      - "/home/{{ ansible_user }}/.sovreign.volume:/home/user/project"
+    # capabilities:
+    #   - NET_ADMIN
+    #   - SYS_MODULE
+    #   - NET_RAW  # When binding to the host network
     # cap_drop:
     #   - all
 
 # In case necessary for Kubernetes, read: https://tailscale.com/blog/kubecon-21/
+
+# docker exec -it coder /bin/bash
+# apt update -yq
+# apt install -yq curl
+# curl -sSLO https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
+# rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
+# export PATH=$PATH:/usr/local/go/bin
+# go install github.com/sorenisanerd/gotty@latest
+# /root/go/bin/gotty -w /bin/bash
