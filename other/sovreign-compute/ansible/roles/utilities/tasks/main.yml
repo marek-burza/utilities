@@ -19,11 +19,13 @@
     restart_policy: always
     recreate: true
     hostname: "{{ hostname_output.stdout }}"
+    # network_mode: "none"
     networks:
       - name: sovreign_network
     env:
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
       TS_STATE_DIR: /var/lib/tailscale
+      TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
     devices:
       - "/dev/net/tun:/dev/net/tun"
     volumes:
