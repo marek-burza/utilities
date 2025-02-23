@@ -39,13 +39,13 @@
     restart_policy: always
     recreate: true
     hostname: "{{ hostname_output.stdout }}"
-    network_mode: "none"
+    # network_mode: "none"
     env:
       USER_ID: "{{ user_output.stdout }}"
       GROUP_ID: "{{ group_output.stdout }}"
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
       TS_STATE_DIR: /var/lib/tailscale
-      PASSWORD: "{{ utilities_password }}"
+      UTILITIES_PASSWORD: "{{ utilities_password }}"
       # TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
     # devices:
     #   - "/dev/net/tun:/dev/net/tun"
