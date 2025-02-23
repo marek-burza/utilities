@@ -5,30 +5,20 @@
 
 - name: Utilities - Directories
   file:
-    path: "/home/{{ ansible_user }}/.sovreign.{{ item }}"
+    path: "/var/sovreign/{{ item }}"
     state: directory
-    owner: "{{ ansible_user }}"
     mode: 0700
   loop:
     - "tailscale"
     - "coder"
     - "coder/config"
     - "coder/local"
-
-- name: Utilities - User
-  command: id -u
-  register: user_output
-
-- name: Utilities - Group
-  command: id -g
-  register: group_output
+  become: yes
 
 - name: Utilities - Config
   copy:
     src: supervisord.conf
-    dest: "/home/{{ ansible_user }}/.sovreign.supervisord.conf"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    dest: "/var/sovreign/etc/supervisord.conf"
     mode: 0600
 
 - name: Utilities - Container
@@ -41,21 +31,18 @@
     hostname: "{{ hostname_output.stdout }}"
     # network_mode: "none"
     env:
-      USER_ID: "{{ user_output.stdout }}"
-      GROUP_ID: "{{ group_output.stdout }}"
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
-      TS_STATE_DIR: /var/lib/tailscale
       UTILITIES_PASSWORD: "{{ utilities_password }}"
       # TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
     # devices:
     #   - "/dev/net/tun:/dev/net/tun"
     command: ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
     volumes:
-      - "/home/{{ ansible_user }}/.sovreign.supervisord.conf:/etc/supervisord.conf"
-      - "/home/{{ ansible_user }}/.sovreign.tailscale:/var/lib/tailscale"
-      - "/home/{{ ansible_user }}/.sovreign.coder/local:/home/user/.local"
-      - "/home/{{ ansible_user }}/.sovreign.coder/config:/home/user/.config"
-      - "/home/{{ ansible_user }}/.sovreign.volume:/home/user/project"
+      - "/var/sovreign/etc/supervisord.conf:/etc/supervisord.conf"
+      - "/var/sovreign/tailscale:/var/run/tailscale"
+      - "/var/sovreign/coder/local:/root/.local"
+      - "/var/sovreign/coder/config:/root/.config"
+      - "/var/sovreign/volume:/root/project"
     # capabilities:
     #   - NET_ADMIN
     #   - SYS_MODULE

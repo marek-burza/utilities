@@ -4,9 +4,10 @@ set -e
 
 apt-get update -yq
 apt-get install -yq \
-  curl \
   build-essential \
+  curl \
   git \
   jq \
+  procps \
   sudo \
   supervisor
