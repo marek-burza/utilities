@@ -1,3 +1,4 @@
+---
 - name: NVIDIA - Kernel
   command: uname -r
   register: uname_kernel_version_output

@@ -1,22 +1,17 @@
 ---
 - name: Key - Check
   stat:
-    path: /home/{{ ansible_user }}/.sovreign.ssh/id_ed25519
+    path: /var/sovreign/ssh/id_ed25519
   register: key_stat
-
-- name: Key - Hostname
-  command: hostname
-  register: hostname_output
 
 - name: Key - Directory
   file:
-    path: /home/{{ ansible_user }}/.sovreign.ssh
+    path: /var/sovreign/ssh
     state: directory
-    owner: "{{ ansible_user }}"
-    mode: '0700'
+    mode: 0700
   become: yes
 
 - name: Key - Create
-  command: ssh-keygen -t ed25519 -C "{{ ansible_user }}@{{ hostname_output.stdout }}" -f /home/{{ ansible_user }}/.sovreign.ssh/id_ed25519
+  command: ssh-keygen -t ed25519 -C "nobody@localhost" -f /var/sovreign/ssh/id_ed25519
   when: not key_stat.stat.exists
   become: yes
