@@ -9,6 +9,7 @@
     state: directory
     mode: 0700
   loop:
+    - "etc"
     - "tailscale"
     - "coder"
     - "coder/config"
@@ -20,22 +21,26 @@
     src: supervisord.conf
     dest: "/var/sovreign/etc/supervisord.conf"
     mode: 0600
+  become: yes
+
+- name: Utilities - Network
+  community.docker.docker_network:
+    name: sovreign-compute-utilities-network
 
 - name: Utilities - Container
   community.docker.docker_container:
-    name: sovreign
+    name: sovreign-compute-utilities
     image: ghcr.io/altermarkive/sovreign-compute-utilities:latest
     state: started
     restart_policy: always
     recreate: true
     hostname: "{{ hostname_output.stdout }}"
-    # network_mode: "none"
+    networks:
+      - name: sovreign-compute-utilities-network
     env:
+      HOSTNAME: "{{ hostname_output.stdout }}"
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
       UTILITIES_PASSWORD: "{{ utilities_password }}"
-      # TS_EXTRA_ARGS: "--advertise-exit-node --hostname=coder --advertise-routes=172.19.0.0/16"
-    # devices:
-    #   - "/dev/net/tun:/dev/net/tun"
     command: ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
     volumes:
       - "/var/sovreign/etc/supervisord.conf:/etc/supervisord.conf"
@@ -43,18 +48,7 @@
       - "/var/sovreign/coder/local:/root/.local"
       - "/var/sovreign/coder/config:/root/.config"
       - "/var/sovreign/volume:/root/project"
-    # capabilities:
-    #   - NET_ADMIN
-    #   - SYS_MODULE
-    #   - NET_RAW  # When binding to the host network
-    # cap_drop:
-    #   - all
 
-# In case necessary for Kubernetes, read: https://tailscale.com/blog/kubecon-21/
-
-# docker exec -it coder /bin/bash
-# apt update -yq
-# apt install -yq curl
 # curl -sSLO https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
 # rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
 # export PATH=$PATH:/usr/local/go/bin
