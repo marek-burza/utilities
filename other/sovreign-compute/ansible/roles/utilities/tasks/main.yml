@@ -45,6 +45,5 @@
     volumes:
       - "/var/sovreign/etc/supervisord.conf:/etc/supervisord.conf"
       - "/var/sovreign/tailscale:/var/run/tailscale"
-      - "/var/sovreign/coder/local:/root/.local"
-      - "/var/sovreign/coder/config:/root/.config"
+      - "/var/sovreign/ssh:/root/.ssh"
       - "/var/sovreign/volume:/root/projects"
