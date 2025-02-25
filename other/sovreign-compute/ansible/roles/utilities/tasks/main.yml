@@ -47,10 +47,4 @@
       - "/var/sovreign/tailscale:/var/run/tailscale"
       - "/var/sovreign/coder/local:/root/.local"
       - "/var/sovreign/coder/config:/root/.config"
-      - "/var/sovreign/volume:/root/project"
-
-# curl -sSLO https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
-# rm -rf /usr/local/go && tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
-# export PATH=$PATH:/usr/local/go/bin
-# go install github.com/sorenisanerd/gotty@latest
-# /root/go/bin/gotty -w /bin/bash
+      - "/var/sovreign/volume:/root/projects"
