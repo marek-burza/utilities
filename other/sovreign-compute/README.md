@@ -23,3 +23,10 @@ install -m 0700 -d $HOME/.ansible/tmp
 cd ansible
 ANSIBLE_ROLES_PATH=$PWD/roles ansible-playbook -u $USER -i ../inventory --extra-vars "ansible_dir=$PWD ansible_ssh_user=$USER tailscale_auth_key=$TS_AUTHKEY utilities_password=$UTILITIES_PASSWORD" books/provision.yml
 ```
+
+# Future
+
+Replace `tailscale` & `gotty` with WebRTC-based solution:
+
+- [GitHub: roccomuso/rtc-web-term](https://github.com/roccomuso/rtc-web-term)
+- [GitHub: roccomuso/rtc-shell](https://github.com/roccomuso/rtc-shell)
