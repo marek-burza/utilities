@@ -8,6 +8,9 @@ apt-get install -yq \
   curl \
   git \
   jq \
+  nano \
   procps \
   sudo \
-  supervisor
+  supervisor \
+  tmux \
+  vim
