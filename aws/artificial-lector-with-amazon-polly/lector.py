@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# TODO - replace with:
+# - https://github.com/myshell-ai/MeloTTS
+# - https://huggingface.co/coqui/XTTS-v2
+# - https://github.com/SWivid/F5-TTS
 
 import boto3
 import os
