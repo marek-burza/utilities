@@ -3,6 +3,7 @@
   stat:
     path: /var/sovreign/ssh/id_ed25519
   register: key_stat
+  become: yes
 
 - name: Key - Directory
   file:
