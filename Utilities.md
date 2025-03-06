@@ -1,34 +1,5 @@
 # Utilities
 
-## Editing Photos (jhead, exiftime, exiftool)
-
-To run the tools included install following packages on Ubuntu: `jhead`, `exiftags`, `libimage-exiftool-perl`.
-
-To add EXIF:
-
-```bash
-jhead -mkexif IMG_0000.jpg
-```
-
-To shift the date:
-
-```bash
-exiftime -v-55M -fw -ta *.JPG
-```
-
-To set an arbitrary date:
-
-```bash
-exiftool "-AllDates=20221131000000" example.jpg
-```
-
-Rename photos to feature album name and creation date:
-
-```bash
-find -type f -printf "mv %p \$ALBUM.\$(exiftool -CreateDate %p | cut -c 35- | sed 's/[ :]//g').jpg\n" | sh
-```
-
-
 ## Editing Videos (ffmpeg)
 
 Can be used for AV conversion between formats ([`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)):
