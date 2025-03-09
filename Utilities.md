@@ -289,7 +289,7 @@ docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1
 
 ### Static Topographic Map with GPX
 
-* [OpenTopoMap](https://opentopomap.org/) - upload a GPX file and take a screen shot
+* [gpx2png](https://altermarkive.github.io/altermarkivex/gpx2png.html) - upload a GPX file and download a PNG file
 
 ### Other
 
