@@ -4,6 +4,7 @@
 # - https://github.com/myshell-ai/MeloTTS
 # - https://huggingface.co/coqui/XTTS-v2
 # - https://github.com/SWivid/F5-TTS
+# - https://github.com/SparkAudio/Spark-TTS
 
 import boto3
 import os
