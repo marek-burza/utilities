@@ -3,6 +3,7 @@ FROM debian:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY *.sh /sovreign/
+COPY .gotty /root/.gotty
 
 RUN ls /sovreign/ && /bin/sh /sovreign/install_utilities.sh && \
     /bin/sh /sovreign/install_tailscale.sh && \
