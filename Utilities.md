@@ -277,19 +277,13 @@ Keyboard shortcuts:
 
 * To enable password import got to `chrome://flags/`
 
-## Visual Studio Code
+## Favorite Visual Studio Code Extensions
 
-Extensions:
-
-* [Dev Containers (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-* [Docker (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
 * [GitLens (GitKraken)](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
-* [Prettier (prettier.io)](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 * [learn-markdown (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-markdown)
 * [learn-preview (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-preview)
 * [Pylance (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 * [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-* [Remote - SSH (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
 * [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
 # Linux
