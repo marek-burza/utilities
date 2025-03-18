@@ -185,14 +185,7 @@ git config core.fsmonitor true
 git config core.untrackedcache true
 ```
 
-
 ## Ubuntu / Bash
-
-Keyboard shortcuts:
-
-| Shortcut           | Function                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| Ctrl + K           | bash: Clear characters in line after cursor                      |
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
@@ -217,16 +210,6 @@ Keyboard shortcuts:
 
 ## Mac
 
-Keyboard shortcuts:
-
-| Shortcut           | Function                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| ⌘ + Shift + E      | Visual Studio Code: Navigate between editor and file tree panels |
-| ⌘ + \[             | Visual Studio Code: Unindent selection                           |
-| ⌘ + \]             | Visual Studio Code: Indent selection                             |
-| ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
-| ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
-
 Completely disable sleep on any Mac:
 
 ```bash
@@ -246,13 +229,6 @@ To make sure that fonts render well on the terminal:
 defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
 defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
 ```
-
-## Chrome / Edge Keyboard Shortcuts
-
-| Shortcut           | Function                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| ⌘ + L              | Edge: Select the URL in the address bar to edit                  |
-| ⌘ + W              | Edge: Close tab                                                  |
 
 ## Favorite Visual Studio Code Extensions
 
