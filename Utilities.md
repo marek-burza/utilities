@@ -291,10 +291,6 @@ docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1
 
 * [gpx2png](https://altermarkive.github.io/altermarkive/gpx2png.html) - upload a GPX file and download a PNG file
 
-### Other
-
-* [Import from CSV to draw.io](https://drawio-app.com/import-from-csv-to-drawio/)
-
 ## Mac
 
 Keyboard shortcuts:
