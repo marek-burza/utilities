@@ -266,16 +266,12 @@ defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
 defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
 ```
 
-## Chrome / Edge
-
-Keyboard shortcuts:
+## Chrome / Edge Keyboard Shortcuts
 
 | Shortcut           | Function                                                         |
 | ------------------ | ---------------------------------------------------------------- |
 | ⌘ + L              | Edge: Select the URL in the address bar to edit                  |
 | ⌘ + W              | Edge: Close tab                                                  |
-
-* To enable password import got to `chrome://flags/`
 
 ## Favorite Visual Studio Code Extensions
 
