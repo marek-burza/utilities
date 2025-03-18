@@ -209,16 +209,6 @@ fi
 cp {source,destination}.txt
 ```
 
-
-## Network Troubleshooting
-
-## IMAP Migration
-
-```shell
-docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1 "$G_USER" --password1 "$G_PASS" --user2 "$M_USER" --password2 "$M_PASS" --exclude 'All Mail|Spam|Drafts|Important|Starred|Trash' --skipemptyfolders
-```
-
-
 ## Links
 
 ### Science
