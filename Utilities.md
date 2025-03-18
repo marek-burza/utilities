@@ -295,61 +295,6 @@ docker run --rm gilleslamiral/imapsync imapsync --gmail1 --office2 --dry --user1
 
 * [Import from CSV to draw.io](https://drawio-app.com/import-from-csv-to-drawio/)
 
-
-## Windows
-
-Keyboard shortcuts:
-
-| Shortcut           | Function                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| Ctrl + Shift + Esc | Windows: Open Task Manager                                       |
-| Win + B            | Windows: Go to System Tray                                       |
-| Shift + F10        | Windows: Right-click in System Tray                              |
-| Win + V            | Windows: Paste from Clipboard history                            |
-| Win + H            | Windows: Start dictation                                         |
-| Win + I            | Windows: System settings                                         |
-
-Beep:
-
-```bash
-powershell -c (New-Object Media.SoundPlayer "C:\beep.wav").PlaySync();
-```
-
-Lock the screen:
-
-```bash
-rundll32 user32.dll, LockWorkStation
-```
-
-A command to set the default printer on Windows:
-
-```bash
-cscript C:\Windows\System32\Printing_Admin_Scripts\en-US\prnmngr.vbs -t -p "\\host\printer"
-```
-
-Run Edge as an administrator (or any other user):
-
-```bash
-runas /user:"%ADMINISTRATOR%" /savecred "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-```
-
-Removing Dead Icons From Taskbar:
-
-* See: https://www.tenforums.com/tutorials/3151-reset-clear-taskbar-pinned-apps-windows-10-a-3.html
-
-List the password of a WiFi network:
-
-```bash
-netsh wlan show profile name=$SSID key=clear
-```
-
-File encryption/decryption with GPG:
-
-```bash
-gpg --cipher-algo AES256 -c filename.tar.gz
-gpg -o filename.tar.gz -d filename.tar.gz.gpg
-```
-
 ## Mac
 
 Keyboard shortcuts:
