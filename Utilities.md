@@ -227,12 +227,6 @@ Keyboard shortcuts:
 | ⌘ + Shift + L      | Visual Studio Code: Select all occurences                        |
 | ⌘ + K, V           | Visual Studio Code: Preview Markdown                             |
 
-Basic tools:
-
-```bash
-brew install bash git jq yq p7zip python@3.10 meld
-```
-
 Completely disable sleep on any Mac:
 
 ```bash
