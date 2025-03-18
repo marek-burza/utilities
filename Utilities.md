@@ -101,26 +101,6 @@ qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
 git describe --tags --dirty
 ```
 
-### Re-commit a particular branch / commit/ tag
-
-```bash
-git rm -r .
-git checkout <branch/tag/commit> .
-git commit
-```
-
-### Undo local uncommited changes on a specific file
-
-```bash
-git checkout -- <file>
-```
-
-### Delete remote branch
-
-```bash
-git push origin :<branch>
-```
-
 ### Merging branch as one commit
 
 ```bash
