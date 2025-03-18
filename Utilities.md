@@ -196,19 +196,6 @@ Keyboard shortcuts:
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
-* Check if the script was called with root privileges:
-```bash
-if [ "$(id -u)" != "0" ]; then
-    echo "This must be run as root!"
-    exit 1
-fi
-```
-
-* Parameterize successive arguments:
-```bash
-cp {source,destination}.txt
-```
-
 ## Links
 
 ### Science
