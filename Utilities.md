@@ -212,16 +212,6 @@ cp {source,destination}.txt
 
 ## Network Troubleshooting
 
-### Wireshark
-
-To filter for UDP, a particular MAC and broadcast use this filter:
-
-```
-udp && (eth.addr == 00:11:22:33:44:55 || eth.addr == FF:FF:FF:FF:FF:FF)
-```
-
-For more see [this link](https://wiki.wireshark.org/DisplayFilters).
-
 ### netcat
 
 Send text "test" in a UDP packet over IPv4 with a connection time of 1 second from port 5000 to a broadcast address 172.17.255.255 and port 10000:
