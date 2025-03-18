@@ -140,24 +140,10 @@ git config core.untrackedcache true
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
-## Links
+## Mapping Links
 
-### Science
-
-* [SciHub](https://sci-hub.se/)
-
-### Cloud
-
-* [Google Cloud Shell](https://shell.cloud.google.com/)
-
-### Commute Time Map - Isochrones
-
-* [Smappen](https://www.smappen.com/)
-* [OpenRouteService](https://maps.openrouteservice.org/)
-
-### Static Topographic Map with GPX
-
-* [gpx2png](https://altermarkive.github.io/altermarkive/gpx2png.html) - upload a GPX file and download a PNG file
+- Isochrones - [Smappen](https://www.smappen.com/), [OpenRouteService](https://maps.openrouteservice.org/)
+- Static Topographic Map - [GPX2PNG](https://altermarkive.github.io/altermarkive/gpx2png.html)
 
 ## Mac
 
