@@ -2,40 +2,12 @@
 
 ## Editing Videos (ffmpeg)
 
-Can be used for AV conversion between formats ([`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)):
-
-```bash
-docker run --rm -it -v $PWD:/w -w /w linuxserver/ffmpeg -i example.avi -c:a aac -c:v libx264 example.mp4
-```
-
-To encode H.265:
-
-```bash
-ffmpeg -i input.mp4 -metadata creation_time="1970-01-10T00:00:00Z" -c:v libx265 -c:a aac output.hevc.mp4
-```
-
-To transcode from DVD:
-
-```bash
-ffmpeg -i dvd.vob -f mp4 -vcodec libx264 -profile:v main -level 4.0 -s 480x384 -b:v 500k -maxrate 500k -bufsize 1000k -c:a aac -strict experimental -ac 2 -ar 48000 -ab 192k -threads 0 video.mp4
-```
-
-To scale:
-
-```bash
-ffmpeg -i video.mp4 -vf scale=540:960 scaled.mp4
-```
+[`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)
 
 To convert video to individual frames:
 
 ```bash
 ffmpeg -i video.mp4 frame.%08d.png
-```
-
-To create a silent audio file:
-
-```bash
-ffmpeg -f s16le -ac 1 -t 1 -i /dev/zero -ar 22050 -y silence.mp3
 ```
 
 To concatenate files:
@@ -52,7 +24,6 @@ do
     ffmpeg -loop 1 -i ${ENTRY}.jpg -i ${ENTRY}.aac -strict -2 -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y ${ENTRY}.mp4
 done
 ```
-
 
 ## PDF Image Conversion (imagemagick)
 
