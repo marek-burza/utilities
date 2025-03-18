@@ -54,7 +54,7 @@ done
 ```
 
 
-## Image Conversion (imagemagick)
+## PDF Image Conversion (imagemagick)
 
 Can be used for conversion between formats:
 
@@ -62,22 +62,6 @@ Can be used for conversion between formats:
 convert example.png example.pdf
 convert -density 600 example.pdf example.png
 ```
-
-Or, in combination with the `exif` utility, one can run the following `compact.sh`:
-
-```bash
-#!/bin/sh
-EXTENSION=$1
-PREFIX=$2
-TEMPORARY_SCRIPT=./compact.$PREFIX.sh
-RENAME="echo -n convert {}; echo -n \ $PREFIX/$PREFIX.; exiftool -CreateDate {} | sed s/[^0-9]*//g | sed -e 's/\$/\.heic/'"
-RENAME_ALL="find $PREFIX -name $EXTENSION -exec /bin/sh -c \"$RENAME\" \;"
-/bin/sh -c "$RENAME_ALL" | tr -d '\r' > $TEMPORARY_SCRIPT
-cat $TEMPORARY_SCRIPT
-/bin/sh $TEMPORARY_SCRIPT
-rm $TEMPORARY_SCRIPT
-```
-
 
 ## PDF Conversion (brew: poppler; Ubuntu: poppler-tools)
 
