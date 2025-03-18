@@ -212,14 +212,6 @@ cp {source,destination}.txt
 
 ## Network Troubleshooting
 
-### netcat
-
-Send text "test" in a UDP packet over IPv4 with a connection time of 1 second from port 5000 to a broadcast address 172.17.255.255 and port 10000:
-
-```bash
-echo test | netcat -4u -w1 -p 5000 -b 172.17.255.255 10000
-```
-
 ### HTTP
 
 Headers to prevent browsers from caching:
