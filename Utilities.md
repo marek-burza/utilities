@@ -212,16 +212,6 @@ cp {source,destination}.txt
 
 ## Network Troubleshooting
 
-### HTTP
-
-Headers to prevent browsers from caching:
-
-```
-Cache-Control: no-cache, no-store, must-revalidate
-Pragma: no-cache
-```
-
-
 ## IMAP Migration
 
 ```shell
