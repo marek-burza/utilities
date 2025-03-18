@@ -167,13 +167,6 @@ Completely disable sleep on any Mac:
 sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep 1;
 ```
 
-List partition and format a USB stick:
-
-```bash
-diskutil list disk2
-diskutil partitionDisk disk2 1 MBR MS-DOS STICK R
-```
-
 To make sure that fonts render well on the terminal:
 
 ```bash
