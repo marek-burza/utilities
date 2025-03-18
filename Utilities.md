@@ -109,15 +109,6 @@ Use this command to encrypt a PDF file:
 qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
 ```
 
-## Midnight Commander
-
-Use: `blackvoidclub/midnight-commander`
-
-```bash
-docker run -it --name=mc -v $PWD:/w -w /w blackvoidclub/midnight-commander -S dark
-```
-
-
 ## git
 
 ### Get latest tag with current "distance"
