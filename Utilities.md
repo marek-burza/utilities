@@ -1,44 +1,5 @@
 # Favorites
 
-## PDF Image Conversion (imagemagick)
-
-Can be used for conversion between formats:
-
-```bash
-convert example.png example.pdf
-convert -density 600 example.pdf example.png
-```
-
-## PDF Conversion (brew: poppler; Ubuntu: poppler-tools)
-
-Can be used to extract pages from a PDF file:
-
-```bash
-pdfseparate -f 1 -l 1 example.pdf %d.pdf
-```
-
-Or to join PDF files:
-
-```bash
-pdfunite 0.pdf 1.pdf result.pdf
-```
-
-## PDF Optimization
-
-Use this command to rescale images in a PDF file (screen = 75dpi, ebook = 150dpi, printer = 300dpi):
-
-```bash
-gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
-```
-
-## PDF Encryption
-
-Use this command to encrypt a PDF file:
-
-```bash
-qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
-```
-
 ## Favorite git Commands
 
 Print all files ever committed:
