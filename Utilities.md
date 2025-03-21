@@ -10,12 +10,6 @@ To convert video to individual frames:
 ffmpeg -i video.mp4 frame.%08d.png
 ```
 
-To concatenate files:
-
-```bash
-ffmpeg -i concat:"one.mp3|two.mp3" -strict -2 -y three.aac
-```
-
 To combine video frames with audio:
 
 ```bash
