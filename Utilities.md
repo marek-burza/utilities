@@ -111,10 +111,6 @@ git config core.fsmonitor true
 git config core.untrackedcache true
 ```
 
-## Ubuntu / Bash
-
-* Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
-
 ## Favorite Mapping Tools
 
 - Isochrones - [Smappen](https://www.smappen.com/), [OpenRouteService](https://maps.openrouteservice.org/)
