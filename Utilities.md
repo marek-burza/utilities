@@ -1,4 +1,4 @@
-# Utilities
+# Favorites
 
 ## PDF Image Conversion (imagemagick)
 
@@ -39,40 +39,9 @@ Use this command to encrypt a PDF file:
 qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
 ```
 
-## git
+## Favorite git Commands
 
-### Get latest tag with current "distance"
-
-```bash
-git describe --tags --dirty
-```
-
-### Merging branch as one commit
-
-```bash
-git merge --squash <branch> -m <message>
-```
-
-### Make the current commit the only commit
-
-```bash
-rm -rf .git
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin <uri>
-git push -u --force origin master
-```
-
-or
-
-```bash
-git switch example-branch
-git reset --soft $(git merge-base master HEAD)
-git commit -m "one commit on example branch"
-```
-
-### Merging repository into another under a subdirectory
+Merging repository into another under a subdirectory:
 
 ```bash
 git clone $A_URL $A_NAME
@@ -83,28 +52,19 @@ git read-tree --prefix=$SUBDIRECTORY -u $B_NAME/master
 git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
 ```
 
-### Print all files ever committed
+Print all files ever committed:
 
 ```bash
 git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-tree --no-commit-id --name-only -r | sort | uniq
 ```
 
-### Correcting author for all commits
-
-```bash
-git config user.name "Corrected Name"
-git config user.email corrected.name@somewhere.com
-git rebase --root --exec 'git commit --amend --no-edit --reset-author'
-git push -f
-```
-
-### Scheduled Prefetch
+Scheduled prefetch:
 
 ```bash
 git maintenance start
 ```
 
-### Accelerate Status
+Accelerate status:
 
 ```bash
 git config core.fsmonitor true
