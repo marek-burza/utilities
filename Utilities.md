@@ -41,17 +41,6 @@ qpdf --encrypt $PASSWORD $PASSWORD 256 -- $PDF_FILE _$PDF_FILE
 
 ## Favorite git Commands
 
-Merging repository into another under a subdirectory:
-
-```bash
-git clone $A_URL $A_NAME
-cd $A_NAME
-git remote add -f $B_NAME $B_URL
-git merge --allow-unrelated-histories -s ours --no-commit $B_NAME/master
-git read-tree --prefix=$SUBDIRECTORY -u $B_NAME/master
-git commit -m "Merged $B_NAME into $A_NAME under $SUBDIRECTORY"
-```
-
 Print all files ever committed:
 
 ```bash
