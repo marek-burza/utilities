@@ -6,6 +6,7 @@ apt-get update -yq
 apt-get install -yq \
   build-essential \
   curl \
+  fzf \
   git \
   imagemagick \
   jq \
@@ -13,6 +14,7 @@ apt-get install -yq \
   poppler-utils \
   procps \
   qpdf \
+  ripgrep \
   sudo \
   supervisor \
   tmux \
