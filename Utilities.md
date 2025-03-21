@@ -1,24 +1,5 @@
 # Utilities
 
-## Editing Videos (ffmpeg)
-
-[`linuxserver/ffmpeg`](https://github.com/linuxserver/docker-ffmpeg)
-
-To convert video to individual frames:
-
-```bash
-ffmpeg -i video.mp4 frame.%08d.png
-```
-
-To combine video frames with audio:
-
-```bash
-for ENTRY in $(ls -1 *.jpg | sed -e 's/\.jpg//g')
-do
-    ffmpeg -loop 1 -i ${ENTRY}.jpg -i ${ENTRY}.aac -strict -2 -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y ${ENTRY}.mp4
-done
-```
-
 ## PDF Image Conversion (imagemagick)
 
 Can be used for conversion between formats:
