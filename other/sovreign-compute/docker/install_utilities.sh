@@ -10,7 +10,7 @@ apt-get install -yq \
   imagemagick \
   jq \
   nano \
-  poppler-tools \
+  poppler-utils \
   procps \
   qpdf \
   sudo \
