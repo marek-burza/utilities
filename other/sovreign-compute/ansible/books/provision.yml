@@ -11,6 +11,10 @@
 
 - hosts: all
   roles:
+    - role: cups
+
+- hosts: all
+  roles:
     - role: nvidia
 
 - hosts: all
