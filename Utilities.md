@@ -115,24 +115,17 @@ git config core.untrackedcache true
 
 * Tutorial about [Bash history](https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps)
 
-## Mapping Links
+## Favorite Mapping Tools
 
 - Isochrones - [Smappen](https://www.smappen.com/), [OpenRouteService](https://maps.openrouteservice.org/)
 - Static Topographic Map - [GPX2PNG](https://altermarkive.github.io/altermarkive/gpx2png.html)
 
-## Mac
+## Favorite macOS Commands
 
-Completely disable sleep on any Mac:
-
-```bash
-sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep 1;
-```
-
-To make sure that fonts render well on the terminal:
+Disable sleep on macOS to avoid interrupting background network tasks with screen lock:
 
 ```bash
-defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO
-defaults -currentHost write -globalDomain AppleFontSmoothing -int 2
+sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep 1
 ```
 
 ## Favorite Visual Studio Code Extensions
