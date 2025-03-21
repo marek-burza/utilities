@@ -75,12 +75,12 @@ sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep
 
 ## Favorite Visual Studio Code Extensions
 
-* [GitLens (GitKraken)](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
-* [learn-markdown (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-markdown)
-* [learn-preview (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-preview)
-* [Pylance (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-* [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-* [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+- [GitLens (GitKraken)](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
+- [learn-markdown (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-markdown)
+- [learn-preview (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-preview)
+- [Pylance (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
 # Linux
 
