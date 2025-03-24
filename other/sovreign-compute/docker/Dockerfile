@@ -4,7 +4,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 COPY install*.sh /sovreign/
 COPY pdf*.sh /usr/local/bin/
-COPY .gotty /root/.gotty
 
 ENV HOME=/root
 
