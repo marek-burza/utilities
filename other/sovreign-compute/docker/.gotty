@@ -1,7 +1,0 @@
-// Based  on:
-// - https://github.com/yudai/gotty/issues/23#issuecomment-135942253
-
-preferences {
-    font_family = "'JetBrains Mono', Courier, monospace"
-    user_css = "https://fonts.googleapis.com/css2?family=JetBrains+Mono"
-}
