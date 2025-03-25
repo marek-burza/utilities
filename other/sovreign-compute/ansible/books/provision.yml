@@ -3,6 +3,10 @@
 
 - hosts: all
   roles:
+    - role: lid
+
+- hosts: all
+  roles:
     - role: docker
 
 - hosts: all
