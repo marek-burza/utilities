@@ -35,12 +35,3 @@ Disable sleep on macOS to avoid interrupting background network tasks with scree
 ```bash
 sudo pmset -a sleep 0; sudo pmset -a hibernatemode 0; sudo pmset -a disablesleep 1
 ```
-
-## Favorite Visual Studio Code Extensions
-
-- [GitLens (GitKraken)](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
-- [learn-markdown (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-markdown)
-- [learn-preview (Microsoft)](https://marketplace.visualstudio.com/items?itemName=docsmsft.docs-preview)
-- [Pylance (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [Python (Microsoft)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [YAML (RedHat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
