@@ -3,7 +3,7 @@ FROM debian:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY install*.sh /sovreign/
-COPY pdf*.sh /usr/local/bin/
+COPY pdf*.py /usr/local/bin/
 
 ENV HOME=/root
 

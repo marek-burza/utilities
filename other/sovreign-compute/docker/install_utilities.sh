@@ -6,6 +6,7 @@ apt-get update -yq
 apt-get install -yq \
   build-essential \
   curl \
+  enscript \
   fzf \
   git \
   imagemagick \
