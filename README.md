@@ -1,3 +1,1 @@
-# Python Experiments
-
-* [Data experiments](data-experiments)
+# Python Data Experiments
