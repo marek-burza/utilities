@@ -1,2 +1,0 @@
-*/10 * * * * /svetovit/svetovit_atlassian.py >> /tmp/atlassian.log 2>&1
-*/10 * * * * /svetovit/svetovit_github.py >> /tmp/gitlab.log 2>&1
