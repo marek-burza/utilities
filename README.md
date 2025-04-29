@@ -29,7 +29,6 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 * [Forwarding service on a local socket to an SSH jump server](other/autossh)
 * [Bypassing firewall rules with socat and an SSH jump server](other/socat)
 * [SSH over Tor](other/ssh-over-tor)
-* [Tailscale as a Sidecar Container](other/tailscale-as-sidecar)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
 * [Sovreign Compute](other/sovreign-compute)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
