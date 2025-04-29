@@ -9,8 +9,6 @@
 * [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
 * [Kubernetes: EKS with Fargate, ECR and a simple ALB, using Terraform & Helm](aws/eks-fargate-ecr-terraform-helm)
 
-For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli).
-
 
 # Azure Experiments
 
@@ -20,10 +18,8 @@ For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/ama
 * [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
 * [Azure VPN Gateway & on-premise facility integration](azure/on-premise-integration/README.md)
 
-For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli).
 
-
-# Other Experiments
+# Sovreign Compute
 
 * [SSH jump server on Kubernetes](other/ssh-jump-server)
 * [Forwarding service on a local socket to an SSH jump server](other/autossh)
@@ -34,3 +30,11 @@ For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.doc
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
 * [API-to-API pump with cron & curl](other/cron-curl)
 * [BitTorrent over VPN](other/bittorrent-over-vpn)
+
+
+# Other Tools
+
+* AWS CLI - [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli)
+* Azure CLI - [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli)
+* Expose Docker host ports on Docker networks with [`qoomon/docker-host`](https://github.com/qoomon/docker-host)
+* Powerful tunneling software - [`socat`](https://www.redhat.com/sysadmin/getting-started-socat)
