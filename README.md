@@ -16,7 +16,6 @@ For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/ama
 
 * [Uploading to Azure Blob Storage](azure/blob-upload)
 * [Password-protected, App Service (Python, Flask & Docker) with Swagger API and static frontend served by Nginx](azure/app-service)
-* [Container Registry creation script](azure/container-registry-creation)
 * [Multicontainer App Service with Volume](azure/multicontainer-app-service-with-volume)
 * [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
 * [Azure VPN Gateway & on-premise facility integration](azure/on-premise-integration/README.md)
