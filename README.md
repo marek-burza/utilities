@@ -7,7 +7,6 @@
 * [Matlab Task Processing with SQS, MCR, Python, S3FS, rsyslog, Ubuntu, Docker, ECS and CloudWatch](aws/running-tasks-on-upload-with-sqs-ecs-cloudwatch-mcr-s3fs-rsyslog-python)
 * [Serving files from S3 with Amazon API Gateway, Lambda and Python](aws/serving-files-s3-apigateway-lambda-python)
 * [Artificial Lector with Amazon Polly](aws/artificial-lector-with-amazon-polly)
-* [Cross-region (cross-account) ECR replication for AWS Lambda](aws/ecr-replication-for-lambda)
 * [Kubernetes: EKS with Fargate, ECR and a simple ALB, using Terraform & Helm](aws/eks-fargate-ecr-terraform-helm)
 
 For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli).
