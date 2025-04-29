@@ -19,7 +19,6 @@ For ad-hoc CLI usage you can use [`amazon/aws-cli`](https://hub.docker.com/r/ama
 * [Multicontainer App Service with Volume](azure/multicontainer-app-service-with-volume)
 * [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
 * [Azure VPN Gateway & on-premise facility integration](azure/on-premise-integration/README.md)
-* [Apache-based reverse proxy with Let's Encrypt and Azure Active Directory authentication](azure/apache-reverse-proxy-lets-encrypt-aad)
 
 For ad-hoc CLI usage you can use [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli).
 
