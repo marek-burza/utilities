@@ -3,7 +3,7 @@
 # Tools
 
 - [Static Topographic Map](https://altermarkive.github.io/altermarkive/gpx2png.html)
-- [Simple Editor backed by Local Storage](https://altermarkive.github.io/altermarkive/scratchpad.html)
+- [Simple Editor Backed by Local Storage](https://altermarkive.github.io/altermarkive/scratchpad.html)
 
 # New Mac Quick Start
 
