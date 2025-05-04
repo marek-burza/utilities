@@ -19,8 +19,7 @@ git config core.untrackedcache true
 
 ## Favorite Mapping Tools
 
-- Isochrones - [Smappen](https://www.smappen.com/), [OpenRouteService](https://maps.openrouteservice.org/)
-- Static Topographic Map - [GPX2PNG](https://altermarkive.github.io/altermarkive/gpx2png.html)
+- [Static Topographic Map](https://altermarkive.github.io/altermarkive/gpx2png.html)
 
 ## Favorite macOS Commands
 
