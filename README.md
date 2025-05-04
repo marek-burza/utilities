@@ -1,8 +1,11 @@
 ![languages](https://github-readme-stats.vercel.app/api/top-langs/?username=altermarkive&hide=html,tex,roff,hcl,jinja,matlab&langs_count=10&layout=compact&hide_border=true&theme=dark)
 
-# Favorites
+# Tools
 
-## Favorite git Commands
+- [Static Topographic Map](https://altermarkive.github.io/altermarkive/gpx2png.html)
+- [Simple Editor backed by Local Storage](https://altermarkive.github.io/altermarkive/scratchpad.html)
+
+# New Mac Quick Start
 
 Scheduled git prefetch:
 
@@ -13,15 +16,9 @@ git maintenance start
 Accelerate git status:
 
 ```bash
-git config core.fsmonitor true
-git config core.untrackedcache true
+git config --global core.fsmonitor true
+git config --global core.untrackedcache true
 ```
-
-## Favorite Mapping Tools
-
-- [Static Topographic Map](https://altermarkive.github.io/altermarkive/gpx2png.html)
-
-## Favorite macOS Commands
 
 Disable sleep on macOS to avoid interrupting background network tasks with screen lock:
 
