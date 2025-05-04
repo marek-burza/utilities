@@ -4,19 +4,13 @@
 
 ## Favorite git Commands
 
-Print all files ever committed:
-
-```bash
-git log --abbrev-commit --pretty=oneline | cut -d ' ' -f 1 | xargs -L1 git diff-tree --no-commit-id --name-only -r | sort | uniq
-```
-
-Scheduled prefetch:
+Scheduled git prefetch:
 
 ```bash
 git maintenance start
 ```
 
-Accelerate status:
+Accelerate git status:
 
 ```bash
 git config core.fsmonitor true
