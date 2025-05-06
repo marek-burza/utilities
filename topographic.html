@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Topographic Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+<style type="text/css">
+html,body {
+  background-color: black;
+  color: white;
+  font-family: sans-serif;
+  font-size: 10vmin;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+  position: fixed;
+}
+#panel {
+  display: flex;
+  background: black;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+a {
+  text-decoration: none;
+  font-size: 10vmin;
+  color: white;
+}
+#canvas {
+  width: 100vmin;
+  height: 100vmin;
+  display: block;
+  z-index: 0;
+}
+</style>
+</head>
+<body>
+<script>
+function urlParseQuery(url) {
+  var re = new RegExp("[?&]+([^=&]+)=([^&]*)", "gi");
+  var map = {};
+  var parts = url.replace(re, function(ignore, key, value){map[key] = decodeURIComponent(value);});
+  return(map);
+}
+
+function httpGet(url) {
+  http = new XMLHttpRequest();
+  http.open("GET", url, false);
+  http.send(null);
+  return({status: http.status, text: http.responseText});
+}
+
+function set(id, text) {
+  document.getElementById(id).innerHTML = text;
+}
+
+function lon2x(lon, level) {
+  if (!(-180.0 <= lon && lon <= 180.0)) {
+    lon = (lon + 180.0) % 360.0 - 180.0;
+  }
+  const x = ((lon + 180.0) / 360.0) * (1 << level);
+  return x;
+}
+
+function lat2y(lat, level) {
+  if (!(-90.0 <= lat && lat <= 90.0)) {
+    lat = (lat + 90.0) % 180.0 - 90.0;
+  }
+  const y = (1.0 - Math.log(Math.tan(lat * Math.PI / 180.0) + 1.0 / Math.cos(lat * Math.PI / 180.0)) / Math.PI) / 2.0 * (1 << level);
+  return y;
+}
+
+function x2pixels(x, centerX, tile, width) {
+  const px = (x - centerX) * tile + (width >> 1);
+  return Math.round(px);
+}
+
+function y2pixels(y, centerY, tile, height) {
+  const py = (y - centerY) * tile + (height >> 1);
+  return Math.round(py);
+}
+
+function zoom(bounds, width, height, padding, tile) {
+  for (var level = 17; level >= 0; level--) {
+    const horizontal = (lon2x(bounds.maximum.lon, level) - lon2x(bounds.minimum.lon, level)) * tile;
+    if (horizontal > (width - padding * 2)) {
+      continue;
+    }
+    const vertical = (lat2y(bounds.minimum.lat, level) - lat2y(bounds.maximum.lat, level)) * tile;
+    if (vertical > (height - padding * 2)) {
+      continue;
+    }
+    return level;
+  }
+  return 0;
+}
+
+function overlay(latitude, longitude, width, height, tile, center, level, tiles) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = width;
+  canvas.height = height;
+  for (var i = 0; i < tiles.length; i++) {
+    context.drawImage(tiles[i], tiles[i].xp, tiles[i].yp, tile, tile);
+  }
+  const data = canvas.toDataURL();
+  const image = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
+  set("panel", image);
+}
+
+function base(latitude, longitude, width, height, tile, center, level) {
+  const min = {
+    x: Math.floor(center.x - (0.5 * width / tile)),
+    y: Math.floor(center.y - (0.5 * height / tile)),
+  };
+  const max = {
+    x: Math.ceil(center.x + (0.5 * width / tile)),
+    y: Math.ceil(center.y + (0.5 * height / tile)),
+  };
+  const tiles = [];
+  for (var x = min.x; x < max.x; x++) {
+    for (var y = min.y; y < max.y; y++) {
+      const tileMax = 1 << level;
+      const tileX = (x + tileMax) % tileMax;
+      const tileY = (y + tileMax) % tileMax;
+      const image = new Image(tile, tile);
+      image.setAttribute("crossOrigin", "anonymous");
+      image.loaded = false;
+      // image.url = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
+      image.url = `https://tile.inkatlas.com/inkatlas/outdoor/${level}/${x}/${y}.png`;
+      image.xp = x2pixels(x, center.x, tile, width);
+      image.yp = y2pixels(y, center.y, tile, height);
+      tiles.push(image);
+    }
+  }
+  for (var i = 0; i < tiles.length; i++) {
+    const image = tiles[i];
+    const url = image.url;
+    image.onload = function (stuff) {
+      image.loaded = true;
+      var loaded = true;
+      for (var j = 0; j < tiles.length; j++) {
+        if (!tiles[j].loaded) {
+          loaded = false;
+          break;
+        }
+      }
+      if (loaded) {
+        overlay(latitude, longitude, width, height, tile, center, level, tiles);
+      }
+    }
+    image.src = url;
+  }
+}
+
+function span(latitude, longitude) {
+  const earthRadius = 6378.0;
+  const corner = 10.0 * Math.sqrt(2.0);
+  const latRad = latitude * Math.PI / 180.0;
+  const lonRad = longitude * Math.PI / 180.0;
+  const latNorthWest = Math.asin(
+    Math.sin(latRad) * Math.cos(corner / earthRadius)
+    + Math.cos(latRad) * Math.sin(corner / earthRadius) * Math.cos(315.0 * Math.PI / 180.0)
+  );
+  const latSouthEast = Math.asin(
+    Math.sin(latRad) * Math.cos(corner / earthRadius)
+    + Math.cos(latRad) * Math.sin(corner / earthRadius) * Math.cos(135.0 * Math.PI / 180.0)
+  );
+  const lonNorthWest = lonRad + Math.atan2(
+    Math.sin(315.0 * Math.PI / 180.0) * Math.sin(corner / earthRadius) * Math.cos(latRad),
+    Math.cos(corner / earthRadius) - Math.sin(latRad) * Math.sin(latNorthWest));
+  const lonSouthEast = lonRad + Math.atan2(
+    Math.sin(135.0 * Math.PI / 180.0) * Math.sin(corner / earthRadius) * Math.cos(latRad),
+    Math.cos(corner / earthRadius) - Math.sin(latRad) * Math.sin(latSouthEast));
+  const bounds = {
+    minimum: {
+      lon: Math.min(lonNorthWest * 180.0 / Math.PI, lonSouthEast * 180.0 / Math.PI),
+      lat: Math.min(latNorthWest * 180.0 / Math.PI, latSouthEast * 180.0 / Math.PI),
+    },
+    maximum: {
+      lon: Math.max(lonNorthWest * 180.0 / Math.PI, lonSouthEast * 180.0 / Math.PI),
+      lat: Math.max(latNorthWest * 180.0 / Math.PI, latSouthEast * 180.0 / Math.PI),
+    },
+  };
+  return bounds;
+}
+
+function render(latitude, longitude) {
+  const tile = 256;
+  const width = 1080;
+  const height = 1080;
+  const bounds = span(latitude, longitude);
+  const level = zoom(bounds, width, height, 0, tile);
+  const center = {
+    x: lon2x((bounds.minimum.lon + bounds.maximum.lon) / 2.0, level),
+    y: lat2y((bounds.minimum.lat + bounds.maximum.lat) / 2.0, level),
+  };
+  base(latitude, longitude, width, height, tile, center, level);
+}
+
+var handle = null;
+
+function updated(position) {
+  navigator.geolocation.clearWatch(handle);
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  console.log(`GPS: ${latitude}°N ${longitude}°E`);
+  render(latitude, longitude);
+}
+
+function failed(error) {
+  navigator.geolocation.clearWatch(handle);
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      error = "Error: Permission Denied";
+      break;
+    case error.POSITION_UNAVAILABLE:
+      error = "Error: Position Unavailable";
+      break;
+    case error.TIMEOUT:
+      error = "Error: Timeout";
+      break;
+    default:
+      error = `Error: ${error.code}`;
+  }
+  console.log(error);
+  const response = JSON.parse(httpGet("https://ipapi.co/json/").text);
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  console.log(`IP: ${latitude}°N ${longitude}°E`);
+  render(latitude, longitude);
+}
+
+function request() {
+  const arguments = urlParseQuery(window.location.href);
+  if ("at" in arguments) {
+    const at = arguments["at"];
+    const latitude = parseFloat(at.split(",")[0]);
+    const longitude = parseFloat(at.split(",")[1]);
+    console.log(`URL: ${latitude}°N ${longitude}°E`);
+    render(latitude, longitude);
+  } else {
+    if (navigator.geolocation) {
+      handle = navigator.geolocation.watchPosition(updated, failed, { enableHighAccuracy: true });
+    }
+  }
+}
+
+request()
+</script>
+<div id="panel">🗺️</div>
+</body>
+</html>
