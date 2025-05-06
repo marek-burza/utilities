@@ -237,6 +237,7 @@ function failed(error) {
 }
 
 function request() {
+  try {
   const arguments = urlParseQuery(window.location.href);
   if ("at" in arguments) {
     const at = arguments["at"];
@@ -248,6 +249,10 @@ function request() {
     if (navigator.geolocation) {
       handle = navigator.geolocation.watchPosition(updated, failed, { enableHighAccuracy: true });
     }
+  }
+  } catch (error) {
+    alert(error)
+    set("panel", error);
   }
 }
 
