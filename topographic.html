@@ -76,7 +76,7 @@ function lat2y(lat, zoom) {
 }
 
 function resolve() {
-  const sufficient = 14;
+  const sufficient = 15;
   const arguments = urlParseQuery(window.location.href);
   if ("zoom" in arguments) {
     try {
@@ -90,7 +90,7 @@ function resolve() {
 }
 
 function span() {
-  const sufficient = 5;
+  const sufficient = 6;
   const arguments = urlParseQuery(window.location.href);
   if ("steps" in arguments) {
     try {
@@ -98,8 +98,8 @@ function span() {
       if (steps < 0) {
         return 0;
       }
-      if (steps > 10) {
-        return 10;
+      if (steps > 6) {
+        return 6;
       }
       return steps;
     } catch {
