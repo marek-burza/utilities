@@ -134,7 +134,18 @@ function render(latitude, longitude) {
   load(steps, tiles, tile);
 }
 
+function mode() {
+  const arguments = urlParseQuery(window.location.href);
+  if ("mode" in arguments) {
+    if (arguments["mode"] == "bw") {
+      return "https://tile.inkatlas.com/inkatlas/outdoor/";
+    }
+  }
+  return "https://a.tile.opentopomap.org/";
+}
+
 function prepare(center, steps, zoom, tile) {
+  const url = mode();
   const tiles = [];
   for (var dx = -steps; dx <= steps; dx++) {
     for (var dy = -steps; dy <= steps; dy++) {
@@ -143,8 +154,7 @@ function prepare(center, steps, zoom, tile) {
       const image = new Image(tile, tile);
       image.setAttribute("crossOrigin", "anonymous");
       image.loaded = false;
-      // image.url = `https://a.tile.opentopomap.org/${zoom}/${x}/${y}.png`;
-      image.url = `https://tile.inkatlas.com/inkatlas/outdoor/${zoom}/${x}/${y}.png`;
+      image.url = `${url}${zoom}/${x}/${y}.png`;
       console.log(image.url);
       image.xp = (dx + steps) * tile;
       image.yp = (dy + steps) * tile;
