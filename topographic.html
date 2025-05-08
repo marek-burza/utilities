@@ -59,48 +59,57 @@ function set(id, text) {
   document.getElementById(id).innerHTML = text;
 }
 
-function lon2x(lon, level) {
+function lon2x(lon, zoom) {
   if (!(-180.0 <= lon && lon <= 180.0)) {
     lon = (lon + 180.0) % 360.0 - 180.0;
   }
-  const x = ((lon + 180.0) / 360.0) * (1 << level);
-  return x;
+  const x = ((lon + 180.0) / 360.0) * (1 << zoom);
+  return Math.round(x);
 }
 
-function lat2y(lat, level) {
+function lat2y(lat, zoom) {
   if (!(-90.0 <= lat && lat <= 90.0)) {
     lat = (lat + 90.0) % 180.0 - 90.0;
   }
-  const y = (1.0 - Math.log(Math.tan(lat * Math.PI / 180.0) + 1.0 / Math.cos(lat * Math.PI / 180.0)) / Math.PI) / 2.0 * (1 << level);
-  return y;
+  const y = (1.0 - Math.log(Math.tan(lat * Math.PI / 180.0) + 1.0 / Math.cos(lat * Math.PI / 180.0)) / Math.PI) / 2.0 * (1 << zoom);
+  return Math.round(y);
 }
 
-function x2pixels(x, centerX, tile, width) {
-  const px = (x - centerX) * tile + (width >> 1);
-  return Math.round(px);
-}
-
-function y2pixels(y, centerY, tile, height) {
-  const py = (y - centerY) * tile + (height >> 1);
-  return Math.round(py);
-}
-
-function zoom(bounds, width, height, padding, tile) {
-  for (var level = 17; level >= 0; level--) {
-    const horizontal = (lon2x(bounds.maximum.lon, level) - lon2x(bounds.minimum.lon, level)) * tile;
-    if (horizontal > (width - padding * 2)) {
-      continue;
+function resolve() {
+  const sufficient = 14;
+  const arguments = urlParseQuery(window.location.href);
+  if ("zoom" in arguments) {
+    try {
+      const zoom = parseInt(arguments["zoom"]);
+      return zoom
+    } catch {
+      return sufficient;
     }
-    const vertical = (lat2y(bounds.minimum.lat, level) - lat2y(bounds.maximum.lat, level)) * tile;
-    if (vertical > (height - padding * 2)) {
-      continue;
-    }
-    return level;
   }
-  return 0;
+  return sufficient;
 }
 
-function overlay(latitude, longitude, width, height, tile, center, level, tiles) {
+function span() {
+  const sufficient = 5;
+  const arguments = urlParseQuery(window.location.href);
+  if ("steps" in arguments) {
+    try {
+      const steps = parseInt(arguments["steps"]);
+      if (steps < 0) {
+        return 0;
+      }
+      if (steps > 10) {
+        return 10;
+      }
+      return steps;
+    } catch {
+      return sufficient;
+    }
+  }
+  return sufficient;
+}
+
+function splice(width, height, tile, tiles) {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   canvas.width = width;
@@ -113,31 +122,39 @@ function overlay(latitude, longitude, width, height, tile, center, level, tiles)
   set("panel", image);
 }
 
-function base(latitude, longitude, width, height, tile, center, level) {
-  const min = {
-    x: Math.floor(center.x - (0.5 * width / tile)),
-    y: Math.floor(center.y - (0.5 * height / tile)),
+function render(latitude, longitude) {
+  const tile = 256;
+  const zoom = resolve();
+  const center = {
+    x: lon2x(longitude, zoom),
+    y: lat2y(latitude, zoom),
   };
-  const max = {
-    x: Math.ceil(center.x + (0.5 * width / tile)),
-    y: Math.ceil(center.y + (0.5 * height / tile)),
-  };
+  const steps = span();
+  const tiles = prepare(center, steps, zoom, tile);
+  load(steps, tiles, tile);
+}
+
+function prepare(center, steps, zoom, tile) {
   const tiles = [];
-  for (var x = min.x; x < max.x; x++) {
-    for (var y = min.y; y < max.y; y++) {
-      const tileMax = 1 << level;
-      const tileX = (x + tileMax) % tileMax;
-      const tileY = (y + tileMax) % tileMax;
+  for (var dx = -steps; dx <= steps; dx++) {
+    for (var dy = -steps; dy <= steps; dy++) {
+      const x = center.x + dx;
+      const y = center.y + dy;
       const image = new Image(tile, tile);
       image.setAttribute("crossOrigin", "anonymous");
       image.loaded = false;
-      // image.url = `https://a.tile.opentopomap.org/${level}/${x}/${y}.png`;
-      image.url = `https://tile.inkatlas.com/inkatlas/outdoor/${level}/${x}/${y}.png`;
-      image.xp = x2pixels(x, center.x, tile, width);
-      image.yp = y2pixels(y, center.y, tile, height);
+      // image.url = `https://a.tile.opentopomap.org/${zoom}/${x}/${y}.png`;
+      image.url = `https://tile.inkatlas.com/inkatlas/outdoor/${zoom}/${x}/${y}.png`;
+      console.log(image.url);
+      image.xp = (dx + steps) * tile;
+      image.yp = (dy + steps) * tile;
       tiles.push(image);
     }
   }
+  return tiles;
+}
+
+function load(steps, tiles, tile) {
   for (var i = 0; i < tiles.length; i++) {
     const image = tiles[i];
     const url = image.url;
@@ -151,70 +168,23 @@ function base(latitude, longitude, width, height, tile, center, level) {
         }
       }
       if (loaded) {
-        overlay(latitude, longitude, width, height, tile, center, level, tiles);
+        const width = (steps * 2 + 1) * tile;
+        const height = (steps * 2 + 1) * tile;
+        splice(width, height, tile, tiles);
       }
     }
     image.src = url;
   }
 }
 
-function span(latitude, longitude) {
-  const earthRadius = 6378.0;
-  const corner = 10.0 * Math.sqrt(2.0);
-  const latRad = latitude * Math.PI / 180.0;
-  const lonRad = longitude * Math.PI / 180.0;
-  const latNorthWest = Math.asin(
-    Math.sin(latRad) * Math.cos(corner / earthRadius)
-    + Math.cos(latRad) * Math.sin(corner / earthRadius) * Math.cos(315.0 * Math.PI / 180.0)
-  );
-  const latSouthEast = Math.asin(
-    Math.sin(latRad) * Math.cos(corner / earthRadius)
-    + Math.cos(latRad) * Math.sin(corner / earthRadius) * Math.cos(135.0 * Math.PI / 180.0)
-  );
-  const lonNorthWest = lonRad + Math.atan2(
-    Math.sin(315.0 * Math.PI / 180.0) * Math.sin(corner / earthRadius) * Math.cos(latRad),
-    Math.cos(corner / earthRadius) - Math.sin(latRad) * Math.sin(latNorthWest));
-  const lonSouthEast = lonRad + Math.atan2(
-    Math.sin(135.0 * Math.PI / 180.0) * Math.sin(corner / earthRadius) * Math.cos(latRad),
-    Math.cos(corner / earthRadius) - Math.sin(latRad) * Math.sin(latSouthEast));
-  const bounds = {
-    minimum: {
-      lon: Math.min(lonNorthWest * 180.0 / Math.PI, lonSouthEast * 180.0 / Math.PI),
-      lat: Math.min(latNorthWest * 180.0 / Math.PI, latSouthEast * 180.0 / Math.PI),
-    },
-    maximum: {
-      lon: Math.max(lonNorthWest * 180.0 / Math.PI, lonSouthEast * 180.0 / Math.PI),
-      lat: Math.max(latNorthWest * 180.0 / Math.PI, latSouthEast * 180.0 / Math.PI),
-    },
-  };
-  return bounds;
-}
-
-function render(latitude, longitude) {
-  const tile = 256;
-  const width = 1080;
-  const height = 1080;
-  const bounds = span(latitude, longitude);
-  const level = zoom(bounds, width, height, 0, tile);
-  const center = {
-    x: lon2x((bounds.minimum.lon + bounds.maximum.lon) / 2.0, level),
-    y: lat2y((bounds.minimum.lat + bounds.maximum.lat) / 2.0, level),
-  };
-  base(latitude, longitude, width, height, tile, center, level);
-}
-
-var handle = null;
-
-function updated(position) {
-  navigator.geolocation.clearWatch(handle);
+function locate(position) {
   const latitude = position.coords.latitude;
   const longitude = position.coords.longitude;
   console.log(`GPS: ${latitude}°N ${longitude}°E`);
   render(latitude, longitude);
 }
 
-function failed(error) {
-  navigator.geolocation.clearWatch(handle);
+function fail(error) {
   switch (error.code) {
     case error.PERMISSION_DENIED:
       error = "Error: Permission Denied";
@@ -230,14 +200,20 @@ function failed(error) {
   }
   console.log(error);
   const response = JSON.parse(httpGet("https://ipapi.co/json/").text);
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
+  const latitude = response.latitude;
+  const longitude = response.longitude;
   console.log(`IP: ${latitude}°N ${longitude}°E`);
   render(latitude, longitude);
 }
 
 function request() {
-  try {
+  console.log("Requesting location...");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(locate, fail, { enableHighAccuracy: true });
+  }
+}
+
+function override() {
   const arguments = urlParseQuery(window.location.href);
   if ("at" in arguments) {
     const at = arguments["at"];
@@ -245,19 +221,13 @@ function request() {
     const longitude = parseFloat(at.split(",")[1]);
     console.log(`URL: ${latitude}°N ${longitude}°E`);
     render(latitude, longitude);
-  } else {
-    if (navigator.geolocation) {
-      handle = navigator.geolocation.watchPosition(updated, failed, { enableHighAccuracy: true });
-    }
-  }
-  } catch (error) {
-    alert(error)
-    set("panel", error);
   }
 }
 
-request()
+override();
 </script>
+<a onclick="request();">
 <div id="panel">🗺️</div>
+</a>
 </body>
 </html>
