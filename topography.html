@@ -147,6 +147,11 @@ function render(latitude, longitude) {
   const data = "data:image/svg+xml;base64," + btoa(svg);
   const image = `<a onclick="request();">🌍</a><br/><a href="${data}">🗺️</a>`;
   set("panel", image);
+  navigator.clipboard.writeText(text).then(() => {
+    console.log("Done!");
+  }).catch(error => {
+    console.error("Clipboard error: ", error);
+  });
 }
 
 function locate(position) {
