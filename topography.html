@@ -115,10 +115,10 @@ function mode() {
   const arguments = urlParseQuery(window.location.href);
   if ("mode" in arguments) {
     if (arguments["mode"] == "bw") {
-      return "https://tile.inkatlas.com/inkatlas/outdoor/";
+      return "http://tile.inkatlas.com/inkatlas/outdoor/";
     }
   }
-  return "https://a.tile.opentopomap.org/";
+  return "http://a.tile.opentopomap.org/";
 }
 
 function render(latitude, longitude) {
@@ -145,7 +145,8 @@ function render(latitude, longitude) {
   }
   svg += "</svg>";
   const data = "data:image/svg+xml;base64," + btoa(svg);
-  const image = `<a onclick="request();">🌍</a><br/><a href="${data}">🗺️</a>`;
+  //const image = `<a onclick="request();">🌍</a><br/><a href="${data}">🗺️</a>`;
+  const image = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
   set("panel", image);
   navigator.clipboard.writeText(text).then(() => {
     console.log("Done!");
