@@ -41,8 +41,7 @@ a {
 </head>
 <body>
 <a onclick="request();">
-<div id="panel">🌍</div>
-</a>
+<div id="panel"><a onclick="request();">🌍</a></div>
 <script>
 function urlParseQuery(url) {
   var re = new RegExp("[?&]+([^=&]+)=([^&]*)", "gi");
@@ -146,7 +145,7 @@ function render(latitude, longitude) {
   }
   svg += "</svg>";
   const data = "data:image/svg+xml;base64," + btoa(svg);
-  const image = `🌍<br/><a href="${data}">🗺️</a>`;
+  const image = `<a onclick="request();">🌍</a><br/><a href="${data}">🗺️</a>`;
   set("panel", image);
 }
 
