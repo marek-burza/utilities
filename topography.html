@@ -115,10 +115,10 @@ function mode() {
   const arguments = urlParseQuery(window.location.href);
   if ("mode" in arguments) {
     if (arguments["mode"] == "bw") {
-      return "http://tile.inkatlas.com/inkatlas/outdoor/";
+      return "https://tile.inkatlas.com/inkatlas/outdoor/";
     }
   }
-  return "http://a.tile.opentopomap.org/";
+  return "https://a.tile.opentopomap.org/";
 }
 
 function render(latitude, longitude) {
