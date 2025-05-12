@@ -9,7 +9,7 @@ html,body {
   background-color: black;
   color: white;
   font-family: sans-serif;
-  font-size: 10vmin;
+  font-size: 20vmin;
   width: 100%;
   height: 100%;
   margin: 0px;
@@ -40,6 +40,9 @@ a {
 </style>
 </head>
 <body>
+<a onclick="request();">
+<div id="panel">🗺️</div>
+</a>
 <script>
 function urlParseQuery(url) {
   var re = new RegExp("[?&]+([^=&]+)=([^&]*)", "gi");
@@ -109,31 +112,6 @@ function span() {
   return sufficient;
 }
 
-function splice(width, height, tile, tiles) {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  for (var i = 0; i < tiles.length; i++) {
-    context.drawImage(tiles[i], tiles[i].xp, tiles[i].yp, tile, tile);
-  }
-  const data = canvas.toDataURL();
-  const image = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
-  set("panel", image);
-}
-
-function render(latitude, longitude) {
-  const tile = 256;
-  const zoom = resolve();
-  const center = {
-    x: lon2x(longitude, zoom),
-    y: lat2y(latitude, zoom),
-  };
-  const steps = span();
-  const tiles = prepare(center, steps, zoom, tile);
-  load(steps, tiles, tile);
-}
-
 function mode() {
   const arguments = urlParseQuery(window.location.href);
   if ("mode" in arguments) {
@@ -144,47 +122,32 @@ function mode() {
   return "https://a.tile.opentopomap.org/";
 }
 
-function prepare(center, steps, zoom, tile) {
+function render(latitude, longitude) {
+  const tile = 256;
+  const zoom = resolve();
+  const center = {
+    x: lon2x(longitude, zoom),
+    y: lat2y(latitude, zoom),
+  };
+  const steps = span();
   const url = mode();
-  const tiles = [];
+  const width = (steps * 2 + 1) * tile;
+  const height = (steps * 2 + 1) * tile;
+  var svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
   for (var dx = -steps; dx <= steps; dx++) {
     for (var dy = -steps; dy <= steps; dy++) {
       const x = center.x + dx;
       const y = center.y + dy;
-      const image = new Image(tile, tile);
-      image.setAttribute("crossOrigin", "anonymous");
-      image.loaded = false;
-      image.url = `${url}${zoom}/${x}/${y}.png`;
-      console.log(image.url);
-      image.xp = (dx + steps) * tile;
-      image.yp = (dy + steps) * tile;
-      tiles.push(image);
+      const href = `${url}${zoom}/${x}/${y}.png`;
+      const xp = (dx + steps) * tile;
+      const yp = (dy + steps) * tile;
+      svg += `<image x="${xp}" y="${yp}" width="${tile}" height="${tile}" href="${href}" crossorigin="anonymous"/>`;
     }
   }
-  return tiles;
-}
-
-function load(steps, tiles, tile) {
-  for (var i = 0; i < tiles.length; i++) {
-    const image = tiles[i];
-    const url = image.url;
-    image.onload = function (stuff) {
-      image.loaded = true;
-      var loaded = true;
-      for (var j = 0; j < tiles.length; j++) {
-        if (!tiles[j].loaded) {
-          loaded = false;
-          break;
-        }
-      }
-      if (loaded) {
-        const width = (steps * 2 + 1) * tile;
-        const height = (steps * 2 + 1) * tile;
-        splice(width, height, tile, tiles);
-      }
-    }
-    image.src = url;
-  }
+  svg += "</svg>";
+  const data = "data:image/svg+xml;base64," + btoa(svg);
+  const image = `<a href="${data}">🗺️</a>`;
+  set("panel", image);
 }
 
 function locate(position) {
@@ -236,8 +199,5 @@ function override() {
 
 override();
 </script>
-<a onclick="request();">
-<div id="panel">🗺️</div>
-</a>
 </body>
 </html>
