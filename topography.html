@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
 <style type="text/css">
 html,body {
-  background-color: green;
+  background-color: black;
   color: white;
   font-family: sans-serif;
   font-size: 20vmin;
@@ -19,7 +19,7 @@ html,body {
 }
 #panel {
   display: flex;
-  background: green;
+  background: black;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -41,7 +41,8 @@ a {
 </head>
 <body>
 <a onclick="request();">
-<div id="panel"><a onclick="request();">🌍</a></div>
+<div id="panel">🗺️</div>
+</a>
 <script>
 function urlParseQuery(url) {
   var re = new RegExp("[?&]+([^=&]+)=([^&]*)", "gi");
@@ -100,8 +101,8 @@ function span() {
       if (steps < 0) {
         return 0;
       }
-      if (steps > 6) {
-        return 6;
+      if (steps > 10) {
+        return 10;
       }
       return steps;
     } catch {
@@ -132,7 +133,10 @@ function render(latitude, longitude) {
   const url = mode();
   const width = (steps * 2 + 1) * tile;
   const height = (steps * 2 + 1) * tile;
-  var svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = width;
+  canvas.height = height;
   for (var dx = -steps; dx <= steps; dx++) {
     for (var dy = -steps; dy <= steps; dy++) {
       const x = center.x + dx;
@@ -140,23 +144,17 @@ function render(latitude, longitude) {
       const href = `${url}${zoom}/${x}/${y}.png`;
       const xp = (dx + steps) * tile;
       const yp = (dy + steps) * tile;
-      svg += `<image x="${xp}" y="${yp}" width="${tile}" height="${tile}" href="${href}" crossorigin="anonymous"/>`;
+      const image = new Image(tile, tile);
+      image.setAttribute("crossOrigin", "anonymous");
+      image.onload = function () {
+        context.drawImage(image, xp, yp, tile, tile);
+        const data = canvas.toDataURL();
+        const img = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;" crossorigin="anonymous"/>`;
+        set("panel", img);
+      };
+      image.src = href;
     }
   }
-  svg += "</svg>";
-  const data = "data:image/svg+xml;base64," + btoa(svg);
-  const image = new Image(width, height);
-  image.setAttribute("crossOrigin", "anonymous");
-  image.onload = function () {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.width = width;
-    canvas.height = height;
-    context.drawImage(image, 0, 0, width, height);
-    const data = canvas.toDataURL();
-    const img = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
-    set("panel", img);
-  };
 }
 
 function locate(position) {
