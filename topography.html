@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
 <style type="text/css">
 html,body {
-  background-color: black;
+  background-color: red;
   color: white;
   font-family: sans-serif;
   font-size: 20vmin;
@@ -19,7 +19,7 @@ html,body {
 }
 #panel {
   display: flex;
-  background: black;
+  background: red;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -147,7 +147,7 @@ function render(latitude, longitude) {
   const data = "data:image/svg+xml;base64," + btoa(svg);
   //const image = `<a onclick="request();">🌍</a><br/><a href="${data}">🗺️</a>`;
   const image = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;"/>`;
-  set("panel", image);
+  set("panel", svg);
   navigator.clipboard.writeText(text).then(() => {
     console.log("Done!");
   }).catch(error => {
