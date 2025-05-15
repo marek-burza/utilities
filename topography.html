@@ -41,7 +41,7 @@ a {
 </head>
 <body>
 <a onclick="request();">
-<div id="panel">🗺️</div>
+<div id="panel"><canvas id="canvas" style="width: auto; height: auto; max-width: 100%; max-height: 100%;" crossorigin="anonymous"></canvas></div>
 </a>
 <script>
 function urlParseQuery(url) {
@@ -56,10 +56,6 @@ function httpGet(url) {
   http.open("GET", url, false);
   http.send(null);
   return({status: http.status, text: http.responseText});
-}
-
-function set(id, text) {
-  document.getElementById(id).innerHTML = text;
 }
 
 function lon2x(lon, zoom) {
@@ -133,7 +129,7 @@ function render(latitude, longitude) {
   const url = mode();
   const width = (steps * 2 + 1) * tile;
   const height = (steps * 2 + 1) * tile;
-  const canvas = document.createElement("canvas");
+  const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
   canvas.width = width;
   canvas.height = height;
@@ -148,9 +144,6 @@ function render(latitude, longitude) {
       image.setAttribute("crossOrigin", "anonymous");
       image.onload = function () {
         context.drawImage(image, xp, yp, tile, tile);
-        const data = canvas.toDataURL();
-        const img = `<img src="${data}" style="width: auto; height: auto; max-width: 100%; max-height: 100%;" crossorigin="anonymous"/>`;
-        set("panel", img);
       };
       image.src = href;
     }
@@ -179,6 +172,10 @@ function fail(error) {
       error = `Error: ${error.code}`;
   }
   console.log(error);
+  approximate();
+}
+
+function approximate() {
   const response = JSON.parse(httpGet("https://ipapi.co/json/").text);
   const latitude = response.latitude;
   const longitude = response.longitude;
@@ -201,6 +198,8 @@ function override() {
     const longitude = parseFloat(at.split(",")[1]);
     console.log(`URL: ${latitude}°N ${longitude}°E`);
     render(latitude, longitude);
+  } else {
+    approximate();
   }
 }
 
