@@ -23,7 +23,6 @@
 
 * [SSH jump server on Kubernetes](other/ssh-jump-server)
 * [Forwarding service on a local socket to an SSH jump server](other/autossh)
-* [Bypassing firewall rules with socat and an SSH jump server](other/socat)
 * [SSH over Tor](other/ssh-over-tor)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
 * [Sovreign Compute](other/sovreign-compute)
@@ -36,5 +35,5 @@
 
 * AWS CLI - [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli)
 * Azure CLI - [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli)
-* Expose Docker host ports on Docker networks with [`qoomon/docker-host`](https://github.com/qoomon/docker-host)
+* Expose Docker host ports on Docker networks - [`qoomon/docker-host`](https://github.com/qoomon/docker-host)
 * Powerful tunneling software - [`socat`](https://www.redhat.com/sysadmin/getting-started-socat)
