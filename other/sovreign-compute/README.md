@@ -20,7 +20,6 @@ install -m 0700 -d $HOME/.ansible/tmp
 ## Installation
 
 ```shell
-cd ansible
 ansible-playbook -i "localhost," --connection=local --ask-become-pass --extra-vars "tailscale_auth_key=$TS_AUTHKEY utilities_password=$UTILITIES_PASSWORD" playbook.yml
 ```
 
