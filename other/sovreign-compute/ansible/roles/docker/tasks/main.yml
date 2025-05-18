@@ -5,21 +5,18 @@
       - ca-certificates
     state: latest
     update_cache: yes
-  become: yes
 
 - name: Docker - Keyring
   file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
-  become: yes
 
 - name: Docker - GPG
   get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /etc/apt/keyrings/docker.asc
     mode: '0664'
-  become: yes
 
 - name: Docker - Architecture
   command: dpkg --print-architecture
@@ -33,7 +30,6 @@
   apt_repository:
     repo: "deb [arch={{ dpkg_architecture_output.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ lsb_release_output.stdout }} stable"
     state: present
-  become: yes
 
 - name: Docker - Engine
   apt:
@@ -45,16 +41,12 @@
       - docker-compose-plugin
     state: latest
     update_cache: yes
-  become: yes
 
 - name: Docker - Group
   group: name=docker
-  become: yes
 
 - name: Docker - User
-  user: name={{ ansible_user }} groups=docker append=yes
-  become: yes
+  user: name={{ lookup('ansible.builtin.env', 'USER') }} groups=docker append=yes
 
 - name: Docker - Service
   systemd: name=docker state=started enabled=yes
-  become: yes

@@ -14,14 +14,12 @@
     - "coder"
     - "coder/config"
     - "coder/local"
-  become: yes
 
 - name: Utilities - Config
   copy:
     src: supervisord.conf
     dest: "/var/sovreign/etc/supervisord.conf"
     mode: 0600
-  become: yes
 
 - name: Utilities - Network
   community.docker.docker_network:

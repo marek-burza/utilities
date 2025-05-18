@@ -7,7 +7,6 @@
     create: yes
     backup: yes
   notify: Lid - Restart systemd-logind
-  become: yes
 
 - name: Lid - HandleLidSwitchDocked
   lineinfile:
@@ -17,7 +16,6 @@
     create: yes
     backup: yes
   notify: Lid - Restart systemd-logind
-  become: yes
 
 - name: Lid - HandleLidSwitchExternalPower
   lineinfile:
@@ -27,7 +25,6 @@
     create: yes
     backup: yes
   notify: Lid - Restart systemd-logind
-  become: yes
 
 - name: Lid - IgnoreLid
   lineinfile:
@@ -37,4 +34,3 @@
     create: yes
     backup: yes
   notify: Lid - Restart upower
-  become: yes

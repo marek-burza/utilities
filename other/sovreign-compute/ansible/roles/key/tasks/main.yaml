@@ -3,16 +3,13 @@
   stat:
     path: /var/sovreign/ssh/id_ed25519
   register: key_stat
-  become: yes
 
 - name: Key - Directory
   file:
     path: /var/sovreign/ssh
     state: directory
     mode: 0700
-  become: yes
 
 - name: Key - Create
   command: ssh-keygen -t ed25519 -C "nobody@localhost" -f /var/sovreign/ssh/id_ed25519
   when: not key_stat.stat.exists
-  become: yes

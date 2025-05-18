@@ -6,11 +6,9 @@
   #   name: systemd-logind
   #   state: restarted
   #   daemon_reload: yes
-  # become: yes
 
 - name: Lid - Restart upower
   systemd:
     name: upower
     state: restarted
     daemon_reload: yes
-  become: yes
