@@ -4,5 +4,3 @@
     path: /var/sovreign/volume
     state: directory
     mode: 0700
-  become: yes
-

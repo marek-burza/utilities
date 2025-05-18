@@ -11,7 +11,6 @@
       - linux-headers-{{ uname_kernel_version_output.stdout }}
     state: latest
     update_cache: yes
-  become: yes
 
 - name: NVIDIA - Architecture
   command: uname -m
@@ -25,13 +24,11 @@
   apt:
     deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/cuda-keyring_1.1-1_all.deb
     state: present
-  become: yes
 
 - name: NVIDIA - Upgrade
   apt:
     update_cache: yes
     upgrade: full
-  become: yes
 
 - name: NVIDIA - Drivers
   apt:
@@ -39,11 +36,9 @@
       - nvidia-open
     state: latest
     update_cache: yes
-  become: yes
 
 - name: NVIDIA - Ubuntu
   command: ubuntu-drivers install
-  become: yes
 
 - name: NVIDIA - GPG
   get_url:
@@ -53,13 +48,11 @@
 
 - name: NVIDIA - Dearmor
   command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/nvidia.gpg
-  become: yes
 
 - name: NVIDIA - Repository
   apt_repository:
     repo: 'deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
     state: present
-  become: yes
 
 - name: NVIDIA - Container Toolkit
   apt:
@@ -67,12 +60,9 @@
       - nvidia-container-toolkit
     state: latest
     update_cache: yes
-  become: yes
 
 - name: NVIDIA - Docker
   command: nvidia-ctk runtime configure --runtime=docker
-  become: yes
 
 - name: NVIDIA - Reload
   systemd: name=docker state=reloaded
-  become: yes

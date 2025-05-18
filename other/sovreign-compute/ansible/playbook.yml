@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - role: lid
+    - role: docker
+    - role: firewall
+    - role: cups
+    - role: nvidia
+    - role: key
+    - role: volume
+    - role: utilities
+  become: yes
