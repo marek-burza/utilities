@@ -20,4 +20,5 @@ ansible-playbook -i "localhost," --connection=local --ask-become-pass --extra-va
 
 ## Future
 
-- Install OpenVPN or Wireguard for secure localaccess
+- Install OpenVPN or Wireguard for secure local access
+- Add [`vsftp`](https://docs.rockylinux.org/guides/file_sharing/secure_ftp_server_vsftpd/)
