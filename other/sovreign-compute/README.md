@@ -20,12 +20,5 @@ install -m 0700 -d $HOME/.ansible/tmp
 ## Installation
 
 ```shell
-ansible-playbook -i "localhost," --connection=local --ask-become-pass --extra-vars "tailscale_auth_key=$TS_AUTHKEY utilities_password=$UTILITIES_PASSWORD" playbook.yml
+ansible-playbook -i "localhost," --connection=local --ask-become-pass playbook.yml
 ```
-
-## Future
-
-Replace `tailscale` & `gotty` with WebRTC-based solution:
-
-- [GitHub: roccomuso/rtc-web-term](https://github.com/roccomuso/rtc-web-term)
-- [GitHub: roccomuso/rtc-shell](https://github.com/roccomuso/rtc-shell)

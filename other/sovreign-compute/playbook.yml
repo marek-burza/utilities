@@ -6,7 +6,4 @@
     - role: firewall
     - role: cups
     - role: nvidia
-    - role: key
-    - role: volume
-    - role: utilities
   become: yes
