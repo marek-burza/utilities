@@ -36,3 +36,4 @@
 * Azure CLI - [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli)
 * Expose Docker host ports on Docker networks - [`qoomon/docker-host`](https://github.com/qoomon/docker-host)
 * Powerful tunneling software - [`socat`](https://www.redhat.com/sysadmin/getting-started-socat)
+* Forward a service on a local port to an SSH jump server - [`autossh`](https://www.harding.motd.ca/autossh/)
