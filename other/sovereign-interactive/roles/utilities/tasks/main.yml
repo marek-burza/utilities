@@ -29,7 +29,7 @@
   community.docker.docker_container:
     name: sovereign-compute-utilities
     image: ghcr.io/altermarkive/sovereign-compute-utilities:latest
-    pull: always
+    pull: yes
     state: started
     restart_policy: always
     recreate: true
