@@ -18,13 +18,13 @@
 * [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
 
 
-# Sovreign Compute
+# Sovereign Compute
 
 * [SSH jump server on Kubernetes](other/ssh-jump-server)
 * [Forwarding service on a local socket to an SSH jump server](other/autossh)
 * [SSH over Tor](other/ssh-over-tor)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
-* [Sovreign Compute](other/sovreign-compute)
+* [Sovereign Compute](other/sovereign-compute)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
 * [API-to-API pump with cron & curl](other/cron-curl)
 * [BitTorrent over VPN](other/bittorrent-over-vpn)

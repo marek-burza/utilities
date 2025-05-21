@@ -1,15 +1,15 @@
 ---
 - name: Key - Check
   stat:
-    path: /var/sovreign/ssh/id_ed25519
+    path: /var/sovereign/ssh/id_ed25519
   register: key_stat
 
 - name: Key - Directory
   file:
-    path: /var/sovreign/ssh
+    path: /var/sovereign/ssh
     state: directory
     mode: 0700
 
 - name: Key - Create
-  command: ssh-keygen -t ed25519 -C "nobody@localhost" -f /var/sovreign/ssh/id_ed25519
+  command: ssh-keygen -t ed25519 -C "nobody@localhost" -f /var/sovereign/ssh/id_ed25519
   when: not key_stat.stat.exists

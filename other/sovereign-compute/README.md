@@ -1,4 +1,4 @@
-# Sovreign Compute
+# Sovereign Compute
 
 ## Introduction
 

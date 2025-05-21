@@ -1,4 +1,4 @@
-name: Automation for sovreign-compute-utilities
+name: Automation for sovereign-compute-utilities
 
 on: [push]
 
@@ -12,7 +12,7 @@ jobs:
       - name: Tags
         id: tags
         run: |
-          DOCKER_IMAGE='ghcr.io/${{ github.actor }}/sovreign-compute-utilities'
+          DOCKER_IMAGE='ghcr.io/${{ github.actor }}/sovereign-compute-utilities'
           TAGS="${DOCKER_IMAGE}:latest"
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
       - name: QEMU
@@ -29,7 +29,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6
         with:
-          context: other/sovreign-utilities
+          context: other/sovereign-utilities
           push: true
           platforms: linux/amd64
           tags: ${{ steps.tags.outputs.tags }}

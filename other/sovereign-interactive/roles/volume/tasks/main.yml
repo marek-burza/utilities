@@ -1,6 +1,6 @@
 ---
 - name: Volume - Directory
   file:
-    path: /var/sovreign/volume
+    path: /var/sovereign/volume
     state: directory
     mode: 0700

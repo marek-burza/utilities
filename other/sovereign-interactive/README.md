@@ -1,4 +1,4 @@
-# Sovreign Interactive
+# Sovereign Interactive
 
 ## Introduction
 

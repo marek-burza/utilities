@@ -5,7 +5,7 @@
 
 - name: Utilities - Directories
   file:
-    path: "/var/sovreign/{{ item }}"
+    path: "/var/sovereign/{{ item }}"
     state: directory
     mode: 0700
   loop:
@@ -18,31 +18,31 @@
 - name: Utilities - Config
   copy:
     src: supervisord.conf
-    dest: "/var/sovreign/etc/supervisord.conf"
+    dest: "/var/sovereign/etc/supervisord.conf"
     mode: 0600
 
 - name: Utilities - Network
   community.docker.docker_network:
-    name: sovreign-compute-utilities-network
+    name: sovereign-compute-utilities-network
 
 - name: Utilities - Container
   community.docker.docker_container:
-    name: sovreign-compute-utilities
-    image: ghcr.io/altermarkive/sovreign-compute-utilities:latest
+    name: sovereign-compute-utilities
+    image: ghcr.io/altermarkive/sovereign-compute-utilities:latest
     pull: yes
     state: started
     restart_policy: always
     recreate: true
     hostname: "{{ hostname_output.stdout }}"
     networks:
-      - name: sovreign-compute-utilities-network
+      - name: sovereign-compute-utilities-network
     env:
       HOSTNAME: "{{ hostname_output.stdout }}"
       TS_AUTHKEY: "{{ tailscale_auth_key }}"
       UTILITIES_PASSWORD: "{{ utilities_password }}"
     command: ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
     volumes:
-      - "/var/sovreign/etc/supervisord.conf:/etc/supervisord.conf"
-      - "/var/sovreign/tailscale:/var/run/tailscale"
-      - "/var/sovreign/ssh:/root/.ssh"
-      - "/var/sovreign/volume:/root/projects"
+      - "/var/sovereign/etc/supervisord.conf:/etc/supervisord.conf"
+      - "/var/sovereign/tailscale:/var/run/tailscale"
+      - "/var/sovereign/ssh:/root/.ssh"
+      - "/var/sovereign/volume:/root/projects"
