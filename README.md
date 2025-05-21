@@ -22,7 +22,6 @@
 
 * [SSH jump server on Kubernetes](other/ssh-jump-server)
 * [Forwarding service on a local socket to an SSH jump server](other/autossh)
-* [SSH over Tor](other/ssh-over-tor)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
 * [Sovereign Compute](other/sovereign-compute)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
