@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>scratchpad</title>
+<title>notepad</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono" rel="stylesheet"/>
 <style>
 * {
@@ -33,25 +33,25 @@ textarea {
 </style>
 </head>
 <body>
-<textarea id="scratchpad"></textarea>
+<textarea id="notepad"></textarea>
 <script>
 function load() {
-    const text = localStorage.getItem('scratchpad');
+    const text = localStorage.getItem('notepad');
     if (text) {
-        document.getElementById('scratchpad').value = text;
+        document.getElementById('notepad').value = text;
     }
 }
 
 function store() {
-    const text = document.getElementById('scratchpad');
-    localStorage.setItem('scratchpad', text.value);
+    const text = document.getElementById('notepad');
+    localStorage.setItem('notepad', text.value);
 }
 
 window.onload = load;
-document.getElementById('scratchpad').addEventListener('input', store);
+document.getElementById('notepad').addEventListener('input', store);
 window.addEventListener('storage', (event) => {
-    if (event.key === 'scratchpad') {
-        document.getElementById('scratchpad').value = event.newValue;
+    if (event.key === 'notepad') {
+        document.getElementById('notepad').value = event.newValue;
     }
 });
 </script>
