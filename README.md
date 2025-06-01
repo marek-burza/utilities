@@ -3,6 +3,7 @@
 # Minimalistic HTML Tools
 
 - [Static Topographic Map](https://altermarkive.github.io/altermarkive/topography.html)
+- [Simple Editor Backed by Local Storage](https://altermarkive.github.io/altermarkive/notepad.html)
 
 # New Mac Quick Start
 
