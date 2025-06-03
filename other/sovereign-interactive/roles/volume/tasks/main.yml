@@ -4,3 +4,9 @@
     path: /var/sovereign/volume
     state: directory
     mode: 0700
+
+- name: Volume - Quarantine
+  file:
+    path: /var/sovereign/volume/quarantine
+    state: directory
+    mode: 0700

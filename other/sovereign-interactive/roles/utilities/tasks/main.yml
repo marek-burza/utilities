@@ -46,3 +46,19 @@
       - "/var/sovereign/tailscale:/var/run/tailscale"
       - "/var/sovereign/ssh:/root/.ssh"
       - "/var/sovereign/volume:/root/projects"
+
+- name: Utilities - Files
+  community.docker.docker_container:
+    name: sovereign-compute-filebrowser
+    image: filebrowser/filebrowser:latest
+    pull: yes
+    state: started
+    restart_policy: always
+    recreate: true
+    networks:
+      - name: sovereign-compute-utilities-network
+    # ports:
+    #   - "9090:80"
+    command: ["--username", "user", "--password", "{{ utilities_password | password_hash('bcrypt') }}", "--disable-exec"]
+    volumes:
+      - "/var/sovereign/volume/quarantine:/srv"
