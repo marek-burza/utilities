@@ -14,8 +14,6 @@
 
 # Sovereign Compute
 
-* [SSH jump server on Kubernetes](other/ssh-jump-server)
-* [Forwarding service on a local socket to an SSH jump server](other/autossh)
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
 * [Sovereign Compute](other/sovereign-compute)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
@@ -30,3 +28,7 @@
 * Expose Docker host ports on Docker networks - [`qoomon/docker-host`](https://github.com/qoomon/docker-host)
 * Powerful tunneling software - [`socat`](https://www.redhat.com/sysadmin/getting-started-socat)
 * Forward a service on a local port to an SSH jump server - [`autossh`](https://www.harding.motd.ca/autossh/)
+
+# To Do
+
+- Rework Kubernetes example into a local cluster with [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installing-from-release-binaries)

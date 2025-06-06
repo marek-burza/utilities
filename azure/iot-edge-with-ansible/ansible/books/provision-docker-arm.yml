@@ -1,7 +1,0 @@
-- hosts: all
-  roles:
-    - geerlingguy.docker_arm
-  vars:
-    docker_users:
-      - "{{ ansible_user }}"
-  become: yes
