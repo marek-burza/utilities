@@ -7,8 +7,6 @@
 
 # Azure Experiments
 
-* [Password-protected, App Service (Python, Flask & Docker) with Swagger API and static frontend served by Nginx](azure/app-service)
-* [Multicontainer App Service with Volume](azure/multicontainer-app-service-with-volume)
 * [Kubernetes: AKS with authenticated App Service ingress](azure/aks-with-app-service-ingress)
 
 
