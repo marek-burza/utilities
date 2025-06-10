@@ -13,3 +13,4 @@
 # To Do
 
 - Rework Kubernetes example into a local cluster with [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installing-from-release-binaries)
+- Replate Tailscale ingress with local-only WireGuard
