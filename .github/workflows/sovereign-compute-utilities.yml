@@ -29,7 +29,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6
         with:
-          context: other/sovereign-utilities
+          context: sovereign-utilities
           push: true
           platforms: linux/amd64
           tags: ${{ steps.tags.outputs.tags }}
