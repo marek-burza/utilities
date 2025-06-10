@@ -1,5 +1,0 @@
----
-
-- hosts: all
-  roles:
-    - role: gitlab-ci-runner
