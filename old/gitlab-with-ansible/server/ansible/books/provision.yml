@@ -1,8 +1,0 @@
----
-
-- hosts: all
-  gather_facts: False
-
-- include: provision-base.yml
-- include: provision-docker.yml
-- include: provision-gitlab-server.yml
