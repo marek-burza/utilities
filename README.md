@@ -17,7 +17,6 @@
 * [Ansible: Install GitLab Server on CentOS](other/gitlab-with-ansible)
 * [Sovereign Compute](other/sovereign-compute)
 * [Quick & Dirty Bare Metal Kubernetes Cluster with kubespray](other/bare-metal-kubernetes-with-kubespray)
-* [API-to-API pump with cron & curl](other/cron-curl)
 * [BitTorrent over VPN](other/bittorrent-over-vpn)
 
 
