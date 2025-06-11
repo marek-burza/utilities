@@ -1,4 +1,4 @@
-![languages](https://github-readme-stats.vercel.app/api/top-langs/?username=altermarkive&hide=roff&langs_count=10&layout=compact&hide_border=true&theme=dark)
+![languages](https://github-readme-stats.vercel.app/api/top-langs/?username=altermarkive&hide=roff&langs_count=10&layout=compact&hide_border=true&disable_animations=true&theme=dark)
 
 # Minimalistic HTML Tools
 
