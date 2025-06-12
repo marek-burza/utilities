@@ -40,4 +40,4 @@ jobs:
         with:
           min-versions-to-keep: 10
           package-name: python-data-experiments
-          package-type: docker
+          package-type: container
