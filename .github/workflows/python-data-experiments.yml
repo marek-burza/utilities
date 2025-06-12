@@ -38,7 +38,6 @@ jobs:
       - name: Trash
         uses: actions/delete-package-versions@v5
         with:
-          num-old-versions-to-delete: 10
           min-versions-to-keep: 10
           package-name: python-data-experiments
           package-type: docker
