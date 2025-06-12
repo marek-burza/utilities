@@ -11,11 +11,11 @@ jobs:
         uses: jlumbroso/free-disk-space@main
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Tags  # To have versioned TAG add: ,${DOCKER_IMAGE}:${{ github.sha }}
+      - name: Tags
         id: tags
         run: |
           DOCKER_IMAGE='ghcr.io/${{ github.repository_owner }}/python-data-experiments'
-          TAGS="${DOCKER_IMAGE}:latest"
+          TAGS="${DOCKER_IMAGE}:latest,${DOCKER_IMAGE}:${{ github.sha }}"
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
       - name: QEMU
         uses: docker/setup-qemu-action@v3
@@ -35,3 +35,10 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: ${{ steps.tags.outputs.tags }}
+      - name: Trash
+        uses: actions/delete-package-versions@v5
+        with:
+          num-old-versions-to-delete: 10
+          min-versions-to-keep: 10
+          package-name: python-data-experiments
+          package-type: docker
