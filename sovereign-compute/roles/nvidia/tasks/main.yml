@@ -20,39 +20,51 @@
   command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
   register: os_release_output
 
-- name: NVIDIA - Keyring
-  apt:
-    deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/cuda-keyring_1.1-1_all.deb
+- name: NVIDIA - CUDA Toolkit GPG
+  get_url:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/3bf863cc.pub
+    dest: /tmp/cuda-toolkit.gpg
+    force: true
+
+- name: NVIDIA - CUDA Toolkit GPG Dearmor
+  command: gpg -o /usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg --batch --yes --dearmor /tmp/cuda-toolkit.gpg
+
+- name: NVIDIA - CUDA Toolkit Repository
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }} /
     state: present
 
-- name: NVIDIA - Upgrade
+- name: NVIDIA - CUDA Toolkit Upgrade
   apt:
     update_cache: yes
     upgrade: full
 
-- name: NVIDIA - Drivers
+- name: NVIDIA - CUDA Toolkit
   apt:
     pkg:
-      - nvidia-open
+      - cuda-toolkit
+      - cuda-drivers
     state: latest
     update_cache: yes
 
-- name: NVIDIA - Ubuntu
-  command: ubuntu-drivers install
-
-- name: NVIDIA - GPG
+- name: NVIDIA - Container Toolkit GPG
   get_url:
     url: https://nvidia.github.io/libnvidia-container/gpgkey
-    dest: /tmp/nvidia.gpg
+    dest: /tmp/container-toolkit.gpg
     force: true
 
-- name: NVIDIA - Dearmor
-  command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/nvidia.gpg
+- name: NVIDIA - Container Toolkit GPG Dearmor
+  command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/container-toolkit.gpg
 
-- name: NVIDIA - Repository
+- name: NVIDIA - Container Toolkit Repository
   apt_repository:
     repo: 'deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
     state: present
+
+- name: NVIDIA - Container Toolkit Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
 
 - name: NVIDIA - Container Toolkit
   apt:
