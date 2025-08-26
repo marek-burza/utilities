@@ -78,3 +78,5 @@
 
 - name: NVIDIA - Reload
   systemd: name=docker state=reloaded
+
+# See also: https://linuxcapable.com/how-to-install-cuda-on-ubuntu-linux/
