@@ -18,6 +18,7 @@
   - Bursting into cloud with [kilo](https://github.com/squat/kilo)?
 - Add [Kueue](https://github.com/kubernetes-sigs/kueue) controller to the local cluster
 - If necessery to govern the queue with a git repo then consider [Argo] (https://github.com/argoproj) (possibly consider [Weave GitOps](https://github.com/weaveworks/weave-gitops) community driven project, and [Flux](https://github.com/fluxcd/flux2))
+- Auto-update sovereign-utilities with https://github.com/containrrr/watchtower
 
 # Secure the Cluster
 
