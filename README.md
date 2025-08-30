@@ -12,7 +12,7 @@
 
 # To Do
 
-- Rework Kubernetes example into a local cluster with [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installing-from-release-binaries)
-- Replate Tailscale ingress with local-only WireGuard
+- Rework Kubernetes example into a local cluster with [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installing-from-release-binaries) (rather than [kubespray](https://github.com/kubernetes-sigs/kubespray) or [minikube](https://github.com/kubernetes/minikube))
+- Replace Tailscale ingress with local-only WireGuard
 - Add [Kueue](https://github.com/kubernetes-sigs/kueue) controller to the local cluster
 - If necessery to govern the queue with a git repo then consider [Argo](https://github.com/argoproj)
