@@ -22,6 +22,7 @@
 # Secure the Cluster
 
 - How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
+- Add this to CI? - https://github.com/ZeroPathAI/zeropathai
 - Attack surface mapping and asset discovery - https://github.com/owasp-amass/amass
 - All-in-one OSINT tool for analysing any website - https://github.com/Lissy93/web-check
 - Fast subdomains enumeration tool for penetration testers - https://github.com/aboul3la/Sublist3r
