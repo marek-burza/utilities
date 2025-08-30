@@ -18,3 +18,11 @@
   - Bursting into cloud with [kilo](https://github.com/squat/kilo)?
 - Add [Kueue](https://github.com/kubernetes-sigs/kueue) controller to the local cluster
 - If necessery to govern the queue with a git repo then consider [Argo] (https://github.com/argoproj) (possibly consider [Weave GitOps](https://github.com/weaveworks/weave-gitops) community driven project, and [Flux](https://github.com/fluxcd/flux2))
+
+# Secure the Cluster
+
+- How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
+- Attack surface mapping and asset discovery - https://github.com/owasp-amass/amass
+- All-in-one OSINT tool for analysing any website - https://github.com/Lissy93/web-check
+- Fast subdomains enumeration tool for penetration testers - https://github.com/aboul3la/Sublist3r
+- Certificate search - https://github.com/PaulSec/crt.sh
