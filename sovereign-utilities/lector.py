@@ -12,7 +12,14 @@
 # [tool.uv.sources]
 # parler-tts = { git = "https://github.com/huggingface/parler-tts.git" }
 # ///
-# https://huggingface.co/docs/transformers/en/tasks/text-to-speech
+# Inspiration:
+# - https://huggingface.co/docs/transformers/en/tasks/text-to-speech
+# Other options:
+# - https://github.com/hexgrad/kokoro - open-weight TTS model
+# - https://github.com/openai/whisper & https://github.com/ggml-org/whisper.cpp - OpenAI speech recognition
+# - https://github.com/Uberi/speech_recognition - speech recognition Python package
+# - https://github.com/ictnlp/LLaMA-Omni - LLaMA-based speech interaction
+# - https://github.com/kyutai-labs/moshi - speech interaction foundation model
 
 import os
 import sys
