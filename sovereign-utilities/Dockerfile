@@ -35,6 +35,8 @@ RUN apt-get update -yq && \
     /bin/sh -c "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" && \
     /bin/sh -c "curl -LsSf https://astral.sh/uv/install.sh | sh" && \
     /usr/local/go/bin/go install github.com/sorenisanerd/gotty@latest && \
-    /bin/sh -c "curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash"
+    /bin/sh -c "curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash" && \
+    curl https://raw.githubusercontent.com/hackerb9/lsix/refs/heads/master/lsix -o /usr/local/bin/lsix && \
+    chmod +x /usr/local/bin/lsix
 
 ENV PATH="/usr/local/go/bin:${HOME}/.cargo/bin:source:${HOME}/.local/bin:${PATH}"
