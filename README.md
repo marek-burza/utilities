@@ -27,3 +27,9 @@ sudo pmset -a sleep 0
 sudo pmset -a hibernatemode 0
 sudo pmset -a disablesleep 1
 ```
+
+# To Do
+
+- Possibly, rework the HTML + JS tool to:
+  - https://github.com/pyscript/pyscript
+  - https://github.com/reflex-dev/reflex
