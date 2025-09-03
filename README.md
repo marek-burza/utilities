@@ -22,6 +22,7 @@
 - Replace gotty & filebrowser by VNC-in-a-container?
   - https://www.baeldung.com/linux/docker-container-gui-applications
   - https://akhilsharmaa.medium.com/ubuntu-gui-inside-docker-vnc-server-setup-f601687ec66d
+- Consider switching from `Ansible` to [`pyinfra-dev/pyinfra`](https://github.com/pyinfra-dev/pyinfra)
 
 # Secure the Cluster
 
