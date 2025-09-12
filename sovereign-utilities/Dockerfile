@@ -11,6 +11,7 @@ RUN apt-get update -yq && \
       build-essential \
       curl \
       enscript \
+      ffmpeg \
       fzf \
       git \
       imagemagick \
