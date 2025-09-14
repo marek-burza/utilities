@@ -20,5 +20,5 @@ install -m 0700 -d $HOME/.ansible/tmp
 ## Installation
 
 ```shell
-ansible-playbook -i "localhost," --connection=local --ask-become-pass playbook.yml
+ansible-playbook -i "localhost," --connection=local --ask-become-pass playbook.yaml
 ```
