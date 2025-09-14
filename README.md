@@ -12,9 +12,7 @@
 
 # To Do
 
-- Replace Tailscale ingress with local-only WireGuard
-  - https://github.com/ivanmorenoj/k8s-wireguard
-  - Bursting into cloud with [kilo](https://github.com/squat/kilo)?
+- Replace Tailscale ingress with local-only WireGuard - https://github.com/ivanmorenoj/k8s-wireguard
 - Add [Kueue](https://github.com/kubernetes-sigs/kueue) controller to the local cluster
 - If necessery to govern the queue with a git repo then consider [Argo](https://github.com/argoproj) (possibly consider [Weave GitOps](https://github.com/weaveworks/weave-gitops) community driven project, and [Flux](https://github.com/fluxcd/flux2))
 - Auto-update sovereign-utilities with https://github.com/containrrr/watchtower
