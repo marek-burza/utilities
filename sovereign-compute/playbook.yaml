@@ -2,8 +2,13 @@
   gather_facts: False
   roles:
     - role: lid
+      become: yes
     - role: docker
+      become: yes
     - role: firewall
+      become: yes
     - role: cups
+      become: yes
     - role: nvidia
-  become: yes
+      become: yes
+    - role: kubernetes

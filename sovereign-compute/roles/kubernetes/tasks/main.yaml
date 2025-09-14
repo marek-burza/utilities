@@ -1,0 +1,50 @@
+---
+- name: Kubernetes - Prerequisites
+  apt:
+    pkg:
+      - ca-certificates
+      - gnupg
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Kubernetes - kind
+  get_url:
+    url: https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+    force: true
+  become: yes
+
+- name: Kubernetes - Version
+  uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: yes
+  register: kubernetes_version
+
+- name: Kubernetes - kubectl
+  get_url:
+    url: https://dl.k8s.io/release/{{ kubernetes_version.content }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+    force: true
+  become: yes
+
+- name: Kubernetes - Check
+  command: kind get clusters
+  register: kind_clusters
+  changed_when: false
+
+- name: Kubernetes - Cluster
+  command: kind create cluster --name sovereign-cluster
+  when: "'sovereign-cluster' not in kind_clusters.stdout"
+  args:
+    creates: "{{ lookup('env','HOME') }}/.kube/config"
+
+- name: Kubernetes - Verify
+  command: kubectl cluster-info
+  register: cluster_info
+
+- name: Kubernetes - Show
+  debug:
+    msg: "{{ cluster_info.stdout }}"
