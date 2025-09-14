@@ -2,11 +2,6 @@
 
 * [Sovereign Compute](sovereign-compute)
 
-# Other Tools
-
-* AWS CLI - [`amazon/aws-cli`](https://hub.docker.com/r/amazon/aws-cli)
-* Azure CLI - [`mcr.microsoft.com/azure-cli`](https://hub.docker.com/_/microsoft-azure-cli)
-
 # To Do
 
 - Add [Kueue](https://github.com/kubernetes-sigs/kueue) controller to the local cluster
