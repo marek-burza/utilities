@@ -12,7 +12,6 @@
 
 # To Do
 
-- Rework Kubernetes example into a local cluster with [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installing-from-release-binaries) (rather than [kubespray](https://github.com/kubernetes-sigs/kubespray) or [minikube](https://github.com/kubernetes/minikube))
 - Replace Tailscale ingress with local-only WireGuard
   - https://github.com/ivanmorenoj/k8s-wireguard
   - Bursting into cloud with [kilo](https://github.com/squat/kilo)?

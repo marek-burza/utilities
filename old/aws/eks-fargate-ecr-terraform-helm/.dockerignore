@@ -1,8 +1,0 @@
-.git
-.dockerignore
-.gitignore
-helm
-kubectl
-terraform
-Dockerfile
-README.md
