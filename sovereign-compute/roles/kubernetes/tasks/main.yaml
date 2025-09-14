@@ -48,3 +48,42 @@
 - name: Kubernetes - Show
   debug:
     msg: "{{ cluster_info.stdout }}"
+
+- name: Kubernetes - Helm GPG
+  get_url:
+    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
+    dest: /tmp/helm.gpg
+    force: true
+
+- name: Kubernetes - Helm GPG Dearmor
+  command: gpg -o /usr/share/keyrings/helm-keyring.gpg --batch --yes --dearmor /tmp/helm.gpg
+  become: yes
+
+- name: Kubernetes - Helm Repository
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/helm-keyring.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main
+    state: present
+  become: yes
+
+- name: Kubernetes - Helm Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+  become: yes
+
+- name: Kubernetes - Helm
+  apt:
+    pkg:
+      - helm
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Kubernetes - Kueue
+  kubernetes.core.helm:
+    name: kueue
+    chart_ref: oci://registry.k8s.io/kueue/charts/kueue
+    release_namespace: kueue-system
+    create_namespace: true
+    wait: true
+    state: present
