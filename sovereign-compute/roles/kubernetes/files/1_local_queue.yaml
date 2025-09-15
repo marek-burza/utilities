@@ -1,0 +1,7 @@
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: LocalQueue
+metadata:
+  name: sovereign-local-queue
+  namespace: default
+spec:
+  clusterQueue: sovereign-cluster-queue

@@ -1,0 +1,20 @@
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ClusterQueue
+metadata:
+  name: sovereign-cluster-queue
+spec:
+  cohort: default
+  namespaceSelector: {}
+  queueingStrategy: StrictFIFO
+  resourceGroups:
+    - coveredResources: ["cpu", "memory", "pods"]
+      flavors:
+        - name: default
+          resources:
+            - name: "cpu"
+              nominalQuota: {{ cpu_output.stdout }}
+            - name: "memory"
+              nominalQuota: {{ ram_output.stdout }}Gi
+            - name: "pods"
+              nominalQuota: 1
+  preemption: {}

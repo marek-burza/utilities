@@ -87,3 +87,42 @@
     create_namespace: true
     wait: true
     state: present
+
+- name: Kubernetes - NVIDIA Device Plugin Version
+  command: /bin/sh -c "curl -s https://api.github.com/repos/NVIDIA/k8s-device-plugin/releases/latest | grep tag_name | sed 's/[^0-9.]//g'"
+  register: nvidia_device_plugin_version_output
+
+- name: Kubernetes - NVIDIA Device Plugin
+  command: kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v{{ nvidia_device_plugin_version_output.stdout }}/deployments/static/nvidia-device-plugin.yml
+
+- name: Kubernetes - RAM
+  command: /bin/sh -c "free --gibi | grep Mem | tr -s ' ' | cut -d ' ' -f2"
+  register: ram_output
+
+- name: Kubernetes - CPU
+  command: nproc
+  register: cpu_output
+
+- name: Kubernetes - Cluster Queue Spec
+  template:
+    src: 0_cluster_queue.j2
+    dest: /tmp/0_cluster_queue.yaml
+
+- name: Kubernetes - Cluster Queue
+  command: kubectl apply -f /tmp/0_cluster_queue.yaml
+
+- name: Kubernetes - Local Queue Spec
+  copy:
+    src: 1_local_queue.yaml
+    dest: /tmp/1_local_queue.yaml
+
+- name: Kubernetes - Local Queue
+  command: kubectl apply -f /tmp/1_local_queue.yaml
+
+- name: Kubernetes - Priority Classes Spec
+  copy:
+    src: 2_priority_classes.yaml
+    dest: /tmp/2_priority_classes.yaml
+
+- name: Kubernetes - Priority Classes
+  command: kubectl apply -f /tmp/2_priority_classes.yaml

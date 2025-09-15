@@ -1,0 +1,15 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: sovereign-queue-job-priority-high
+value: 1000
+globalDefault: false
+description: "High priority workloads"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: sovereign-queue-job-priority-low
+value: 100
+globalDefault: true
+description: "Low priority workloads"
