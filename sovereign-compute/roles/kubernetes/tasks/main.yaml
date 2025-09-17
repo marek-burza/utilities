@@ -8,10 +8,10 @@
     update_cache: yes
   become: yes
 
-- name: Kubernetes - kind
+- name: Kubernetes - minikube
   get_url:
-    url: https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
-    dest: /usr/local/bin/kind
+    url: https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
     mode: '0755'
     force: true
   become: yes
@@ -30,16 +30,46 @@
     force: true
   become: yes
 
-- name: Kubernetes - Check
-  command: kind get clusters
-  register: kind_clusters
-  changed_when: false
+- name: Kubernetes - user
+  command: whoami
+  register: kubernetes_user
 
-- name: Kubernetes - Cluster
-  command: kind create cluster --name sovereign-cluster
-  when: "'sovereign-cluster' not in kind_clusters.stdout"
-  args:
-    creates: "{{ lookup('env','HOME') }}/.kube/config"
+- name: Kubernetes - group
+  command: id -gn {{ kubernetes_user.stdout }}
+  register: kubernetes_group
+
+- name: Kubernetes - minikube service
+  template:
+    src: minikube.service.j2
+    dest: /etc/systemd/system/minikube.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Kubernetes - minikube up
+  systemd:
+    name: minikube
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+  become: yes
+
+- name: Kubernetes - NVIDIA net.core.bpf_jit_harden
+  sysctl:
+    name: net.core.bpf_jit_harden
+    value: '0'
+    state: present
+    reload: yes
+  become: yes
+
+# - name: Kubernetes - NVIDIA runtime
+#   command: nvidia-ctk runtime configure --runtime=docker
+# - name: Kubernetes - NVIDIA Docker
+#   systemd:
+#     name: docker
+#     state: restarted
+#   become: yes
 
 - name: Kubernetes - Verify
   command: kubectl cluster-info
