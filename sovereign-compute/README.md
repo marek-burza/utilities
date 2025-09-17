@@ -8,7 +8,7 @@ This is a set of Ansible scripts to:
 - Automate restrictive `ufw` firewall configuration. Based on instructions [here](https://www.digitalocean.com/community/tutorials/how-to-setup-a-firewall-with-ufw-on-an-ubuntu-and-debian-cloud-server).
 - Automate installation of NVIDIA GPU support. Based on instructions for installing the [drivers](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/index.html#ubuntu-installation) and [container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt).
 - Automate removal of insecure CUPS
-- Automate installation of Kubernetes (with `kind`) & Kueue
+- Automate installation of Kubernetes (with `minikube`) & Kueue
 
 ## Prerequisites
 
