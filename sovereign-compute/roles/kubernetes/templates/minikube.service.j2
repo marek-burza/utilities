@@ -7,7 +7,7 @@ Requires=docker.socket docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/bin/minikube start --driver=docker --container-runtime docker --gpus nvidia.com
+ExecStart=/usr/local/bin/minikube start --driver=docker --container-runtime=docker --gpus all --mount-string="{{ lookup('env','HOME') }}/.minikube_shared:/shared"
 ExecStop=/usr/local/bin/minikube stop
 StandardOutput=journal
 User={{ kubernetes_user.stdout }}

@@ -30,6 +30,12 @@
     force: true
   become: yes
 
+- name: Kubernetes - Shared
+  file:
+    path: "{{ lookup('env','HOME') }}/.minikube_shared"
+    state: directory
+    mode: '0755'
+
 - name: Kubernetes - User
   command: whoami
   register: kubernetes_user
@@ -149,7 +155,7 @@
     dest: /tmp/cluster_queue.yaml
 
 - name: Kubernetes - Cluster Queue
-  command: kubectl apply -f /tmp/cluster_queue.yaml
+  command: kubectl apply --request-timeout 60 -f /tmp/cluster_queue.yaml
 
 - name: Kubernetes - Local Queue Spec
   copy:
