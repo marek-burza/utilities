@@ -30,11 +30,11 @@
     force: true
   become: yes
 
-- name: Kubernetes - user
+- name: Kubernetes - User
   command: whoami
   register: kubernetes_user
 
-- name: Kubernetes - group
+- name: Kubernetes - Group
   command: id -gn {{ kubernetes_user.stdout }}
   register: kubernetes_group
 
@@ -65,6 +65,7 @@
 
 # - name: Kubernetes - NVIDIA runtime
 #   command: nvidia-ctk runtime configure --runtime=docker
+
 # - name: Kubernetes - NVIDIA Docker
 #   systemd:
 #     name: docker
@@ -125,6 +126,15 @@
 - name: Kubernetes - NVIDIA Device Plugin
   command: kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v{{ nvidia_device_plugin_version_output.stdout }}/deployments/static/nvidia-device-plugin.yml
 
+- name: Kubernetes - Resource Flavor Spec
+  copy:
+    src: resource_flavor.yaml
+    dest: /tmp/resource_flavor.yaml
+
+- name: Kubernetes - Resource Flavor
+  command: kubectl apply -f /tmp/resource_flavor.yaml
+
+
 - name: Kubernetes - RAM
   command: /bin/sh -c "free --gibi | grep Mem | tr -s ' ' | cut -d ' ' -f2"
   register: ram_output
@@ -135,24 +145,24 @@
 
 - name: Kubernetes - Cluster Queue Spec
   template:
-    src: 0_cluster_queue.j2
-    dest: /tmp/0_cluster_queue.yaml
+    src: cluster_queue.j2
+    dest: /tmp/cluster_queue.yaml
 
 - name: Kubernetes - Cluster Queue
-  command: kubectl apply -f /tmp/0_cluster_queue.yaml
+  command: kubectl apply -f /tmp/cluster_queue.yaml
 
 - name: Kubernetes - Local Queue Spec
   copy:
-    src: 1_local_queue.yaml
-    dest: /tmp/1_local_queue.yaml
+    src: local_queue.yaml
+    dest: /tmp/local_queue.yaml
 
 - name: Kubernetes - Local Queue
-  command: kubectl apply -f /tmp/1_local_queue.yaml
+  command: kubectl apply -f /tmp/local_queue.yaml
 
 - name: Kubernetes - Priority Classes Spec
   copy:
-    src: 2_priority_classes.yaml
-    dest: /tmp/2_priority_classes.yaml
+    src: priority_classes.yaml
+    dest: /tmp/priority_classes.yaml
 
 - name: Kubernetes - Priority Classes
-  command: kubectl apply -f /tmp/2_priority_classes.yaml
+  command: kubectl apply -f /tmp/priority_classes.yaml
