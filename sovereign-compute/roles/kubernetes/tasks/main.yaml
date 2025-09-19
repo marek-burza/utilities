@@ -36,6 +36,14 @@
     state: directory
     mode: '0755'
 
+- name: Kubernetes - RAM
+  command: /bin/sh -c "free --gibi | grep Mem | tr -s ' ' | cut -d ' ' -f2"
+  register: ram_output
+
+- name: Kubernetes - CPU
+  command: nproc
+  register: cpu_output
+
 - name: Kubernetes - User
   command: whoami
   register: kubernetes_user
@@ -139,15 +147,6 @@
 
 - name: Kubernetes - Resource Flavor
   command: kubectl apply -f /tmp/resource_flavor.yaml
-
-
-- name: Kubernetes - RAM
-  command: /bin/sh -c "free --gibi | grep Mem | tr -s ' ' | cut -d ' ' -f2"
-  register: ram_output
-
-- name: Kubernetes - CPU
-  command: nproc
-  register: cpu_output
 
 - name: Kubernetes - Cluster Queue Spec
   template:
