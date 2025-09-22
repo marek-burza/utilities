@@ -7,6 +7,8 @@
       become: yes
     - role: cups
       become: yes
+    - role: utilities
+      become: yes
     - role: nvidia
       become: yes
     - role: kubernetes

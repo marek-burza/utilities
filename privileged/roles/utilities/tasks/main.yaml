@@ -1,0 +1,42 @@
+---
+- name: Utilities - Distribution
+  apt:
+    pkg:
+      - build-essential
+      - curl
+      - enscript
+      - ffmpeg
+      - git
+      - imagemagick
+      - jq
+      - poppler-utils
+      - qpdf
+    state: latest
+    update_cache: yes
+
+- name: Utilities - uv
+  command: /bin/sh -c "((curl -LsSf https://astral.sh/uv/install.sh | sh); uv self update) || true"
+
+- name: Utilities - lsix
+  get_url:
+    url: https://raw.githubusercontent.com/hackerb9/lsix/refs/heads/master/lsix
+    dest: /usr/local/bin/lsix
+    mode: '0755'
+    force: true
+
+- name: Utilities - Personal
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+  with_items:
+    - jc.py
+    - lector.py
+    - pdf_encrypt.py
+    - pdf_from_image.py
+    - pdf_join.py
+    - pdf_optimize.py
+    - pdf_split.py
+    - pdf_to_image.py
+    - pdf_verify.py
+    - surveillance.py
