@@ -1,0 +1,13 @@
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: sovereign-queue-workload-priority-high
+value: 1000
+description: "High priority workloads"
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: sovereign-queue-workload-priority-low
+value: 100
+description: "Low priority workloads"

@@ -1,0 +1,82 @@
+---
+- name: NVIDIA - Kernel
+  command: uname -r
+  register: uname_kernel_version_output
+
+- name: NVIDIA - Prerequisites
+  apt:
+    pkg:
+      - build-essential
+      - gnupg
+      - linux-headers-{{ uname_kernel_version_output.stdout }}
+    state: latest
+    update_cache: yes
+
+- name: NVIDIA - Architecture
+  command: uname -m
+  register: uname_architecture_output
+
+- name: NVIDIA - Release
+  command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
+  register: os_release_output
+
+- name: NVIDIA - CUDA Toolkit GPG
+  get_url:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/3bf863cc.pub
+    dest: /tmp/cuda-toolkit.gpg
+    force: true
+
+- name: NVIDIA - CUDA Toolkit GPG Dearmor
+  command: gpg -o /usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg --batch --yes --dearmor /tmp/cuda-toolkit.gpg
+
+- name: NVIDIA - CUDA Toolkit Repository
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }} /
+    state: present
+
+- name: NVIDIA - CUDA Toolkit Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+
+- name: NVIDIA - CUDA Toolkit
+  apt:
+    pkg:
+      - cuda-toolkit
+      - cuda-drivers
+    state: latest
+    update_cache: yes
+
+- name: NVIDIA - Container Toolkit GPG
+  get_url:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    dest: /tmp/container-toolkit.gpg
+    force: true
+
+- name: NVIDIA - Container Toolkit GPG Dearmor
+  command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/container-toolkit.gpg
+
+- name: NVIDIA - Container Toolkit Repository
+  apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
+    state: present
+
+- name: NVIDIA - Container Toolkit Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+
+- name: NVIDIA - Container Toolkit
+  apt:
+    pkg:
+      - nvidia-container-toolkit
+    state: latest
+    update_cache: yes
+
+- name: NVIDIA - Docker
+  command: nvidia-ctk runtime configure --runtime=docker
+
+- name: NVIDIA - Reload
+  systemd: name=docker state=reloaded
+
+# See also: https://linuxcapable.com/how-to-install-cuda-on-ubuntu-linux/
