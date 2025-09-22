@@ -1,0 +1,25 @@
+ClusterName=local
+ControlMachine=localhost
+SlurmUser=slurm
+SlurmdUser=root
+StateSaveLocation=/var/lib/slurm
+SlurmdSpoolDir=/var/lib/slurm/slurmd
+SwitchType=switch/none
+MpiDefault=none
+ReturnToService=1
+SlurmctldPort=6817
+SlurmdPort=6818
+ProctrackType=proctrack/pgid
+SchedulerType=sched/backfill
+SchedulerParameters=batch_sched_delay=1
+PriorityType=priority/basic
+PriorityWeightAge=0
+PriorityWeightFairshare=0
+PriorityWeightPartition=0
+PriorityWeightJobSize=0
+PriorityWeightQOS=0
+SelectType=select/linear
+
+# Define local node
+NodeName=localhost CPUs={{ cpu_output.stdout }} State=UNKNOWN
+PartitionName=partition Nodes=localhost Default=YES MaxTime=INFINITE State=UP
