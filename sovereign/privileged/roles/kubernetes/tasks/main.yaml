@@ -1,0 +1,173 @@
+---
+- name: Kubernetes - Prerequisites
+  apt:
+    pkg:
+      - ca-certificates
+      - gnupg
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Kubernetes - minikube
+  get_url:
+    url: https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    mode: '0755'
+    force: true
+  become: yes
+
+- name: Kubernetes - Version
+  uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: yes
+  register: kubernetes_version
+
+- name: Kubernetes - kubectl
+  get_url:
+    url: https://dl.k8s.io/release/{{ kubernetes_version.content }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+    force: true
+  become: yes
+
+- name: Kubernetes - Shared
+  file:
+    path: "{{ lookup('env','HOME') }}/.minikube_shared"
+    state: directory
+    mode: '0755'
+
+- name: Kubernetes - RAM
+  command: /bin/sh -c "free --gibi | grep Mem | tr -s ' ' | cut -d ' ' -f2"
+  register: ram_output
+
+- name: Kubernetes - CPU
+  command: nproc
+  register: cpu_output
+
+- name: Kubernetes - User
+  command: whoami
+  register: kubernetes_user
+
+- name: Kubernetes - Group
+  command: id -gn {{ kubernetes_user.stdout }}
+  register: kubernetes_group
+
+- name: Kubernetes - minikube service
+  template:
+    src: minikube.service.j2
+    dest: /etc/systemd/system/minikube.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Kubernetes - minikube up
+  systemd:
+    name: minikube
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+  become: yes
+
+- name: Kubernetes - NVIDIA net.core.bpf_jit_harden
+  sysctl:
+    name: net.core.bpf_jit_harden
+    value: '0'
+    state: present
+    reload: yes
+  become: yes
+
+# - name: Kubernetes - NVIDIA runtime
+#   command: nvidia-ctk runtime configure --runtime=docker
+
+# - name: Kubernetes - NVIDIA Docker
+#   systemd:
+#     name: docker
+#     state: restarted
+#   become: yes
+
+- name: Kubernetes - Verify
+  command: kubectl cluster-info
+  register: cluster_info
+
+- name: Kubernetes - Show
+  debug:
+    msg: "{{ cluster_info.stdout }}"
+
+- name: Kubernetes - Helm GPG
+  get_url:
+    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
+    dest: /tmp/helm.gpg
+    force: true
+
+- name: Kubernetes - Helm GPG Dearmor
+  command: gpg -o /usr/share/keyrings/helm-keyring.gpg --batch --yes --dearmor /tmp/helm.gpg
+  become: yes
+
+- name: Kubernetes - Helm Repository
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/helm-keyring.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main
+    state: present
+  become: yes
+
+- name: Kubernetes - Helm Upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+  become: yes
+
+- name: Kubernetes - Helm
+  apt:
+    pkg:
+      - helm
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Kubernetes - Kueue
+  kubernetes.core.helm:
+    name: kueue
+    chart_ref: oci://registry.k8s.io/kueue/charts/kueue
+    release_namespace: kueue-system
+    create_namespace: true
+    wait: true
+    state: present
+
+- name: Kubernetes - NVIDIA Device Plugin Version
+  command: /bin/sh -c "curl -s https://api.github.com/repos/NVIDIA/k8s-device-plugin/releases/latest | grep tag_name | sed 's/[^0-9.]//g'"
+  register: nvidia_device_plugin_version_output
+
+- name: Kubernetes - NVIDIA Device Plugin
+  command: kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v{{ nvidia_device_plugin_version_output.stdout }}/deployments/static/nvidia-device-plugin.yml
+
+- name: Kubernetes - Resource Flavor Spec
+  copy:
+    src: resource_flavor.yaml
+    dest: /tmp/resource_flavor.yaml
+
+- name: Kubernetes - Resource Flavor
+  command: kubectl apply -f /tmp/resource_flavor.yaml
+
+- name: Kubernetes - Cluster Queue Spec
+  template:
+    src: cluster_queue.j2
+    dest: /tmp/cluster_queue.yaml
+
+- name: Kubernetes - Cluster Queue
+  command: kubectl apply --request-timeout 60 -f /tmp/cluster_queue.yaml
+
+- name: Kubernetes - Local Queue Spec
+  copy:
+    src: local_queue.yaml
+    dest: /tmp/local_queue.yaml
+
+- name: Kubernetes - Local Queue
+  command: kubectl apply -f /tmp/local_queue.yaml
+
+- name: Kubernetes - Priority Classes Spec
+  copy:
+    src: priority_classes.yaml
+    dest: /tmp/priority_classes.yaml
+
+- name: Kubernetes - Priority Classes
+  command: kubectl apply -f /tmp/priority_classes.yaml

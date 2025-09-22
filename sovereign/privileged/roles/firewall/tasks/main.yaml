@@ -1,0 +1,13 @@
+---
+- name: Firewall - Package
+  apt:
+    pkg:
+      - ufw
+    state: latest
+    update_cache: yes
+
+- name: Firewall - Enabled
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
