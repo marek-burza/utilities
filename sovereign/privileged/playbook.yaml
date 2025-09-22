@@ -1,14 +1,15 @@
 - hosts: localhost
   gather_facts: False
   roles:
-    - role: docker
-      become: yes
     - role: firewall
       become: yes
     - role: cups
       become: yes
     - role: utilities
       become: yes
+    - role: docker
+      become: yes
     - role: nvidia
       become: yes
-    - role: kubernetes
+    - role: slurm
+      become: yes

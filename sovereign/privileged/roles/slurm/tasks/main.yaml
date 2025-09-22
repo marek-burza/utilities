@@ -1,0 +1,35 @@
+---
+- name: Slurm - Distribution
+  apt:
+    pkg:
+      - slurm-wlm
+    state: latest
+    update_cache: yes
+
+- name: Slurm - CPUs
+  command: nproc
+  register: cpu_output
+
+- name: Slurm - Config
+  template:
+    src: slurm.conf.j2
+    dest: /etc/slurm/slurm.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Slurm - Daemon 
+  systemd:
+    daemon_reload: yes
+
+- name: Slurm - Service slurmctld
+  systemd:
+    name: slurmctld
+    enabled: yes
+    state: restarted
+
+- name: Slurm - Service slurmd
+  systemd:
+    name: slurmd
+    enabled: yes
+    state: restarted
