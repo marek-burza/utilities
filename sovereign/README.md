@@ -9,6 +9,7 @@ This is a set of Ansible scripts to:
 - Automate installation of NVIDIA GPU support. Based on instructions for installing the [drivers](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/index.html#ubuntu-installation) and [container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt).
 - Automate removal of insecure CUPS
 - Automate installation of Slurm
+- Automate disabling swap
 
 ## Prerequisites
 
