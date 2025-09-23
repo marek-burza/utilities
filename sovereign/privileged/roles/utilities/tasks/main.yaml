@@ -2,6 +2,7 @@
 - name: Utilities - Distribution
   apt:
     pkg:
+      - autokey-gtk
       - build-essential
       - curl
       - enscript

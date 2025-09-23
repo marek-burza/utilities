@@ -1,0 +1,16 @@
+- name: autokey - Directory
+  file:
+    path: "{{ lookup('env','HOME') }}/.config/autokey/data/My Phrases/"
+    state: directory
+    mode: '0755'
+
+- name: autokey - Files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ lookup('env','HOME') }}/.config/autokey/data/My Phrases/{{ item }}"
+    mode: '0644'
+  with_items:
+    - .WinCToCtrlC.json
+    - WinCToCtrlC.py
+    - .WinVToCtrlV.json
+    - WinVToCtrlV.py
