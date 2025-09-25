@@ -58,6 +58,8 @@ function httpGet(url) {
   return({status: http.status, text: http.responseText});
 }
 
+// See also: https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Implementations
+
 function lon2x(lon, zoom) {
   if (!(-180.0 <= lon && lon <= 180.0)) {
     lon = (lon + 180.0) % 360.0 - 180.0;
@@ -72,6 +74,19 @@ function lat2y(lat, zoom) {
   }
   const y = (1.0 - Math.log(Math.tan(lat * Math.PI / 180.0) + 1.0 / Math.cos(lat * Math.PI / 180.0)) / Math.PI) / 2.0 * (1 << zoom);
   return Math.round(y);
+}
+
+function x2lon(x, zoom) {
+  const n = 1 << zoom;
+  const lon = (x / n) * 360.0 - 180.0;
+  return lon;
+}
+
+function y2lat(y, zoom) {
+  const n = 1 << zoom;
+  const v = Math.PI * (1.0 - 2.0 * y / n);
+  const lat = Math.atan(0.5 * (Math.exp(v) - Math.exp(-v))) * 180.0 / Math.PI;
+  return lat;
 }
 
 function resolve() {
@@ -118,6 +133,39 @@ function mode() {
   return "https://a.tile.opentopomap.org/";
 }
 
+function represent(value) {
+  const degrees = Math.floor(value);
+  const minutes = Math.round((value - degrees) * 60);
+  return `${degrees}° ${minutes}'`;
+}
+
+function graticule(context, zoom, width, height, tile, center, steps) {
+  const north = y2lat(center.y - steps, zoom);
+  const south = y2lat(center.y + steps + 1, zoom);
+  const east = x2lon(center.x - steps, zoom);
+  const west = x2lon(center.x + steps + 1, zoom);
+  const minute = 1.0 / 60.0;
+  context.lineWidth = 5.0;
+  context.font = "80px sans";
+  context.textBaseline = "bottom";
+  for (var lat = Math.floor(south * 60.0) / 60.0; lat <= north; lat += minute) {
+    const y = height - Math.round((lat - south) * height / Math.abs(north - south));
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+    context.fillText(represent(lat), 20, y);
+  }
+  for (var lon = Math.floor(east * 60.0) / 60.0; lon <= west; lon += minute) {
+    const x = Math.round((lon - east) * width / Math.abs(west - east));
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, height);
+    context.stroke();
+    context.fillText(represent(lon), x, 80);
+  }
+}
+
 function render(latitude, longitude) {
   const element = '<canvas id="canvas" style="width: auto; height: auto; max-width: 100%; max-height: 100%;" crossorigin="anonymous" onclick="download();"></canvas>';
   document.getElementById("panel").innerHTML = element;
@@ -135,6 +183,9 @@ function render(latitude, longitude) {
   const context = canvas.getContext("2d");
   canvas.width = width;
   canvas.height = height;
+  // context.filter = "grayscale(100%) contrast(150%) brightness(90%)";
+  let loaded = 0;
+  const total = (steps * 2 + 1) * (steps * 2 + 1);
   for (var dx = -steps; dx <= steps; dx++) {
     for (var dy = -steps; dy <= steps; dy++) {
       const x = center.x + dx;
@@ -146,6 +197,11 @@ function render(latitude, longitude) {
       image.setAttribute("crossOrigin", "anonymous");
       image.onload = function () {
         context.drawImage(image, xp, yp, tile, tile);
+        loaded++;
+        if (loaded === total) {
+          graticule(context, zoom, width, height, tile, center, steps);
+          download();
+        }
       };
       image.src = href;
     }
