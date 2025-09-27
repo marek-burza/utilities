@@ -20,14 +20,21 @@
   command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
   register: os_release_output
 
+- name: NVIDIA - CUDA Toolkit GPG Temporary
+  tempfile:
+    state: file
+    prefix: cuda-toolkit.
+    suffix: .pub
+  register: cuda_toolkit_pub
+
 - name: NVIDIA - CUDA Toolkit GPG
   get_url:
     url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/3bf863cc.pub
-    dest: /tmp/cuda-toolkit.gpg
+    dest: "{{ cuda_toolkit_pub.path }}"
     force: true
 
 - name: NVIDIA - CUDA Toolkit GPG Dearmor
-  command: gpg -o /usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg --batch --yes --dearmor /tmp/cuda-toolkit.gpg
+  command: "gpg -o /usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg --batch --yes --dearmor {{ cuda_toolkit_pub.path }}"
 
 - name: NVIDIA - CUDA Toolkit Repository
   apt_repository:
@@ -47,14 +54,21 @@
     state: latest
     update_cache: yes
 
+- name: NVIDIA - Container Toolkit GPG Temporary
+  tempfile:
+    state: file
+    prefix: container-toolkit.
+    suffix: .key
+  register: container_toolkit_key
+
 - name: NVIDIA - Container Toolkit GPG
   get_url:
     url: https://nvidia.github.io/libnvidia-container/gpgkey
-    dest: /tmp/container-toolkit.gpg
+    dest: "{{ container_toolkit_key.path }}"
     force: true
 
 - name: NVIDIA - Container Toolkit GPG Dearmor
-  command: gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor /tmp/container-toolkit.gpg
+  command: "gpg -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg --batch --yes --dearmor {{ container_toolkit_key.path }}"
 
 - name: NVIDIA - Container Toolkit Repository
   apt_repository:
