@@ -14,8 +14,8 @@ if __name__ == '__main__':
     encrypted_pdf_file = original_pdf_file.parent / f'{original_pdf_file.stem}_{original_pdf_file.suffix}'
     open = os.system(f'pdfinfo {original_pdf_file} > /dev/null 2> /dev/null') == 0
     if open:
-        os.system(f'qpdf --encrypt {password} {password} 256 -- {original_pdf_file} {encrypted_pdf_file}')
+        os.system(f'qpdf --encrypt --user-password=\'{password}\' --owner-password=\'{password}\' --bits=256 -- {original_pdf_file} {encrypted_pdf_file}')
         print(f'🔒 {encrypted_pdf_file}')
     else:
-        verified = '✅' if os.system(f'qpdf --decrypt --password={password} {original_pdf_file} /dev/null > /dev/null 2> /dev/null') == 0 else '❌'
+        verified = '✅' if os.system(f'qpdf --decrypt --password=\'{password}\' {original_pdf_file} /dev/null > /dev/null 2> /dev/null') == 0 else '❌'
         print(f'{verified} {original_pdf_file}')
