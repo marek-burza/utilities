@@ -33,11 +33,9 @@
   with_items:
     - jc.py
     - lector.py
-    - pdf_encrypt.py
-    - pdf_from_image.py
     - pdf_join.py
     - pdf_optimize.py
-    - pdf_split.py
-    - pdf_to_image.py
-    - pdf_verify.py
+    - pdf_protect.py
     - surveillance.py
+    - transcriptor.py
+    - uniformer.py
