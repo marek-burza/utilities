@@ -31,3 +31,7 @@ sudo pmset -a disablesleep 1
 # To Do
 
 - Possibly, rework the HTML + JS tool to: https://github.com/pyscript/pyscript
+
+# Other
+
+- Disable all AI in Firefox by going to `about:config` and setting `browser.ml.enable` to `false`
