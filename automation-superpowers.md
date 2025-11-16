@@ -40,3 +40,12 @@
 - [Significant-Gravitas/AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) - powerful platform that allows you to create, deploy, and manage continuous AI agents that automate complex workflows
 - [openai/agents.md](https://github.com/openai/agents.md) - A simple, open format for guiding coding agents
 
+## Software Comprehension
+
+- [PhialsBasement/Chain-of-Recursive-Thoughts](https://github.com/PhialsBasement/Chain-of-Recursive-Thoughts) - Make AI think harder by making it argue with itself repeatedly
+- [microsoft/amplifier](http://github.com/microsoft/amplifier) - Amplifier is a coordinated and accelerated development system that turns your expertise into reusable AI tools without requiring code. Describe the step-by-step thinking process for handling a task—a "metacognitive recipe"—and Amplifier builds a tool that executes it reliably.
+- [Darwin Gödel Machine](https://arxiv.org/pdf/2505.22954) - Open-Ended Evolution of Self-Improving Agents
+- [The-Pocket/PocketFlow-Tutorial-Codebase-Knowledge](https://github.com/The-Pocket/PocketFlow-Tutorial-Codebase-Knowledge) - Pocket Flow: Codebase to Tutorial
+- [AsyncFuncAI/deepwiki-open](https://github.com/AsyncFuncAI/deepwiki-open) - Open Source DeepWiki: AI-Powered Wiki Generator for GitHub/Gitlab/Bitbucket Repositories
+- [ibm-granite/granite-code-models](https://github.com/ibm-granite/granite-code-models) - Granite Code Models: A Family of Open Foundation Models for Code Intelligence
+- [thepersonalaicompany/amurex](https://github.com/thepersonalaicompany/amurex) - Leverages cutting-edge AI to handle your meetings, capture important details, summarize discussions, and manage follow-up actions
