@@ -25,3 +25,8 @@
 - [Gemini AI Studio](https://aistudio.google.com/)
 - [Gemini in GitHub Copilot](https://docs.github.com/en/copilot/using-github-copilot/ai-models/using-gemini-in-github-copilot)
 - [Gemini CLI](https://blog.google/technology/developers/introducing-gemini-cli-open-source-ai-agent/)
+
+## IDEs
+
+- [Zed](https://zed.dev/)
+- [Void](https://voideditor.com/) - Open source Cursor alternative
