@@ -31,5 +31,4 @@ ansible-playbook -i "localhost," --connection=local --ask-become-pass playbook.y
 - Consider switching from `Ansible` to [`pyinfra-dev/pyinfra`](https://github.com/pyinfra-dev/pyinfra)
 - Cluster Security
   - How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
-  - Add this to CI (?) - https://github.com/ZeroPathAI/zeropathai
   - Resolve handling of temporary files in Ansible
