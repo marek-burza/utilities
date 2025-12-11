@@ -18,13 +18,6 @@
 
 - NotebookLM - [third-party NotebookLM introduction video](https://youtu.be/tgPk8KNCb0c), [blog post about NotebookLM](https://blog.google/technology/ai/notebooklm-google-ai/), [NotebookLM Audio Overviews](https://support.google.com/notebooklm/answer/15731776?hl=en), [with sources](https://m.slashdot.org/story/440583)
 
-## Gemini
-
-- [Gemini Code Assist](https://codeassist.google/products/individual)
-- [Gemini AI Studio](https://aistudio.google.com/)
-- [Gemini in GitHub Copilot](https://docs.github.com/en/copilot/using-github-copilot/ai-models/using-gemini-in-github-copilot)
-- [Gemini CLI](https://blog.google/technology/developers/introducing-gemini-cli-open-source-ai-agent/)
-
 ## IDEs
 
 - [Zed](https://zed.dev/)
