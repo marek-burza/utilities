@@ -9,7 +9,6 @@
 
 ## Chat
 
-- [simonw/llm](https://github.com/simonw/llm) - Access large language models from the command-line
 - [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) - Enhanced ChatGPT Clone (features Agents)
 - [cookbook.openai.com](https://cookbook.openai.com/)
 
