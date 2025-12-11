@@ -10,7 +10,6 @@
 ## Chat
 
 - [simonw/llm](https://github.com/simonw/llm) - Access large language models from the command-line
-- [menloresearch/jan](https://github.com/menloresearch/jan) - Jan is an open source alternative to ChatGPT that runs 100% offline on your computer
 - [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) - Enhanced ChatGPT Clone (features Agents)
 - [cookbook.openai.com](https://cookbook.openai.com/)
 
