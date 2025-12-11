@@ -14,10 +14,6 @@
 - [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) - Enhanced ChatGPT Clone (features Agents)
 - [cookbook.openai.com](https://cookbook.openai.com/)
 
-## Notes
-
-- NotebookLM - [third-party NotebookLM introduction video](https://youtu.be/tgPk8KNCb0c), [blog post about NotebookLM](https://blog.google/technology/ai/notebooklm-google-ai/), [NotebookLM Audio Overviews](https://support.google.com/notebooklm/answer/15731776?hl=en), [with sources](https://m.slashdot.org/story/440583)
-
 ## IDEs
 
 - [Zed](https://zed.dev/)
