@@ -9,7 +9,11 @@
 ## Chat
 
 - [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) - Enhanced ChatGPT Clone (features Agents)
-- [cookbook.openai.com](https://cookbook.openai.com/)
+
+## Docs
+
+- [AGENTS.md](https://agents.md)
+- [Claude Cookbook](https://github.com/anthropics/claude-cookbooks)
 
 ## IDEs
 
