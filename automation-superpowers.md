@@ -4,7 +4,6 @@
 
 - [Kagi](https://kagi.com/) vs. [ItzCrazyKns/Perplexica](https://github.com/ItzCrazyKns/Perplexica)
 - [lmarena.ai](https://lmarena.ai)
-- [browseros-ai/BrowserOS](https://github.com/browseros-ai/BrowserOS) - BrowserOS is an open-source agentic web browser
 
 ## Docs
 
