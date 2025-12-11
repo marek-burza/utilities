@@ -14,7 +14,7 @@
 ## IDEs & Coding Agents
 
 - Claude / [Devstral 2](https://mistral.ai/news/devstral-2-vibe-cli) / Deepseek V3.2
-- [Zed](https://zed.dev/) / [Void](https://voideditor.com/) / Cline
+- [Zed](https://zed.dev/) / [Void](https://voideditor.com/) / Cline / Google Antigravity
 - [TabbyML/tabby](https://github.com/TabbyML/tabby) - Self-hosted AI coding assistant
 - [block/goose](https://github.com/block/goose) - an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM
 - [charmbracelet/crush](https://github.com/charmbracelet/crush) - The glamourous AI coding agent for your favourite terminal
