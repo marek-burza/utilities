@@ -6,10 +6,6 @@
 - [lmarena.ai](https://lmarena.ai)
 - [browseros-ai/BrowserOS](https://github.com/browseros-ai/BrowserOS) - BrowserOS is an open-source agentic web browser
 
-## Chat
-
-- [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) - Enhanced ChatGPT Clone (features Agents)
-
 ## Docs
 
 - [AGENTS.md](https://agents.md)
@@ -33,3 +29,4 @@
 - [AsyncFuncAI/deepwiki-open](https://github.com/AsyncFuncAI/deepwiki-open) - Open Source DeepWiki: AI-Powered Wiki Generator for GitHub/Gitlab/Bitbucket Repositories
 - [ibm-granite/granite-code-models](https://github.com/ibm-granite/granite-code-models) - Granite Code Models: A Family of Open Foundation Models for Code Intelligence
 - [thepersonalaicompany/amurex](https://github.com/thepersonalaicompany/amurex) - Leverages cutting-edge AI to handle your meetings, capture important details, summarize discussions, and manage follow-up actions
+- [Mermaid diagrams with danny-avila/LibreChat](https://youtu.be/GfTj7O4gmd0)
