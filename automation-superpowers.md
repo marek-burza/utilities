@@ -2,7 +2,7 @@
 
 ## Research
 
-- [Kagi](https://kagi.com/) vs. [ItzCrazyKns/Perplexica](https://github.com/ItzCrazyKns/Perplexica)
+- [Kagi](https://kagi.com/)
 - [lmarena.ai](https://lmarena.ai)
 
 ## Docs
