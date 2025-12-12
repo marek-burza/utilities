@@ -1,6 +1,6 @@
 # Minimalistic Tools
 
-- [Static Topographic Map](https://altermarkive.github.io/altermarkive/web/topography.html)
+- [Static Topographic Map](https://altermarkive.github.io/altermarkive/web/topography.html) (TODO: Possibly rework to [pyscript](https://github.com/pyscript/pyscript)?)
 - [Development Environment](sovereign)
 
 # New Mac Quick Start
@@ -26,10 +26,9 @@ sudo pmset -a hibernatemode 0
 sudo pmset -a disablesleep 1
 ```
 
-# To Do
-
-- Possibly, rework the HTML + JS tool to: https://github.com/pyscript/pyscript
-
-# Other
+# AI
 
 - Disable all AI in Firefox by going to `about:config` and setting `browser.ml.enable` to `false`
+- [lmarena.ai](https://lmarena.ai)
+- [AGENTS.md](https://agents.md)
+- [Claude Cookbook](https://github.com/anthropics/claude-cookbooks)
