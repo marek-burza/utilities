@@ -7,7 +7,7 @@ const FORWARDED = 'FORWARDED';
 const DEFAULT_FORWARDED = '{}';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 const GEMINI_API_KEY = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
-const GEMINI_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`; // gemini-2.5-pro
+const GEMINI_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
 
 function children(element, name) {
   const result = [];
@@ -129,7 +129,7 @@ function gemini(prompt) {
       {
         'parts': [
           {
-            'text': prompt
+            'text': prompt + ` Stick to time span ${span()}.`
           },
         ],
       },
@@ -189,4 +189,10 @@ function prompted() {
 
 function reset() {
   PropertiesService.getUserProperties().setProperty(FORWARDED, DEFAULT_FORWARDED);
+}
+
+function span() {
+  const now = new Date().toLocaleDateString('en-UK', {'year': 'numeric', 'month': 'long', 'day': 'numeric'});
+  const then = new Date(new Date().getTime() - WEEK).toLocaleDateString('en-UK', {'year': 'numeric', 'month': 'long', 'day': 'numeric'});
+  return `from ${then} to ${now}`;
 }
