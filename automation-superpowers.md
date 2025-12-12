@@ -23,6 +23,5 @@
 
 - [microsoft/amplifier](http://github.com/microsoft/amplifier) - Amplifier is a coordinated and accelerated development system that turns your expertise into reusable AI tools without requiring code. Describe the step-by-step thinking process for handling a task—a "metacognitive recipe"—and Amplifier builds a tool that executes it reliably.
 - [Darwin Gödel Machine](https://arxiv.org/pdf/2505.22954) - Open-Ended Evolution of Self-Improving Agents
-- [AsyncFuncAI/deepwiki-open](https://github.com/AsyncFuncAI/deepwiki-open) - Open Source DeepWiki: AI-Powered Wiki Generator for GitHub/Gitlab/Bitbucket Repositories
 - [ibm-granite/granite-code-models](https://github.com/ibm-granite/granite-code-models) - Granite Code Models: A Family of Open Foundation Models for Code Intelligence
 - [thepersonalaicompany/amurex](https://github.com/thepersonalaicompany/amurex) - Leverages cutting-edge AI to handle your meetings, capture important details, summarize discussions, and manage follow-up actions
