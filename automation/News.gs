@@ -79,7 +79,7 @@ function verbatim() {
     properties.setProperty(FORWARDED, DEFAULT_FORWARDED);
   }
   const now = new Date().getTime();
-  const expiry = now + WEEK;
+  const expiry = now + 4 * WEEK;
   var forwarded = JSON.parse(properties.getProperty(FORWARDED));
   const active = new Set();
   Object.keys(VERBATIM_FEEDS).forEach(feed => {
