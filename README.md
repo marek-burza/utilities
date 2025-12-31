@@ -1,6 +1,6 @@
 # Minimalistic Tools
 
-- [Static Topographic Map](https://altermarkive.github.io/altermarkive/web/topography.html) (TODO: Possibly rework to [pyscript](https://github.com/pyscript/pyscript)?)
+- [Static Topographic Map](https://altermarkive.github.io/altermarkive/web/topography.html)
 - [Development Environment](sovereign)
 
 # New Mac Quick Start
