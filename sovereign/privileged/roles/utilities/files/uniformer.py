@@ -31,9 +31,11 @@ def main(
     for item in path.iterdir():
         if item.is_file():
             command = [
-                'identify',
-                '-format',
-                '%[EXIF:DateTimeOriginal]',
+                'exiftool',
+                '-CreateDate',
+                '-s',
+                '-s',
+                '-s',
                 item,
             ]
             result = subprocess.run(command, capture_output=True, text=True, check=True)
