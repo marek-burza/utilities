@@ -1,13 +1,8 @@
 const RECIPIENT = PropertiesService.getScriptProperties().getProperty('RECIPIENT');
 const VERBATIM_FEEDS = JSON.parse(PropertiesService.getScriptProperties().getProperty('VERBATIM_FEEDS'));
-const PROMPTED_FEEDS = JSON.parse(PropertiesService.getScriptProperties().getProperty('PROMPTED_FEEDS'));
-const RETRIES = 5;
-const SLEEP = 10000;
 const FORWARDED = 'FORWARDED';
 const DEFAULT_FORWARDED = '{}';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
-const GEMINI_API_KEY = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
-const GEMINI_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
 
 function children(element, name) {
   const result = [];
@@ -121,70 +116,6 @@ function verbatim() {
     }
   }
   properties.setProperty(FORWARDED, JSON.stringify(forwarded));
-}
-
-function gemini(prompt) {
-  const payload = {
-    'contents': [
-      {
-        'parts': [
-          {
-            'text': prompt + ` Stick to time span ${span()}.`
-          },
-        ],
-      },
-    ],
-  };
-  const options = {
-    method: 'POST',
-    contentType: 'application/json',
-    headers: {
-      'x-goog-api-key': GEMINI_API_KEY,
-    },
-    payload: JSON.stringify(payload)
-  };
-  var response = null;
-  for (let attempt = 0; attempt < RETRIES; attempt++) {
-    try {
-      response = UrlFetchApp.fetch(GEMINI_API, options);
-      break;
-    } catch (exception) {
-      Logger.log('Error: ' + exception.message);
-      Utilities.sleep(SLEEP);
-    }
-  }
-  if (response == null) {
-    return null;
-  }
-  const data = JSON.parse(response);
-  return data['candidates'][0]['content']['parts'][0]['text'];
-}
-
-function prompted() {
-  Object.keys(PROMPTED_FEEDS).forEach(feed => {
-    try {
-      Logger.log('Feed: ' + feed);
-      const reply = gemini(PROMPTED_FEEDS[feed])
-      const subject = feed;
-      const content = reply;
-      Logger.log('---');
-      Logger.log(subject);
-      Logger.log(content);
-      if (content != null) {
-        MailApp.sendEmail(
-          RECIPIENT,
-          feed,
-          '',
-          {
-            htmlBody: `<html>${subject}<br/>${content}</html>`
-          }
-        );
-      }
-    } catch (error) {
-      Logger.log('Error processing news feed: ' + error.toString());
-      throw error;
-    }
-  });
 }
 
 function reset() {
