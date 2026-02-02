@@ -10,12 +10,13 @@ if __name__ == '__main__':
         sys.exit(1)
     password = sys.argv[2]
     pdf_file = Path(sys.argv[1])
-    original_pdf_file = Path(sys.argv[1])
-    encrypted_pdf_file = original_pdf_file.parent / f'{original_pdf_file.stem}_{original_pdf_file.suffix}'
-    open = os.system(f'pdfinfo {original_pdf_file} > /dev/null 2> /dev/null') == 0
+    open = os.system(f'pdfinfo {pdf_file} > /dev/null 2> /dev/null') == 0
     if open:
+        original_pdf_file = pdf_file.parent / f'{pdf_file.stem}.original{pdf_file.suffix}'
+        pdf_file.rename(original_pdf_file)
+        encrypted_pdf_file = pdf_file
         os.system(f'qpdf --encrypt --user-password=\'{password}\' --owner-password=\'{password}\' --bits=256 -- {original_pdf_file} {encrypted_pdf_file}')
         print(f'🔒 {encrypted_pdf_file}')
     else:
-        verified = '✅' if os.system(f'qpdf --decrypt --password=\'{password}\' {original_pdf_file} /dev/null > /dev/null 2> /dev/null') == 0 else '❌'
-        print(f'{verified} {original_pdf_file}')
+        verified = '✅' if os.system(f'qpdf --decrypt --password=\'{password}\' {pdf_file} /dev/null > /dev/null 2> /dev/null') == 0 else '❌'
+        print(f'{verified} {pdf_file}')
