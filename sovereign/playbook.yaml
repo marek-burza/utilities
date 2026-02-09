@@ -5,8 +5,6 @@
       become: yes
     - role: cups
       become: yes
-    - role: utilities
-      become: yes
     - role: docker
       become: yes
     - role: nvidia
@@ -15,3 +13,6 @@
       become: yes
     - role: swap
       become: yes
+    - role: uv
+      become: yes
+    - role: autokey

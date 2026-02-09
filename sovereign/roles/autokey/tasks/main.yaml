@@ -1,3 +1,12 @@
+---
+- name: autokey - Package
+  apt:
+    pkg:
+      - autokey-gtk
+    state: latest
+    update_cache: yes
+  become: yes
+
 - name: autokey - Directory
   file:
     path: "{{ lookup('env','HOME') }}/.config/autokey/data/My Phrases/"
