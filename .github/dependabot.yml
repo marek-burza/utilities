@@ -6,14 +6,10 @@ updates:
     schedule:
       interval: "weekly"
     cooldown:
-      default-days: 2
-      semver-major-days: 7
-      semver-minor-days: 3
+      default-days: 7
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
     cooldown:
-      default-days: 2
-      semver-major-days: 7
-      semver-minor-days: 3
+      default-days: 7
