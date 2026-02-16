@@ -31,4 +31,3 @@ sudo pmset -a disablesleep 1
 - Disable all AI in Firefox by going to `about:config` and setting `browser.ml.enable` to `false`
 - [lmarena.ai](https://lmarena.ai)
 - [AGENTS.md](https://agents.md)
-- [Claude Cookbook](https://github.com/anthropics/claude-cookbooks)
