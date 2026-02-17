@@ -33,9 +33,9 @@ USER sandbox
 
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm config set prefix "$HOME/.npm-global"
-ENV PATH="$HOME/.npm-global/bin:$PATH"
 
-RUN npm install -g @anthropic-ai/claude-code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+ENV PATH="$HOME/.local/bin:$PATH"
 
 CMD ["/bin/bash"]
 
