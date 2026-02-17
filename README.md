@@ -34,7 +34,7 @@ sudo pmset -a disablesleep 1
 ## Claude Code Cheat Sheet
 
 - `Shift + TAB, Shift TAB` - cycle through modes to enter planning mode
-- `#` - with this prefix, the instruction will be memorized in `CLAUDE.md`
+- `/memory` - with this prefix, the instruction will be memorized in `CLAUDE.md`
 - `/init` - to create `CLAUDE.md` (optionally, append and provide more instructions and request it to "ultrathink")
 - `Esc, Esc` - to rewind the conversation to before an unrelated side-quest or a mistake in instruction
 - `/compact` - to retain knowledge gathered but not the minutia (e.g. to start on a similar task)
