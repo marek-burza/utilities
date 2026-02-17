@@ -39,3 +39,5 @@ sudo pmset -a disablesleep 1
 - `Esc, Esc` - to rewind the conversation to before an unrelated side-quest or a mistake in instruction
 - `/compact` - to retain knowledge gathered but not the minutia (e.g. to start on a similar task)
 - Create `.claude/commands/[name].md` with instructions for a new `/name` command (use `$ARGUMENTS` to insert subject into generic instruction)
+- `claude mcp add ...` - MCP!
+- `/install-github-app` - ability to: mention `@claude` from an issue or a PR to interact there, have Claude Code review your PR
