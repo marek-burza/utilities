@@ -9,5 +9,10 @@
 - `claude mcp add ...` - MCP!
 - `/install-github-app` - ability to: mention `@claude` from an issue or a PR to interact there, have Claude Code review your PR
 - Use `--teleport` to move cession between web and terminal
-- Turn every (repeated) Claude mistake into a rule in `CLAUDE.md`
+- Turn every (repeated) Claude mistake into a rule in `CLAUDE.md`, same with PR/MR ("review and extractnew desirable patterns/conventions, and preventable anti-patterns")
 - Use smartest model to reduce mistakes/churn/dead-ends
+- Plan (interactively), then execute (automatically)
+- Consider [sub-agents](https://code.claude.com/docs/en/sub-agents) for specific domain/expertise/tool and to avoid poluting main context window
+- Automate everything with hooks to reduce interruptions / defend flow
+- Use "Stop" hook for long-running tasks to verify work delivered
+- Tests / verification are crucial
