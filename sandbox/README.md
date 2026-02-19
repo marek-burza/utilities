@@ -9,4 +9,5 @@
 - `claude mcp add ...` - MCP!
 - `/install-github-app` - ability to: mention `@claude` from an issue or a PR to interact there, have Claude Code review your PR
 - Use `--teleport` to move cession between web and terminal
-- Turn every (repeated) Claude mistake into a rule in CLAUDE.md
+- Turn every (repeated) Claude mistake into a rule in `CLAUDE.md`
+- Use smartest model to reduce mistakes/churn/dead-ends
