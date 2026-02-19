@@ -8,3 +8,5 @@
 - Create `.claude/commands/[name].md` with instructions for a new `/name` command (use `$ARGUMENTS` to insert subject into generic instruction)
 - `claude mcp add ...` - MCP!
 - `/install-github-app` - ability to: mention `@claude` from an issue or a PR to interact there, have Claude Code review your PR
+- Use `--teleport` to move cession between web and terminal
+- Turn every (repeated) Claude mistake into a rule in CLAUDE.md
