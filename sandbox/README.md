@@ -16,3 +16,6 @@
 - Automate everything with hooks to reduce interruptions / defend flow
 - Use "Stop" hook for long-running tasks to verify work delivered
 - Tests / verification are crucial
+- General remark about writing Claude prompts:
+  - Simple language, write instructions instead of questions, specific (including guidelines and, for more complex problems, also steps the answer should follow); Providing example(s) of a quality answer might help as well (particularly helpful for prompt evals)
+  - Faux XML tags allow the model to delimit better the fragments of the prompt you refer to, or to "understand" their semantics better
