@@ -1,4 +1,12 @@
-# Claude Code Sandbox
+# Utilities
+
+## Running Utilities
+
+```bash
+docker run -it -e TERM=xterm-256color --rm --cap-drop=ALL --security-opt=no-new-privileges:true --network host --user $(id -u):$(id -g) -e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native -e PIPEWIRE_REMOTE=/run/user/$(id -u)/pipewire-0 -v /run/user/$(id -u)/pulse/native:/run/user/$(id -u)/pulse/native -v /run/user/$(id -u)/pipewire-0:/run/user/$(id -u)/pipewire-0 -v $HOME/.claude.json:/home/user/.claude.json -v $HOME/.claude:/home/user/.claude -v $PWD:/home/user/workspace -w /home/user/workspace ghcr.io/altermarkive/utilities
+```
+
+## Claude Code Notes
 
 - `Shift + TAB, Shift TAB` - cycle through modes to enter planning mode
 - `/memory` - with this prefix, the instruction will be memorized in `CLAUDE.md` ([AGENTS.md](https://agents.md))
