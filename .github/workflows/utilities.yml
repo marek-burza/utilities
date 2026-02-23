@@ -1,7 +1,7 @@
 name: utilities
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: "0 0 * * 1"
   push:
 jobs:
   pipeline:
@@ -37,6 +37,6 @@ jobs:
       - name: Trash
         uses: actions/delete-package-versions@v5
         with:
-          min-versions-to-keep: 10
+          min-versions-to-keep: 20
           package-name: utilities
           package-type: container
