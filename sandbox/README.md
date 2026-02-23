@@ -5,7 +5,7 @@
 - `/init` - to create `CLAUDE.md` (optionally, append and provide more instructions and request it to "ultrathink")
 - `Esc, Esc` - to rewind the conversation to before an unrelated side-quest or a mistake in instruction
 - `/compact` - to retain knowledge gathered but not the minutia (e.g. to start on a similar task)
-- Create `.claude/commands/[name].md` with instructions for a new `/name` command (use `$ARGUMENTS` to insert subject into generic instruction and `/name:arguments` to execute)
+- Create `.claude/commands/[name].md` with instructions for a new `/name` command (use `$ARGUMENTS` to insert subject into generic instruction and `/project:name arguments` to execute)
 - `claude mcp add ...` - MCP!
 - `/install-github-app` - ability to: mention `@claude` from an issue or a PR to interact there, have Claude Code review your PR
 - Use `--teleport` to move cession between web and terminal
