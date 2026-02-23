@@ -19,3 +19,4 @@
 - General remark about writing Claude prompts:
   - Simple language, write instructions instead of questions, specific (including guidelines and, for more complex problems, also steps the answer should follow); Providing example(s) of a quality answer might help as well (particularly helpful for prompt evals)
   - Faux XML tags allow the model to delimit better the fragments of the prompt you refer to, or to "understand" their semantics better
+  - If you have one long prompt with orthogonal asks, you may consider breaking it up into a chain of prompts
