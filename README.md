@@ -25,7 +25,3 @@ sudo pmset -a sleep 0
 sudo pmset -a hibernatemode 0
 sudo pmset -a disablesleep 1
 ```
-
-# AI
-
-- Disable all AI in Firefox by going to `about:config` and setting `browser.ml.enable` to `false`
