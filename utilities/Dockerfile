@@ -29,6 +29,7 @@ RUN apt-get -yq update && \
     qpdf \
     ripgrep \
     software-properties-common \
+    sudo \
     unzip \
     zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
@@ -70,7 +71,8 @@ ENV HOME=/home/$USER
 WORKDIR $HOME
 RUN userdel -r ubuntu 2> /dev/null || true
 RUN useradd -m -s /bin/bash -u 1000 $USER && \
-    chown -R $USER:$USER $HOME
+    chown -R $USER:$USER $HOME && \
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USER
 
 ENV NODE_OPTIONS="--max-old-space-size=2048"
