@@ -6,7 +6,6 @@ FROM nvidia/cuda:13.1.1-runtime-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Python package dependencies
 RUN apt-get -yq update && \
     apt-get -yq remove python && \
     apt-get -yq install \
@@ -73,14 +72,14 @@ RUN chmod +x /usr/local/bin/pdf_*.py
 ENV USER=user
 ENV HOME=/home/$USER
 WORKDIR $HOME
-RUN userdel -r ubuntu 2>/dev/null || true
+RUN userdel -r ubuntu 2> /dev/null || true
 RUN useradd -m -s /bin/bash -u 1000 $USER && \
     chown -R $USER:$USER $HOME
 USER $USER
 
 RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://astral.sh/uv/install.sh | /bin/sh) && \
-    (curl --proto '=https' --tlsv1.2 -sSfL https://go.dev/dl/go1.24.1.linux-amd64.tar.gz | tar -C $HOME/.local -xzf -) && \
+    (curl --proto '=https' --tlsv1.2 -fsSL https://go.dev/dl/$(curl -sL https://golang.org/dl/ | grep -oP 'go[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1).linux-amd64.tar.gz | /usr/bin/tar -C $HOME/.local -xzf -) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | /bin/sh -s -- -y)
 ENV PATH="$PATH:$HOME/.local/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
 
