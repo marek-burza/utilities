@@ -29,9 +29,6 @@ RUN apt-get -yq update && \
     pipewire-bin \
     pkg-config \
     poppler-utils \
-    python3 \
-    python3-pip \
-    python3-venv \
     qpdf \
     ripgrep \
     software-properties-common \
@@ -57,9 +54,6 @@ RUN apt-get -yq update && \
 # pipewire-bin - Claude Code
 # pkg-config - matplotlib (older, non-wheel version)
 # poppler-utils - N/A
-# python3 - N/A
-# python3-pip - N/A
-# python3-venv - N/A
 # qpdf - N/A
 # ripgrep - Claude Code
 # software-properties-common - Python
