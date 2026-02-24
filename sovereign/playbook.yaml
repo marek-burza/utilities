@@ -16,3 +16,5 @@
     - role: uv
       become: yes
     - role: autokey
+    - role: git
+    - role: fonts

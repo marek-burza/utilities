@@ -72,7 +72,7 @@
 
 - name: NVIDIA - Container Toolkit Repository
   apt_repository:
-    repo: 'deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
+    repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
     state: present
 
 - name: NVIDIA - Container Toolkit Upgrade
@@ -92,5 +92,6 @@
 
 - name: NVIDIA - Reload
   systemd: name=docker state=reloaded
-
-# See also: https://linuxcapable.com/how-to-install-cuda-on-ubuntu-linux/
+# - NVIDIA CUDA Installation Guide for Linux: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
+# - Installing the NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+# - See also: https://linuxcapable.com/how-to-install-cuda-on-ubuntu-linux/

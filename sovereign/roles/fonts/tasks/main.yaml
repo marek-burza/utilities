@@ -1,0 +1,52 @@
+---
+- name: Fonts - JetBrains Mono directory
+  file:
+    path: /usr/local/share/fonts/jetbrains_mono
+    state: directory
+    mode: "0755"
+  become: yes
+
+- name: Fonts - JetBrains Mono archive
+  tempfile:
+    state: file
+    prefix: JetBrainsMono.
+    suffix: .zip
+  register: jetbrains_mono_zip
+
+- name: Fonts - JetBrains Mono fetch
+  get_url:
+    url: https://download-cdn.jetbrains.com/fonts/JetBrainsMono-2.304.zip
+    dest: "{{ jetbrains_mono_zip.path }}"
+    force: true
+
+- name: Fonts - JetBrains Mono installation
+  command: unzip -j "{{ jetbrains_mono_zip.path }}" "fonts/ttf/*" -d /usr/local/share/fonts/jetbrains_mono
+  become: yes
+
+- name: Fonts - Microsoft Cascadia Code directory
+  file:
+    path: /usr/local/share/fonts/microsoft_cascadia_code
+    state: directory
+    mode: "0755"
+  become: yes
+
+- name: Fonts - Microsoft Cascadia Code archive
+  tempfile:
+    state: file
+    prefix: CascadiaCode.
+    suffix: .zip
+  register: microsoft_cascadia_code_zip
+
+- name: Fonts - Microsoft Cascadia Code fetch
+  get_url:
+    url: https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip
+    dest: "{{ microsoft_cascadia_code_zip.path }}"
+    force: true
+
+- name: Fonts - Microsoft Cascadia Code installation
+  command: unzip -j "{{ microsoft_cascadia_code_zip.path }}" "otf/static/*" -d /usr/local/share/fonts/microsoft_cascadia_code
+  become: yes
+
+- name: Fonts - Reload
+  command: fc-cache -f -v
+  become: yes
