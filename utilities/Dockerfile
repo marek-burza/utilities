@@ -30,7 +30,8 @@ RUN apt-get -yq update && \
     ripgrep \
     software-properties-common \
     unzip \
-    zlib1g-dev
+    zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
 # build-essential - N/A
 # cmake - lightgbm (older, non-wheel version)
 # curl - N/A
@@ -57,6 +58,10 @@ RUN apt-get -yq update && \
 # unzip - N/A
 # zlib - Pillow (older, non-wheel version)
 
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | /bin/bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/pdf_*.py
 
@@ -67,6 +72,11 @@ RUN userdel -r ubuntu 2> /dev/null || true
 RUN useradd -m -s /bin/bash -u 1000 $USER && \
     chown -R $USER:$USER $HOME
 USER $USER
+
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+RUN npm config set prefix "$HOME/.npm-global"
+ENV PATH="$PATH:$HOME/.npm-global/bin"
+RUN npm install -g @google/gemini-cli
 
 RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://astral.sh/uv/install.sh | /bin/sh) && \
