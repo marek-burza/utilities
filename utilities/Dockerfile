@@ -1,8 +1,5 @@
-# Sync with NVIDIA Driver & CUDA versions (`nvidia-smi`)
+# Sync NVIDIA Driver & CUDA versions (`nvidia-smi`)
 FROM nvidia/cuda:13.1.1-runtime-ubuntu24.04
-
-# 1. NVIDIA CUDA Installation Guide for Linux (Ubuntu): https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#ubuntu
-# 2. Installing the NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt
 
 ENV DEBIAN_FRONTEND=noninteractive
 
