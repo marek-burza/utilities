@@ -18,3 +18,4 @@
     - role: autokey
     - role: git
     - role: fonts
+    - role: sounds
