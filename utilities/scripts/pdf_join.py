@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env -S uv run --script --quiet
 
 import os
 import sys
