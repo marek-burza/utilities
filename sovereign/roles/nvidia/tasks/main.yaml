@@ -49,8 +49,8 @@
 - name: NVIDIA - CUDA Toolkit
   apt:
     pkg:
+      - cuda-drivers  # TODO: Transition to nvidia-open
       - cuda-toolkit
-      - cuda-drivers
     state: latest
     update_cache: yes
 
