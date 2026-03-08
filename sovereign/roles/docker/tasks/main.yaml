@@ -1,4 +1,5 @@
 ---
+# TODO: Switch to podman - https://podman-desktop.io/docs/podman/gpu
 - name: Docker - Prerequisites
   apt:
     pkg:
