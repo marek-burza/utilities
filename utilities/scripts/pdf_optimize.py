@@ -12,7 +12,7 @@ if __name__ == '__main__':
     original_pdf_file = pdf_file.parent / f'{pdf_file.stem}.original{pdf_file.suffix}'
     optimized_pdf_file = pdf_file.parent / f'{pdf_file.stem}.optimized{pdf_file.suffix}'
     pdf_file.rename(original_pdf_file)
-    os.system(f'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dDownsampleColorImages=true -dDownsampleGrayImages=true -dDownsampleMonoImages=true -dColorImageResolution=150 -dGrayImageResolution=150 -dMonoImageResolution=150 -dGrayImageDownsampleType=/Bicubic -dMonoImageDownsampleType=/Bicubic -dColorImageDownsampleType=/Bicubic -dCompressPages=true -dNOPAUSE -dQUIET -dBATCH -sOutputFile={optimized_pdf_file} {original_pdf_file}')
+    os.system(f'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dDownsampleColorImages=true -dDownsampleGrayImages=true -dDownsampleMonoImages=true -dColorImageResolution=200 -dGrayImageResolution=200 -dMonoImageResolution=200 -dGrayImageDownsampleType=/Bicubic -dMonoImageDownsampleType=/Bicubic -dColorImageDownsampleType=/Bicubic -dCompressPages=true -dNOPAUSE -dQUIET -dBATCH -sOutputFile={optimized_pdf_file} {original_pdf_file}')
     original_size = original_pdf_file.stat().st_size
     optimized_size = optimized_pdf_file.stat().st_size
     if optimized_size < original_size:
