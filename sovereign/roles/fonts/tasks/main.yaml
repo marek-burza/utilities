@@ -20,7 +20,7 @@
     force: true
 
 - name: Fonts - JetBrains Mono installation
-  command: unzip -j "{{ jetbrains_mono_zip.path }}" "fonts/ttf/*" -d /usr/local/share/fonts/jetbrains_mono
+  command: unzip -f -j "{{ jetbrains_mono_zip.path }}" "fonts/ttf/*" -d /usr/local/share/fonts/jetbrains_mono
   become: yes
 
 - name: Fonts - Microsoft Cascadia Code directory
@@ -44,7 +44,7 @@
     force: true
 
 - name: Fonts - Microsoft Cascadia Code installation
-  command: unzip -j "{{ microsoft_cascadia_code_zip.path }}" "otf/static/*" -d /usr/local/share/fonts/microsoft_cascadia_code
+  command: unzip -f -j "{{ microsoft_cascadia_code_zip.path }}" "otf/static/*" -d /usr/local/share/fonts/microsoft_cascadia_code
   become: yes
 
 - name: Fonts - Reload
