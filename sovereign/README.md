@@ -4,7 +4,7 @@
 
 This is a set of Ansible scripts to automate:
 
-- Installation of Podman on Debian/Ubuntu.
+- Installation of Podman
 - Restrictive `ufw` firewall configuration. Based on instructions [here](https://www.digitalocean.com/community/tutorials/how-to-setup-a-firewall-with-ufw-on-an-ubuntu-and-debian-cloud-server).
 - Installation of NVIDIA GPU support. Based on instructions for installing the [drivers](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/index.html) and [container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt).
 - Removal of insecure CUPS

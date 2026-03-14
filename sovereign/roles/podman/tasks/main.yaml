@@ -5,3 +5,9 @@
       - podman
     state: latest
     update_cache: yes
+
+- name: Podman - Docker Hub
+  lineinfile:
+    path: /etc/containers/registries.conf
+    line: 'unqualified-search-registries = ["docker.io"]'
+    state: present
