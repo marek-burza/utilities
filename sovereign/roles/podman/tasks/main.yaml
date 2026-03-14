@@ -1,0 +1,7 @@
+---
+- name: Podman - Installation
+  apt:
+    pkg:
+      - podman
+    state: latest
+    update_cache: yes

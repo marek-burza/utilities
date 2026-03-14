@@ -7,7 +7,8 @@
   apt:
     pkg:
       - build-essential
-      - gnupg
+      - ca-certificates
+      - gnupg2
       - linux-headers-{{ uname_kernel_version_output.stdout }}
     state: latest
     update_cache: yes
@@ -16,43 +17,52 @@
   command: uname -m
   register: uname_architecture_output
 
+- name: NVIDIA - Distribution
+  command: /bin/sh -c '. /etc/os-release && echo $ID | tr -d .'
+  register: os_distribution_output
+
 - name: NVIDIA - Release
   command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
   register: os_release_output
 
-- name: NVIDIA - CUDA Toolkit GPG Temporary
+- name: NVIDIA - Contrib
+  command: add-apt-repository contrib
+  when: os_distribution_output.stdout == 'debian'
+
+- name: NVIDIA - CUDA Key Ring Temporary
   tempfile:
     state: file
-    prefix: cuda-toolkit.
-    suffix: .pub
-  register: cuda_toolkit_pub
+    prefix: cuda-keyring.
+    suffix: .deb
+  register: cuda_keyring_deb
 
-- name: NVIDIA - CUDA Toolkit GPG
+- name: NVIDIA - CUDA Key Ring Download
   get_url:
-    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/3bf863cc.pub
-    dest: "{{ cuda_toolkit_pub.path }}"
+    url: https://developer.download.nvidia.com/compute/cuda/repos/{{ os_distribution_output.stdout }}{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/cuda-keyring_1.1-1_all.deb
+    dest: "{{ cuda_keyring_deb.path }}"
     force: true
 
-- name: NVIDIA - CUDA Toolkit GPG Dearmor
-  command: "gpg -o /usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg --batch --yes --dearmor {{ cuda_toolkit_pub.path }}"
+- name: NVIDIA - CUDA Key Ring Install
+  apt:
+    deb: "{{ cuda_keyring_deb.path }}"
 
-- name: NVIDIA - CUDA Toolkit Repository
-  apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/nvidia-cuda-toolkit-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }} /
-    state: present
-
-- name: NVIDIA - CUDA Toolkit Upgrade
+- name: NVIDIA - CUDA Key Ring Update
   apt:
     update_cache: yes
     upgrade: full
 
-- name: NVIDIA - CUDA Toolkit
+- name: NVIDIA - CUDA Driver
   apt:
     pkg:
       - nvidia-open
-      - cuda-toolkit
     state: latest
     update_cache: yes
+
+- name: NVIDIA - CUDA Driver Check
+  command: nvidia-smi
+  register: nvidia_smi_check
+  failed_when: false
+  changed_when: false
 
 - name: NVIDIA - Container Toolkit GPG Temporary
   tempfile:
@@ -84,14 +94,21 @@
   apt:
     pkg:
       - nvidia-container-toolkit
+      - nvidia-container-toolkit-base
+      - libnvidia-container-tools
+      - libnvidia-container1
     state: latest
     update_cache: yes
 
-- name: NVIDIA - Docker
-  command: nvidia-ctk runtime configure --runtime=docker
+- name: NVIDIA - Container Toolkit Podman Note
+  debug:
+    msg: "Re-run provisioning after a reboot to configure NVIDIA Container Toolkit with Podman"
+  when: nvidia_smi_check.rc != 0
 
-- name: NVIDIA - Reload
-  systemd: name=docker state=reloaded
+- name: NVIDIA - Container Toolkit Podman
+  command: nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+  when: nvidia_smi_check.rc == 0
+
 # - NVIDIA CUDA Installation Guide for Linux: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
 # - Installing the NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
 # - See also: https://linuxcapable.com/how-to-install-cuda-on-ubuntu-linux/
