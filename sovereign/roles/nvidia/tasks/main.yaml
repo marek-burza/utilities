@@ -25,36 +25,14 @@
   command: /bin/sh -c '. /etc/os-release && echo $VERSION_ID | tr -d .'
   register: os_release_output
 
-- name: NVIDIA - Contrib
-  command: add-apt-repository contrib
-  when: os_distribution_output.stdout == 'debian'
-
-- name: NVIDIA - CUDA Key Ring Temporary
-  tempfile:
-    state: file
-    prefix: cuda-keyring.
-    suffix: .deb
-  register: cuda_keyring_deb
-
-- name: NVIDIA - CUDA Key Ring Download
-  get_url:
-    url: https://developer.download.nvidia.com/compute/cuda/repos/{{ os_distribution_output.stdout }}{{ os_release_output.stdout }}/{{ uname_architecture_output.stdout }}/cuda-keyring_1.1-1_all.deb
-    dest: "{{ cuda_keyring_deb.path }}"
-    force: true
-
-- name: NVIDIA - CUDA Key Ring Install
-  apt:
-    deb: "{{ cuda_keyring_deb.path }}"
-
-- name: NVIDIA - CUDA Key Ring Update
-  apt:
-    update_cache: yes
-    upgrade: full
+- name: NVIDIA - Driver Version
+  command: /bin/sh -c "apt list nvidia-driver* 2> /dev/null | grep -oP 'nvidia-driver-\\K\\d+' | sort | tail -1"
+  register: nvidia_driver_version
 
 - name: NVIDIA - CUDA Driver
   apt:
     pkg:
-      - nvidia-open
+      - nvidia-driver-{{ nvidia_driver_version.stdout }}-open
     state: latest
     update_cache: yes
 
