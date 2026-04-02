@@ -16,6 +16,7 @@
 
 import dataclasses
 import enum
+import logging
 import queue
 import threading
 import subprocess
@@ -26,10 +27,14 @@ import numpy as np
 import torch
 import typer
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from transformers.utils import logging as transformers_logging
 
 
 warnings.filterwarnings('ignore', message='A custom logits processor of type')
 warnings.filterwarnings('ignore', message='You seem to be using the pipelines sequentially on GPU')
+warnings.filterwarnings('ignore', message='You are sending unauthenticated requests')
+transformers_logging.set_verbosity_error()
+logging.getLogger('huggingface_hub').setLevel(logging.ERROR)
 
 
 SAMPLE_RATE = 16000
