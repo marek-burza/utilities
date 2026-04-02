@@ -4,6 +4,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "accelerate",
+#     "librosa",
 #     "numpy",
 #     "torch",
 #     "transformers",
@@ -17,6 +18,7 @@
 import dataclasses
 import enum
 import logging
+import os
 import queue
 import threading
 import subprocess
@@ -180,6 +182,11 @@ def main(
         '--chunk-seconds',
         help='Seconds of audio to accumulate before each transcription pass.',
     ),
+    model_id: str = typer.Option(
+        'openai/whisper-large-v3',
+        '--model', '-m',
+        help='HuggingFace model ID for transcription, e.g. CohereLabs/cohere-transcribe-03-2026.',
+    ),
 ) -> None:
     sources = pulse_sources()
     if list_devices:
@@ -189,7 +196,6 @@ def main(
     print('Loading model...')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-    model_id = 'openai/whisper-large-v3'
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
         model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
     )
@@ -204,10 +210,11 @@ def main(
         device=device,
         batch_size=1,
     )
-    pipe.model.generation_config.language = 'en'
-    pipe.model.generation_config.task = 'transcribe'
-    pipe.model.generation_config.no_repeat_ngram_size = 3
-    pipe.model.generation_config.forced_decoder_ids = None
+    if 'whisper' in model_id.lower():
+        pipe.model.generation_config.language = 'en'
+        pipe.model.generation_config.task = 'transcribe'
+        pipe.model.generation_config.no_repeat_ngram_size = 3
+        pipe.model.generation_config.forced_decoder_ids = None
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
