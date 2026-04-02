@@ -185,7 +185,7 @@ def main(
     model_id: str = typer.Option(
         'openai/whisper-large-v3',
         '--model', '-m',
-        help='HuggingFace model ID for transcription, e.g. CohereLabs/cohere-transcribe-03-2026.',
+        help='HuggingFace model ID for transcription, e.g. CohereLabs/cohere-transcribe-03-2026. Set HF_TOKEN if necessary.',
     ),
 ) -> None:
     sources = pulse_sources()
