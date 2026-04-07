@@ -49,6 +49,28 @@ class Source(str, enum.Enum):
     BOTH = 'both'
 
 
+class Model(str, enum.Enum):
+    WHISPER = 'whisper'
+    COHERE = 'cohere'
+
+
+MODEL_TO_HUGGINGFACE_ID = {
+    Model.WHISPER: 'openai/whisper-large-v3',
+    Model.COHERE: 'CohereLabs/cohere-transcribe-03-2026',
+}
+
+
+def whisper_initializer(pipe: pipeline) -> None:
+    pipe.model.generation_config.language = 'en'
+    pipe.model.generation_config.task = 'transcribe'
+    pipe.model.generation_config.no_repeat_ngram_size = 3
+    pipe.model.generation_config.forced_decoder_ids = None
+
+
+MODEL_TO_INITIALIZER = {
+    Model.WHISPER: whisper_initializer,
+}
+
 @dataclasses.dataclass
 class Device:
     default: bool
@@ -182,10 +204,10 @@ def main(
         '--chunk-seconds',
         help='Seconds of audio to accumulate before each transcription pass.',
     ),
-    model_id: str = typer.Option(
-        'openai/whisper-large-v3',
+    model: Model = typer.Option(
+        Model.WHISPER,
         '--model', '-m',
-        help='HuggingFace model ID for transcription, e.g. CohereLabs/cohere-transcribe-03-2026. Set HF_TOKEN if necessary.',
+        help='Model used for transcription. Set HF_TOKEN if necessary.',
     ),
 ) -> None:
     sources = pulse_sources()
@@ -196,6 +218,7 @@ def main(
     print('Loading model...')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+    model_id = MODEL_TO_HUGGINGFACE_ID[model]
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
         model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
     )
@@ -210,11 +233,8 @@ def main(
         device=device,
         batch_size=1,
     )
-    if 'whisper' in model_id.lower():
-        pipe.model.generation_config.language = 'en'
-        pipe.model.generation_config.task = 'transcribe'
-        pipe.model.generation_config.no_repeat_ngram_size = 3
-        pipe.model.generation_config.forced_decoder_ids = None
+    if model in MODEL_TO_INITIALIZER:
+        MODEL_TO_INITIALIZER[model](pipe)
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
