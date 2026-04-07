@@ -6,7 +6,10 @@
 #     "accelerate",
 #     "librosa",
 #     "numpy",
+#     "pillow",
+#     "soundfile",
 #     "torch",
+#     "torchvision",
 #     "transformers",
 #     "typer",
 # ]
@@ -20,15 +23,17 @@ import enum
 import logging
 import os
 import queue
+import tempfile
 import threading
 import subprocess
 import sys
 import warnings
 
 import numpy as np
+import soundfile as sf
 import torch
 import typer
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from transformers import AutoModelForCausalLM, AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 from transformers.utils import logging as transformers_logging
 
 
@@ -53,13 +58,42 @@ class Model(str, enum.Enum):
     WHISPER = 'whisper'
     COHERE = 'cohere'
     VOXTRAL = 'voxtral'
+    GEMMA = 'gemma'
 
 
 MODEL_TO_HUGGINGFACE_ID = {
     Model.WHISPER: 'openai/whisper-large-v3',
     Model.COHERE: 'CohereLabs/cohere-transcribe-03-2026',  # https://cohere.com/blog/transcribe
     Model.VOXTRAL: 'mistralai/Voxtral-Mini-3B-2507',
+    Model.GEMMA: 'google/gemma-4-E4B-it',
 }
+
+
+class GemmaPipeline:
+    def __init__(self, model, processor, device):
+        self.model = model
+        self.processor = processor
+        self.device = device
+
+    def __call__(self, audio: np.ndarray) -> dict:
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f:
+            tmp_path = f.name
+        try:
+            sf.write(tmp_path, audio, SAMPLE_RATE)
+            messages = [{'role': 'user', 'content': [
+                {'type': 'audio', 'url': tmp_path},
+                {'type': 'text', 'text': 'Transcribe the audio.'},
+            ]}]
+            inputs = self.processor.apply_chat_template(
+                messages, tokenize=True, return_dict=True,
+                return_tensors='pt', add_generation_prompt=True,
+            ).to(self.device)
+            prompt_len = inputs['input_ids'].shape[1]
+            outputs = self.model.generate(**inputs, max_new_tokens=500, do_sample=False)
+            text = self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
+            return {'text': text}
+        finally:
+            os.unlink(tmp_path)
 
 
 def whisper_initializer(pipe: pipeline) -> None:
@@ -220,23 +254,29 @@ def main(
     print('Loading model...')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-    model_id = MODEL_TO_HUGGINGFACE_ID[model]
-    model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
-    )
-    model.to(device)
+    model_type = model
+    model_id = MODEL_TO_HUGGINGFACE_ID[model_type]
     processor = AutoProcessor.from_pretrained(model_id)
-    pipe = pipeline(
-        'automatic-speech-recognition',
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        dtype=dtype,
-        device=device,
-        batch_size=1,
-    )
-    if model in MODEL_TO_INITIALIZER:
-        MODEL_TO_INITIALIZER[model](pipe)
+    if model_type == Model.GEMMA:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, torch_dtype=dtype, low_cpu_mem_usage=True,
+        ).to(device)
+        pipe = GemmaPipeline(model, processor, device)
+    else:
+        model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
+        pipe = pipeline(
+            'automatic-speech-recognition',
+            model=model,
+            tokenizer=processor.tokenizer,
+            feature_extractor=processor.feature_extractor,
+            dtype=dtype,
+            device=device,
+            batch_size=1,
+        )
+        if model_type in MODEL_TO_INITIALIZER:
+            MODEL_TO_INITIALIZER[model_type](pipe)
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
