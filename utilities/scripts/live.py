@@ -52,11 +52,13 @@ class Source(str, enum.Enum):
 class Model(str, enum.Enum):
     WHISPER = 'whisper'
     COHERE = 'cohere'
+    VOXTRAL = 'voxtral'
 
 
 MODEL_TO_HUGGINGFACE_ID = {
     Model.WHISPER: 'openai/whisper-large-v3',
-    Model.COHERE: 'CohereLabs/cohere-transcribe-03-2026',
+    Model.COHERE: 'CohereLabs/cohere-transcribe-03-2026',  # https://cohere.com/blog/transcribe
+    Model.VOXTRAL: 'mistralai/Voxtral-Mini-3B-2507',
 }
 
 
