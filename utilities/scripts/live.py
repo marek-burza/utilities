@@ -5,6 +5,7 @@
 # dependencies = [
 #     "accelerate",
 #     "librosa",
+#     "mistral-common",
 #     "numpy",
 #     "pillow",
 #     "soundfile",
@@ -69,16 +70,46 @@ MODEL_TO_HUGGINGFACE_ID = {
 }
 
 
-class GemmaPipeline:
-    def __init__(self, model, processor, device):
-        self.model = model
-        self.processor = processor
+class VoxtralPipeline:
+    def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
         self.device = device
+        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
 
     def __call__(self, audio: np.ndarray) -> dict:
         with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f:
             tmp_path = f.name
         try:
+            sf.write(tmp_path, audio, SAMPLE_RATE)
+            messages = [{'role': 'user', 'content': [
+                {'type': 'audio', 'url': tmp_path},
+                {'type': 'text', 'text': 'Transcribe the audio.'},
+            ]}]
+            inputs = self.processor.apply_chat_template(
+                messages, chat_template='', tokenize=True, return_dict=True,
+                return_tensors='pt', add_generation_prompt=True,
+            ).to(self.device)
+        finally:
+            os.unlink(tmp_path)
+        prompt_len = inputs['input_ids'].shape[1]
+        outputs = self.model.generate(**inputs, max_new_tokens=500)
+        text = self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
+        return {'text': text}
+
+
+class GemmaPipeline:
+    def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
+        self.device = device
+        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_id, torch_dtype=dtype, low_cpu_mem_usage=True,
+        ).to(device)
+
+    def __call__(self, audio: np.ndarray) -> str:
+        with tempfile.NamedTemporaryFile(suffix='.wav') as f:
+            tmp_path = f.name
             sf.write(tmp_path, audio, SAMPLE_RATE)
             messages = [{'role': 'user', 'content': [
                 {'type': 'audio', 'url': tmp_path},
@@ -92,8 +123,6 @@ class GemmaPipeline:
             outputs = self.model.generate(**inputs, max_new_tokens=500, do_sample=False)
             text = self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
             return {'text': text}
-        finally:
-            os.unlink(tmp_path)
 
 
 def whisper_initializer(pipe: pipeline) -> None:
@@ -256,27 +285,27 @@ def main(
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     model_type = model
     model_id = MODEL_TO_HUGGINGFACE_ID[model_type]
-    processor = AutoProcessor.from_pretrained(model_id)
-    if model_type == Model.GEMMA:
-        model = AutoModelForCausalLM.from_pretrained(
-            model_id, torch_dtype=dtype, low_cpu_mem_usage=True,
-        ).to(device)
-        pipe = GemmaPipeline(model, processor, device)
-    else:
-        model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
-        ).to(device)
-        pipe = pipeline(
-            'automatic-speech-recognition',
-            model=model,
-            tokenizer=processor.tokenizer,
-            feature_extractor=processor.feature_extractor,
-            dtype=dtype,
-            device=device,
-            batch_size=1,
-        )
-        if model_type in MODEL_TO_INITIALIZER:
-            MODEL_TO_INITIALIZER[model_type](pipe)
+    match model_type:
+        case Model.VOXTRAL:
+            pipe = VoxtralPipeline(model_id, device, dtype)
+        case Model.GEMMA:
+            pipe = GemmaPipeline(model_id, device, dtype)
+        case _:
+            asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
+                model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+            ).to(device)
+            processor = AutoProcessor.from_pretrained(model_id)
+            pipe = pipeline(
+                'automatic-speech-recognition',
+                model=asr_model,
+                tokenizer=processor.tokenizer,
+                feature_extractor=processor.feature_extractor,
+                dtype=dtype,
+                device=device,
+                batch_size=1,
+            )
+            if model_type in MODEL_TO_INITIALIZER:
+                MODEL_TO_INITIALIZER[model_type](pipe)
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
