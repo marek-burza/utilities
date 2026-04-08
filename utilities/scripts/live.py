@@ -34,7 +34,17 @@ import numpy as np
 import soundfile as sf
 import torch
 import typer
-from transformers import AutoModelForCausalLM, AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from transformers import (
+    CohereAsrForConditionalGeneration,
+    CohereAsrProcessor,
+    Gemma4ForConditionalGeneration,
+    Gemma4Processor,
+    VoxtralForConditionalGeneration,
+    VoxtralProcessor,
+    WhisperForConditionalGeneration,
+    WhisperProcessor,
+    pipeline,
+)
 from transformers.utils import logging as transformers_logging
 
 
@@ -72,10 +82,10 @@ MODEL_TO_HUGGINGFACE_ID = {
 
 class WhisperPipeline:
     def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
-        asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        asr_model = WhisperForConditionalGeneration.from_pretrained(
+            model_id, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
         ).to(device)
-        processor = AutoProcessor.from_pretrained(model_id)
+        processor = WhisperProcessor.from_pretrained(model_id)
         self._pipe = pipeline(
             'automatic-speech-recognition',
             model=asr_model,
@@ -96,10 +106,10 @@ class WhisperPipeline:
 
 class CoherePipeline:
     def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
-        asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        asr_model = CohereAsrForConditionalGeneration.from_pretrained(
+            model_id, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
         ).to(device)
-        processor = AutoProcessor.from_pretrained(model_id)
+        processor = CohereAsrProcessor.from_pretrained(model_id)
         self._pipe = pipeline(
             'automatic-speech-recognition',
             model=asr_model,
@@ -117,9 +127,9 @@ class CoherePipeline:
 class VoxtralPipeline:
     def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
         self.device = device
-        self.processor = AutoProcessor.from_pretrained(model_id)
-        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        self.processor = VoxtralProcessor.from_pretrained(model_id)
+        self.model = VoxtralForConditionalGeneration.from_pretrained(
+            model_id, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
         ).to(device)
 
     def __call__(self, audio: np.ndarray) -> dict:
@@ -146,8 +156,8 @@ class VoxtralPipeline:
 class GemmaPipeline:
     def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
         self.device = device
-        self.processor = AutoProcessor.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.processor = Gemma4Processor.from_pretrained(model_id)
+        self.model = Gemma4ForConditionalGeneration.from_pretrained(
             model_id, torch_dtype=dtype, low_cpu_mem_usage=True,
         ).to(device)
 
