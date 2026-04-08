@@ -70,6 +70,50 @@ MODEL_TO_HUGGINGFACE_ID = {
 }
 
 
+class WhisperPipeline:
+    def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
+        asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
+        processor = AutoProcessor.from_pretrained(model_id)
+        self._pipe = pipeline(
+            'automatic-speech-recognition',
+            model=asr_model,
+            tokenizer=processor.tokenizer,
+            feature_extractor=processor.feature_extractor,
+            dtype=dtype,
+            device=device,
+            batch_size=1,
+        )
+        self._pipe.model.generation_config.language = 'en'
+        self._pipe.model.generation_config.task = 'transcribe'
+        self._pipe.model.generation_config.no_repeat_ngram_size = 3
+        self._pipe.model.generation_config.forced_decoder_ids = None
+
+    def __call__(self, audio: np.ndarray) -> dict:
+        return self._pipe(audio)
+
+
+class CoherePipeline:
+    def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
+        asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
+        processor = AutoProcessor.from_pretrained(model_id)
+        self._pipe = pipeline(
+            'automatic-speech-recognition',
+            model=asr_model,
+            tokenizer=processor.tokenizer,
+            feature_extractor=processor.feature_extractor,
+            dtype=dtype,
+            device=device,
+            batch_size=1,
+        )
+
+    def __call__(self, audio: np.ndarray) -> dict:
+        return self._pipe(audio)
+
+
 class VoxtralPipeline:
     def __init__(self, model_id: str, device: str, dtype: torch.dtype) -> None:
         self.device = device
@@ -124,17 +168,6 @@ class GemmaPipeline:
             text = self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
             return {'text': text}
 
-
-def whisper_initializer(pipe: pipeline) -> None:
-    pipe.model.generation_config.language = 'en'
-    pipe.model.generation_config.task = 'transcribe'
-    pipe.model.generation_config.no_repeat_ngram_size = 3
-    pipe.model.generation_config.forced_decoder_ids = None
-
-
-MODEL_TO_INITIALIZER = {
-    Model.WHISPER: whisper_initializer,
-}
 
 @dataclasses.dataclass
 class Device:
@@ -286,26 +319,14 @@ def main(
     model_type = model
     model_id = MODEL_TO_HUGGINGFACE_ID[model_type]
     match model_type:
+        case Model.WHISPER:
+            pipe = WhisperPipeline(model_id, device, dtype)
+        case Model.COHERE:
+            pipe = CoherePipeline(model_id, device, dtype)
         case Model.VOXTRAL:
             pipe = VoxtralPipeline(model_id, device, dtype)
         case Model.GEMMA:
             pipe = GemmaPipeline(model_id, device, dtype)
-        case _:
-            asr_model = AutoModelForSpeechSeq2Seq.from_pretrained(
-                model_id, dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
-            ).to(device)
-            processor = AutoProcessor.from_pretrained(model_id)
-            pipe = pipeline(
-                'automatic-speech-recognition',
-                model=asr_model,
-                tokenizer=processor.tokenizer,
-                feature_extractor=processor.feature_extractor,
-                dtype=dtype,
-                device=device,
-                batch_size=1,
-            )
-            if model_type in MODEL_TO_INITIALIZER:
-                MODEL_TO_INITIALIZER[model_type](pipe)
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
