@@ -8,6 +8,7 @@
 #     "mistral-common",
 #     "numpy",
 #     "pillow",
+#     "pytest",
 #     "soundfile",
 #     "torch",
 #     "torchvision",
@@ -454,7 +455,7 @@ if __name__ == '__main__':
     typer.run(main)
 
 
-# Tests — run with: python -m pytest utilities/scripts/live.py -v
+# Tests — run with: uv run --with pytest --with numpy --with soundfile --with torch --with torchvision --with transformers --with typer --with accelerate --with librosa --with pillow --with mistral-common python -m pytest utilities/scripts/live.py -v
 class TestVadAccumulator:
     _FRAME_SAMPLES = SAMPLE_RATE * 20 // 1000  # 320 samples per 20ms frame
 
