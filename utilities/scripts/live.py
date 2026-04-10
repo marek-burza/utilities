@@ -191,6 +191,64 @@ class Chunk:
     origin: str
     data: np.ndarray
 
+"""
+Energy-envelope Voice Activity Detection (VAD).
+
+Note: A frame is a small fixed-size slice of audio samples — the unit the VAD processes
+one at a time rather than all at once.
+At 16 kHz, 20 ms = 320 samples. Each call to vad.feed() receives exactly that array.
+We are using 20 ms as a default because it is a standard in speech processing because
+it matches the typical time scale of a phoneme - short enough that speech/silence transitions
+are detected quickly, but long enough that the RMS energy measurement is stable
+and not fooled by individual waveform peaks.
+At 10 ms you get noisier energy estimates; at 40 ms you start missing fast transitions.
+"""
+class VadAccumulator:
+    def __init__(
+        self,
+        frame_ms: int = 20,
+        energy_threshold: float = 0.01,
+        min_silence_ms: int = 600,
+        min_speech_ms: int = 300,
+        max_speech_ms: int = 15000,
+    ) -> None:
+        self.frame_samples = SAMPLE_RATE * frame_ms // 1000
+        self._min_silence_frames = min_silence_ms // frame_ms
+        self._min_speech_frames = min_speech_ms // frame_ms
+        self._max_speech_samples = int(max_speech_ms / 1000 * SAMPLE_RATE)
+        self._energy_threshold = energy_threshold
+        self._buffer: list[np.ndarray] = []
+        self._speech_frames = 0
+        self._silence_frames = 0
+        self._in_speech = False
+
+    def feed(self, frame: np.ndarray) -> np.ndarray | None:
+        is_speech = np.sqrt(np.mean(frame ** 2)) >= self._energy_threshold
+        if is_speech:
+            self._buffer.append(frame)
+            self._speech_frames += 1
+            self._silence_frames = 0
+            self._in_speech = True
+            if sum(len(frame) for frame in self._buffer) >= self._max_speech_samples:
+                return self.flush()
+        elif self._in_speech:
+            self._buffer.append(frame)
+            self._silence_frames += 1
+            if self._silence_frames >= self._min_silence_frames:
+                return self.flush()
+        return None
+
+    def flush(self) -> np.ndarray | None:
+        segment: np.ndarray | None = None
+        if self._speech_frames >= self._min_speech_frames:
+            segment = np.concatenate(self._buffer)
+        # Reset buffer
+        self._buffer = []
+        self._speech_frames = 0
+        self._silence_frames = 0
+        self._in_speech = False
+        return segment
+
 
 def pulse_sources() -> list[Device]:
     result = subprocess.run(
@@ -248,21 +306,20 @@ def transcribe_worker(
         chunk = audio.get()
         if chunk is None:
             break
-        if np.sqrt(np.mean(chunk.data ** 2)) >= 0.01:
-            result = pipe(chunk.data)
-            text = result['text'].strip()
-            if text:
-                prefix = f'[{chunk.origin}] ' if multi_source else ''
-                sys.stdout.write(f'{prefix}{text} ')
-                sys.stdout.flush()
+        result = pipe(chunk.data)
+        text = result['text'].strip()
+        if text:
+            prefix = f'[{chunk.origin}] ' if multi_source else ''
+            sys.stdout.write(f'{prefix}{text}\n')
+            sys.stdout.flush()
 
 
 def capture_worker(
     device: str,
-    chunk_seconds: int,
     origin: str,
     audio: queue.Queue[Chunk | None],
     exit: threading.Event,
+    vad: VadAccumulator,
 ) -> None:
     cmd = [
         'ffmpeg', '-loglevel', 'quiet',
@@ -270,17 +327,20 @@ def capture_worker(
         '-f', 's16le', '-ar', str(SAMPLE_RATE), '-ac', '1',
         'pipe:1',
     ]
-    chunk_bytes = SAMPLE_RATE * chunk_seconds * BYTES_PER_SAMPLE
+    frame_bytes = vad.frame_samples * BYTES_PER_SAMPLE
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as process:
         try:
             while not exit.is_set():
-                raw = process.stdout.read(chunk_bytes)
+                raw = process.stdout.read(frame_bytes)
                 if not raw:
                     break
-                if len(raw) < chunk_bytes:
-                    raw += b'\x00' * (chunk_bytes - len(raw))
-                data = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-                audio.put(Chunk(origin.value, data))
+                frame = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+                segment = vad.feed(frame)
+                if segment is not None:
+                    audio.put(Chunk(origin, segment))
+            remainder = vad.flush()
+            if remainder is not None:
+                audio.put(Chunk(origin, remainder))
         finally:
             process.terminate()
             process.wait()
@@ -307,10 +367,15 @@ def main(
         '--speaker-device',
         help='PulseAudio source index for speaker (loopback). Auto-detected if not provided.',
     ),
-    chunk_seconds: int = typer.Option(
-        4,
-        '--chunk-seconds',
-        help='Seconds of audio to accumulate before each transcription pass.',
+    min_silence_ms: int = typer.Option(
+        600,
+        '--min-silence-ms',
+        help='Milliseconds of silence required to end a speech segment.',
+    ),
+    max_speech_ms: int = typer.Option(
+        15000,
+        '--max-speech-ms',
+        help='Maximum milliseconds of speech before forcing a speech segment boundary.',
     ),
     model: Model = typer.Option(
         Model.WHISPER,
@@ -353,17 +418,19 @@ def main(
     capture_threads: list[threading.Thread] = []
     if source in (Source.MICROPHONE, Source.BOTH):
         device = default_microphone_device(sources, microphone_device)
+        vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
             target=capture_worker,
-            args=(device, chunk_seconds, Source.MICROPHONE, audio, exit),
+            args=(device, 'local', audio, exit, vad),
             daemon=True,
         )
         capture_threads.append(capture_thread)
     if source in (Source.SPEAKER, Source.BOTH):
         device = default_speaker_device(sources, speaker_device)
+        vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
             target=capture_worker,
-            args=(device, chunk_seconds, Source.SPEAKER, audio, exit),
+            args=(device, 'remote', audio, exit, vad),
             daemon=True,
         )
         capture_threads.append(capture_thread)
@@ -385,3 +452,86 @@ def main(
 
 if __name__ == '__main__':
     typer.run(main)
+
+
+# Tests — run with: python -m pytest utilities/scripts/live.py -v
+class TestVadAccumulator:
+    _FRAME_SAMPLES = SAMPLE_RATE * 20 // 1000  # 320 samples per 20ms frame
+
+    @staticmethod
+    def _make_speech_frame(energy: float = 0.05) -> np.ndarray:
+        t = np.linspace(0, 20 / 1000, TestVadAccumulator._FRAME_SAMPLES, endpoint=False)
+        return (energy * np.sin(2 * np.pi * 440 * t)).astype(np.float32)
+
+    @staticmethod
+    def _make_silent_frame() -> np.ndarray:
+        return np.zeros(TestVadAccumulator._FRAME_SAMPLES, dtype=np.float32)
+
+    def test_silence_only_emits_nothing(self):
+        vad = VadAccumulator()
+        for _ in range(200):
+            assert vad.feed(TestVadAccumulator._make_silent_frame()) is None
+        assert vad.flush() is None
+
+    def test_speech_then_silence_emits_segment(self):
+        vad = VadAccumulator(min_silence_ms=600, min_speech_ms=300)
+        for _ in range(25):  # 500ms speech
+            result = vad.feed(TestVadAccumulator._make_speech_frame())
+            assert result is None
+        segment = None
+        for _ in range(35):  # 700ms silence
+            result = vad.feed(TestVadAccumulator._make_silent_frame())
+            if result is not None:
+                segment = result
+                break
+        assert segment is not None
+        assert len(segment) >= 25 * TestVadAccumulator._FRAME_SAMPLES
+
+    def test_short_speech_below_min_is_discarded(self):
+        vad = VadAccumulator(min_silence_ms=200, min_speech_ms=500)
+        for _ in range(5):  # 100ms speech
+            vad.feed(TestVadAccumulator._make_speech_frame())
+        for _ in range(50):
+            result = vad.feed(TestVadAccumulator._make_silent_frame())
+            assert result is None
+
+    def test_brief_silence_does_not_split(self):
+        vad = VadAccumulator(min_silence_ms=600, min_speech_ms=300)
+        for _ in range(25):
+            vad.feed(TestVadAccumulator._make_speech_frame())
+        for _ in range(10):  # 200ms silence
+            assert vad.feed(TestVadAccumulator._make_silent_frame()) is None
+        for _ in range(25):
+            assert vad.feed(TestVadAccumulator._make_speech_frame()) is None
+        segment = None
+        for _ in range(35):
+            result = vad.feed(TestVadAccumulator._make_silent_frame())
+            if result is not None:
+                segment = result
+                break
+        assert segment is not None
+        assert len(segment) >= 50 * TestVadAccumulator._FRAME_SAMPLES
+
+    def test_max_speech_cap_forces_emit(self):
+        vad = VadAccumulator(max_speech_ms=1000)
+        segment = None
+        for _ in range(75):  # 1.5s continuous speech
+            result = vad.feed(TestVadAccumulator._make_speech_frame())
+            if result is not None:
+                segment = result
+                break
+        assert segment is not None
+        expected = int(1.0 * SAMPLE_RATE)
+        assert abs(len(segment) - expected) < TestVadAccumulator._FRAME_SAMPLES * 2
+
+    def test_flush_returns_accumulated_speech(self):
+        vad = VadAccumulator(min_speech_ms=300)
+        for _ in range(25):
+            vad.feed(TestVadAccumulator._make_speech_frame())
+        segment = vad.flush()
+        assert segment is not None
+        assert len(segment) == 25 * TestVadAccumulator._FRAME_SAMPLES
+
+    def test_flush_on_empty_returns_none(self):
+        vad = VadAccumulator()
+        assert vad.flush() is None
