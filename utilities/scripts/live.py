@@ -3,6 +3,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
+#     "anthropic",
 #     "accelerate",
 #     "librosa",
 #     "mistral-common",
@@ -20,21 +21,26 @@
 # Captures audio via ffmpeg using PulseAudio sources.
 # Run with --list-devices to find available source names.
 
+import base64
 import dataclasses
 import enum
 import logging
 import os
 import queue
-import tempfile
-import threading
 import subprocess
 import sys
+import tempfile
+import threading
+import time
 import warnings
+from io import BytesIO
 
+import anthropic
 import numpy as np
 import soundfile as sf
 import torch
 import typer
+from PIL import ImageGrab
 from transformers import (
     CohereAsrForConditionalGeneration,
     CohereAsrProcessor,
@@ -347,6 +353,54 @@ def capture_worker(
             process.wait()
 
 
+PROMPT_OCR = """
+Describe what is on this screen. Extract any visible text,"
+summarize diagrams or plots, capture assignments/tasks/questions verbatim,
+and take a separate note of any partial solutions."
+"""
+
+def capture_screen_contents():
+    agent = anthropic.Anthropic(
+        base_url='http://localhost:11434',  # host.docker.internal
+        api_key='ollama',
+    )
+    while True:
+        try:
+            screenshot = ImageGrab.grab()
+            buffer = BytesIO()
+            screenshot.save(buffer, format='PNG')
+            png_base64 = base64.b64encode(buffer.getvalue()).decode()
+            message = agent.messages.create(
+                # model='mistral-small3.1:24b',
+                # model='gemma4:26b',
+                model='gemma3:12b',
+                max_tokens=4096,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'image',
+                                'source': {
+                                    'type': 'base64',
+                                    'media_type': 'image/png',
+                                    'data': png_base64,
+                                },
+                            },
+                            {'type': 'text', 'text': PROMPT_OCR},
+                        ],
+                    }
+                ],
+            )
+            text = next(
+                block.text for block in message.content if block.type == 'text'
+            )
+            print(f"\n[{time.strftime('%H:%M:%S')}] {text}")
+        except Exception as e:
+            print(f"\n[{time.strftime('%H:%M:%S')}] Error: {e}")
+        # time.sleep(2)
+
+
 def main(
     list_devices: bool = typer.Option(
         False,
@@ -435,6 +489,12 @@ def main(
             daemon=True,
         )
         capture_threads.append(capture_thread)
+    # if source in (Source.SCREEN, Source.ALL):
+    #     capture_thread = threading.Thread(
+    #         target=capture_screen_contents,
+    #         daemon=True,
+    #     )
+    #     capture_threads.append(capture_thread)
     for capture_thread in capture_threads:
         capture_thread.start()
 
