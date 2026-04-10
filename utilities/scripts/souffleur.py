@@ -257,16 +257,15 @@ class VadAccumulator:
         return segment
 
 
-def pulse_sources() -> list[Device]:
+def pulse_devices(flag: str) -> list[Device]:
     result = subprocess.run(
-        ['ffmpeg', '-sources', 'pulse'],
+        ['ffmpeg', flag, 'pulse'],
         capture_output=True,
         text=True,
     )
-    lines = result.stdout.splitlines()
-    sources = []
+    devices = []
     listing = False
-    for line in lines:
+    for line in result.stdout.splitlines():
         if line.startswith('Auto-detected'):
             listing = True
             continue
@@ -275,8 +274,16 @@ def pulse_sources() -> list[Device]:
             line = line[2:]
             device = line[:line.index(' ')]
             name = line[line.index('[') + 1 : line.index(']')]
-            sources.append(Device(default, device, name))
-    return sources
+            devices.append(Device(default, device, name))
+    return devices
+
+
+def pulse_sources() -> list[Device]:
+    return pulse_devices('-sources')
+
+
+def pulse_sinks() -> list[Device]:
+    return pulse_devices('-sinks')
 
 
 def default_microphone_device(sources: list[Device], override: int | None) -> str:
@@ -295,7 +302,8 @@ def default_speaker_device(sources: list[Device], override: int | None) -> str:
     try:
         if override:
             return sources[override].device
-        return [source.device for source in sources if source.device.endswith('.monitor')][0]
+        default = [sink for sink in pulse_sinks() if sink.default][0].device + '.monitor'
+        return [s.device for s in sources if s.device == default][0]
     except:
         raise RuntimeError(
             'No monitor source found. Specify one with --speaker-device.\n'
