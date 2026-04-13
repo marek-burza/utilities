@@ -27,3 +27,24 @@
 - When properly sandboxed use [auto mode](https://claude.com/blog/auto-mode) to reduce interruptions: `claude --enable-auto-mode`
 - Use GitHub Copilot with Claude to be [charged per request rather than per token](https://stevehanov.ca/blog/how-i-run-multiple-10k-mrr-companies-on-a-20month-tech-stack) (and then use detailed prompts)
 - If hosted models are an option, you can use e.g. [MiniMax M2.7 to get most of performance for a fraction of the cost](https://blog.kilo.ai/p/we-tested-minimax-m27-against-claude)
+
+## [Claude Code Cheat Sheet](https://cc.storyfox.cz/)
+
+Mode switching:
+
+- `Shift+Tab` Cycle permission modes
+- `Alt+P` Switch model
+- `Alt+T` Toggle thinking
+- `Alt+O` Toggle fast mode
+
+Session:
+
+- `/compact [focus]` Compact context
+- `/branch [name]` Branch conversation
+- `/copy [N]` Copy last (or Nth) response
+
+Tools:
+
+- `/memory` Edit CLAUDE.md files, toggle auto memory, view entries
+- `/agents` Manage agent configurations
+- `/add-dir <path>` Add working directory
