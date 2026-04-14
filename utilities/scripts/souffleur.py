@@ -69,7 +69,8 @@ BYTES_PER_SAMPLE = 2  # int16 / s16le
 class Source(str, enum.Enum):
     MICROPHONE = 'microphone'
     SPEAKER = 'speaker'
-    BOTH = 'both'
+    SCREEN = 'screen'
+    ALL = 'all'
 
 
 class Model(str, enum.Enum):
@@ -198,6 +199,23 @@ class Chunk:
     origin: str
     data: np.ndarray
 
+
+@dataclasses.dataclass
+class SessionState:
+    transcript: str = ''
+    screen_contents: str = ''
+    lock: threading.Lock = dataclasses.field(
+        default_factory=threading.Lock, init=False, repr=False, compare=False
+    )
+
+    def add_transcript(self, text: str) -> None:
+        with self.lock:
+            self.transcript += text + '\n'
+
+    def update_screen(self, contents: str) -> None:
+        with self.lock:
+            self.screen_contents = contents
+
 """
 Energy-envelope Voice Activity Detection (VAD).
 
@@ -316,6 +334,7 @@ def transcribe_worker(
     multi_source: bool,
     audio: queue.Queue[Chunk | None],
     exit: threading.Event,
+    state: SessionState,
 ) -> None:
     while not exit.is_set():
         chunk = audio.get()
@@ -325,8 +344,7 @@ def transcribe_worker(
         text = result['text'].strip()
         if text:
             prefix = f'[{chunk.origin}] ' if multi_source else ''
-            sys.stdout.write(f'{prefix}{text}\n')
-            sys.stdout.flush()
+            state.add_transcript(f'{prefix}{text}')
 
 
 def capture_worker(
@@ -367,12 +385,12 @@ summarize diagrams or plots, capture assignments/tasks/questions verbatim,
 and take a separate note of any partial solutions."
 """
 
-def capture_screen_contents():
+def capture_screen_contents(state: SessionState, exit: threading.Event) -> None:
     agent = anthropic.Anthropic(
         base_url='http://localhost:11434',  # host.docker.internal
         api_key='ollama',
     )
-    while True:
+    while not exit.is_set():
         try:
             screenshot = ImageGrab.grab()
             buffer = BytesIO()
@@ -403,9 +421,9 @@ def capture_screen_contents():
             text = next(
                 block.text for block in message.content if block.type == 'text'
             )
-            print(f"\n[{time.strftime('%H:%M:%S')}] {text}")
+            state.update_screen(text)
         except Exception as e:
-            print(f"\n[{time.strftime('%H:%M:%S')}] Error: {e}")
+            print(f'Error: {e}')
         # time.sleep(2)
 
 
@@ -416,9 +434,9 @@ def main(
         help='List available PulseAudio sources and exit.',
     ),
     source: Source = typer.Option(
-        Source.BOTH,
+        Source.ALL,
         '--source', '-s',
-        help='Audio source to transcribe: mic, speaker (loopback), or both.',
+        help='Audio source to transcribe: mic, speaker (loopback), screen or all.',
     ),
     microphone_device: int | None = typer.Option(
         None,
@@ -468,18 +486,19 @@ def main(
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
-    multi_source = source == Source.BOTH
+    multi_source = source == Source.ALL
     exit = threading.Event()
+    state = SessionState()
 
     transcriber = threading.Thread(
         target=transcribe_worker,
-        args=(pipe, multi_source, audio, exit),
+        args=(pipe, multi_source, audio, exit, state),
         daemon=True,
     )
     transcriber.start()
 
     capture_threads: list[threading.Thread] = []
-    if source in (Source.MICROPHONE, Source.BOTH):
+    if source in (Source.MICROPHONE, Source.ALL):
         device = default_microphone_device(sources, microphone_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
@@ -488,7 +507,7 @@ def main(
             daemon=True,
         )
         capture_threads.append(capture_thread)
-    if source in (Source.SPEAKER, Source.BOTH):
+    if source in (Source.SPEAKER, Source.ALL):
         device = default_speaker_device(sources, speaker_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
@@ -497,12 +516,13 @@ def main(
             daemon=True,
         )
         capture_threads.append(capture_thread)
-    # if source in (Source.SCREEN, Source.ALL):
-    #     capture_thread = threading.Thread(
-    #         target=capture_screen_contents,
-    #         daemon=True,
-    #     )
-    #     capture_threads.append(capture_thread)
+    if source in (Source.SCREEN, Source.ALL):
+        capture_thread = threading.Thread(
+            target=capture_screen_contents,
+            args=(state, exit),
+            daemon=True,
+        )
+        capture_threads.append(capture_thread)
     for capture_thread in capture_threads:
         capture_thread.start()
 
