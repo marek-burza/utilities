@@ -205,6 +205,7 @@ class SessionState:
     transcript: str = ''
     screen_contents: str = ''
     assignment: str = ''
+    solution: str = ''
     lock: threading.Lock = dataclasses.field(
         default_factory=threading.Lock, init=False, repr=False, compare=False
     )
@@ -220,6 +221,10 @@ class SessionState:
     def update_assignment(self, text: str) -> None:
         with self.lock:
             self.assignment = text
+
+    def update_solution(self, text: str) -> None:
+        with self.lock:
+            self.solution = text
 
     def snapshot(self) -> tuple[str, str, str]:
         with self.lock:
@@ -437,6 +442,21 @@ def capture_screen_contents(
         time.sleep(interval)
 
 
+PROMPT_SOLUTION = """
+Solve the following assignment concisely.
+
+<assignment>
+{assignment}
+</assignment>
+
+Structure your response as:
+
+TL;DR: <one or two sentences summarising the answer>
+
+<detailed answer — correct and complete, but no padding or repetition>
+"""
+
+
 PROMPT_ASSIGNMENT = """
 You are monitoring a live transcript and screen capture for a student.
 Your job is to identify the most recent task or question being worked on
@@ -490,7 +510,6 @@ def assignment_worker(
         try:
             message = local_agent.messages.create(
                 model='gemma4:26b',
-                max_tokens=2048,
                 max_tokens=4096,
                 messages=[
                     {
@@ -513,8 +532,24 @@ def assignment_worker(
             ).strip()
             if text != 'NO_CHANGE':
                 state.update_assignment(text)
+                solution_message = remote_agent.messages.create(
+                    model='claude-sonnet-4-5',
+                    max_tokens=2048,
+                    messages=[
+                        {
+                            'role': 'user',
+                            'content': PROMPT_SOLUTION.format(assignment=text),
+                        }
+                    ],
+                )
+                solution = next(
+                    block.text for block in solution_message.content if block.type == 'text'
+                ).strip()
+                state.update_solution(solution)
                 print('\n===\n')
                 print(state.assignment)
+                print('\n---\n')
+                print(state.solution)
                 print('\n---\n')
         except Exception as e:
             print(f'Assignment worker error: {e}')
