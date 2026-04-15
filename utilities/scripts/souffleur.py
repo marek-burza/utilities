@@ -28,7 +28,6 @@ import logging
 import os
 import queue
 import subprocess
-import sys
 import tempfile
 import threading
 import time
@@ -69,6 +68,7 @@ BYTES_PER_SAMPLE = 2  # int16 / s16le
 class Source(str, enum.Enum):
     MICROPHONE = 'microphone'
     SPEAKER = 'speaker'
+    AUDIO = 'audio'
     SCREEN = 'screen'
     ALL = 'all'
 
@@ -204,6 +204,7 @@ class Chunk:
 class SessionState:
     transcript: str = ''
     screen_contents: str = ''
+    assignment: str = ''
     lock: threading.Lock = dataclasses.field(
         default_factory=threading.Lock, init=False, repr=False, compare=False
     )
@@ -215,6 +216,14 @@ class SessionState:
     def update_screen(self, contents: str) -> None:
         with self.lock:
             self.screen_contents = contents
+
+    def update_assignment(self, text: str) -> None:
+        with self.lock:
+            self.assignment = text
+
+    def snapshot(self) -> tuple[str, str, str]:
+        with self.lock:
+            return self.transcript, self.screen_contents, self.assignment
 
 """
 Energy-envelope Voice Activity Detection (VAD).
@@ -385,18 +394,19 @@ summarize diagrams or plots, capture assignments/tasks/questions verbatim,
 and take a separate note of any partial solutions."
 """
 
-def capture_screen_contents(state: SessionState, exit: threading.Event) -> None:
-    agent = anthropic.Anthropic(
-        base_url='http://localhost:11434',  # host.docker.internal
-        api_key='ollama',
-    )
+def capture_screen_contents(
+    state: SessionState,
+    exit: threading.Event,
+    local_agent: anthropic.Anthropic,
+    interval: float = 0.0,
+) -> None:
     while not exit.is_set():
         try:
             screenshot = ImageGrab.grab()
             buffer = BytesIO()
             screenshot.save(buffer, format='PNG')
             png_base64 = base64.b64encode(buffer.getvalue()).decode()
-            message = agent.messages.create(
+            message = local_agent.messages.create(
                 # model='mistral-small3.1:24b',
                 # model='gemma4:26b',
                 model='gemma3:12b',
@@ -424,7 +434,91 @@ def capture_screen_contents(state: SessionState, exit: threading.Event) -> None:
             state.update_screen(text)
         except Exception as e:
             print(f'Error: {e}')
-        # time.sleep(2)
+        time.sleep(interval)
+
+
+PROMPT_ASSIGNMENT = """
+You are monitoring a live transcript and screen capture for a student.
+Your job is to identify the most recent task or question being worked on
+and maintain a concise, complete summary of it — the "assignment".
+
+<current_assignment>
+{assignment}
+</current_assignment>
+
+<transcript>
+{transcript}
+</transcript>
+
+<screen_contents>
+{screen_contents}
+</screen_contents>
+
+Compare the transcript and screen contents against the current assignment.
+If the transcript or screen contain additional information, clues, corrections,
+or a new/different task that supersedes the current assignment, respond with
+an updated assignment summary that incorporates all relevant details.
+
+If there is no meaningful new information beyond what the current assignment
+already captures, respond with exactly: NO_CHANGE
+
+Rules:
+- Focus on the MOST RECENT task or question — older completed tasks are irrelevant.
+- The assignment should be a self-contained summary: someone reading only the
+  assignment should understand what needs to be done.
+- Include any constraints, hints, partial answers, or corrections mentioned.
+- Be concise but complete.
+"""
+
+
+def assignment_worker(
+    state: SessionState,
+    exit: threading.Event,
+    local_agent: anthropic.Anthropic,
+    remote_agent: anthropic.Anthropic,
+    interval: float = 1.0,
+) -> None:
+    previous_transcript = ''
+    previous_screen_contents = ''
+    while not exit.is_set():
+        transcript, screen_contents, assignment = state.snapshot()
+        if transcript == previous_transcript and screen_contents == previous_screen_contents:
+            time.sleep(interval)
+            continue
+        previous_transcript = transcript
+        previous_screen_contents = screen_contents
+        try:
+            message = local_agent.messages.create(
+                model='gemma4:26b',
+                max_tokens=2048,
+                max_tokens=4096,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': PROMPT_ASSIGNMENT.format(
+                                    assignment=assignment or '(none yet)',
+                                    transcript=transcript or '(empty)',
+                                    screen_contents=screen_contents or '(empty)',
+                                ),
+                            }
+                        ],
+                    }
+                ],
+            )
+            text = next(
+                block.text for block in message.content if block.type == 'text'
+            ).strip()
+            if text != 'NO_CHANGE':
+                state.update_assignment(text)
+                print('\n===\n')
+                print(state.assignment)
+                print('\n---\n')
+        except Exception as e:
+            print(f'Assignment worker error: {e}')
+
 
 
 def main(
@@ -486,9 +580,14 @@ def main(
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
     audio: queue.Queue[Chunk | None] = queue.Queue()
-    multi_source = source == Source.ALL
+    multi_source = source == Source.ALL or source == Source.AUDIO
     exit = threading.Event()
     state = SessionState()
+    local_agent = anthropic.Anthropic(
+        base_url='http://localhost:11434',  # host.docker.internal
+        api_key='ollama',
+    )
+    remote_agent = anthropic.Anthropic()
 
     transcriber = threading.Thread(
         target=transcribe_worker,
@@ -498,7 +597,7 @@ def main(
     transcriber.start()
 
     capture_threads: list[threading.Thread] = []
-    if source in (Source.MICROPHONE, Source.ALL):
+    if source in [Source.MICROPHONE, Source.AUDIO, Source.ALL]:
         device = default_microphone_device(sources, microphone_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
@@ -507,7 +606,7 @@ def main(
             daemon=True,
         )
         capture_threads.append(capture_thread)
-    if source in (Source.SPEAKER, Source.ALL):
+    if source in [Source.SPEAKER, Source.AUDIO, Source.ALL]:
         device = default_speaker_device(sources, speaker_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
         capture_thread = threading.Thread(
@@ -519,10 +618,16 @@ def main(
     if source in (Source.SCREEN, Source.ALL):
         capture_thread = threading.Thread(
             target=capture_screen_contents,
-            args=(state, exit),
+            args=(state, exit, local_agent),
             daemon=True,
         )
         capture_threads.append(capture_thread)
+    assignment_thread = threading.Thread(
+        target=assignment_worker,
+        args=(state, exit, local_agent, remote_agent),
+        daemon=True,
+    )
+    capture_threads.append(assignment_thread)
     for capture_thread in capture_threads:
         capture_thread.start()
 
