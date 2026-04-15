@@ -522,9 +522,9 @@ def assignment_worker(
                                     transcript=transcript or '(empty)',
                                     screen_contents=screen_contents or '(empty)',
                                 ),
-                            }
+                            },
                         ],
-                    }
+                    },
                 ],
             )
             text = next(
@@ -532,14 +532,21 @@ def assignment_worker(
             ).strip()
             if text != 'NO_CHANGE':
                 state.update_assignment(text)
-                solution_message = remote_agent.messages.create(
-                    model='claude-sonnet-4-5',
+                # solution_message = remote_agent.messages.create(  # Requires ANTHROPIC_API_KEY
+                #     model='claude-sonnet-4-5',
+                solution_message = local_agent.messages.create(
+                    model='gemma4:26b',
                     max_tokens=2048,
                     messages=[
                         {
                             'role': 'user',
-                            'content': PROMPT_SOLUTION.format(assignment=text),
-                        }
+                            'content': [
+                                {
+                                    'type': 'text',
+                                    'text': PROMPT_SOLUTION.format(assignment=text),
+                                },
+                            ],
+                        },
                     ],
                 )
                 solution = next(
