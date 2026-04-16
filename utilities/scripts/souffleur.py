@@ -27,6 +27,7 @@ import enum
 import logging
 import os
 import queue
+import re
 import subprocess
 import tempfile
 import threading
@@ -453,18 +454,17 @@ Structure your response as:
 
 TL;DR: <one or two sentences summarising the answer>
 
-<detailed answer — correct and complete, but no padding or repetition>
+<detailed answer using bullet points — correct and complete, but no padding or repetition;
+prefer bullet points over a block of text>
 """
 
 
 PROMPT_ASSIGNMENT = """
 You are monitoring a live transcript and screen capture for a student.
-Your job is to identify the most recent task or question being worked on
-and maintain a concise, complete summary of it — the "assignment".
+Your job is to identify the most recent question or task — the "assignment".
 
-<current_assignment>
-{assignment}
-</current_assignment>
+Below are the latest transcript and screen contents. Pay closest attention to
+the END of the transcript — that is where the most recent question appears.
 
 <transcript>
 {transcript}
@@ -474,29 +474,44 @@ and maintain a concise, complete summary of it — the "assignment".
 {screen_contents}
 </screen_contents>
 
-Compare the transcript and screen contents against the current assignment.
-If the transcript or screen contain additional information, clues, corrections,
-or a new/different task that supersedes the current assignment, respond with
-an updated assignment summary that incorporates all relevant details.
+For reference, here is the previous assignment (may be empty):
 
-If there is no meaningful new information beyond what the current assignment
-already captures, respond with exactly: NO_CHANGE
+<previous_assignment>
+{assignment}
+</previous_assignment>
 
-Rules:
-- Focus on the MOST RECENT task or question — older completed tasks are irrelevant.
-- The assignment should be a self-contained summary: someone reading only the
-  assignment should understand what needs to be done.
-- Include any constraints, hints, partial answers, or corrections mentioned.
-- Be concise but complete.
+Step 1 — Classify. Decide which case applies:
+  A) A NEW question or task appears in the transcript or screen that is different
+     from the previous assignment. This includes follow-up questions like
+     "what do you mean by X?", "can you explain Y?", "why?" — these are NEW
+     questions even if topically related.
+  B) No new question, but there is new information (constraint, hint, correction)
+     that refines the SAME task in the previous assignment.
+  C) Nothing meaningful has changed.
+
+Step 2 — Respond:
+  Case A: Write a NEW assignment from scratch based ONLY on the new question.
+          Do NOT include, merge, or reference any details from the previous
+          assignment. Pretend the previous assignment does not exist.
+  Case B: Write an updated version of the previous assignment incorporating
+          the new details.
+  Case C: Respond with exactly: NO_CHANGE
+
+Your response must contain ONLY the assignment text (cases A/B) or NO_CHANGE
+(case C). No preamble, no labels, no XML tags, no "Case A:" prefix.
 """
 
 
-def assignment_worker(
+def strip_xml_tags(text: str) -> str:
+    return re.sub(r'</?[a-zA-Z_][a-zA-Z0-9_]*>', '', text).strip()
+
+
+def distiller_worker(
     state: SessionState,
     exit: threading.Event,
     local_agent: anthropic.Anthropic,
-    remote_agent: anthropic.Anthropic,
-    interval: float = 1.0,
+    distill_model: str,
+    interval: float = 0.5,
 ) -> None:
     previous_transcript = ''
     previous_screen_contents = ''
@@ -509,7 +524,7 @@ def assignment_worker(
         previous_screen_contents = screen_contents
         try:
             message = local_agent.messages.create(
-                model='gemma4:26b',
+                model=distill_model,
                 max_tokens=4096,
                 messages=[
                     {
@@ -531,35 +546,52 @@ def assignment_worker(
                 block.text for block in message.content if block.type == 'text'
             ).strip()
             if text != 'NO_CHANGE':
-                state.update_assignment(text)
-                # solution_message = remote_agent.messages.create(  # Requires ANTHROPIC_API_KEY
-                #     model='claude-sonnet-4-5',
-                solution_message = local_agent.messages.create(
-                    model='gemma4:26b',
-                    max_tokens=2048,
-                    messages=[
-                        {
-                            'role': 'user',
-                            'content': [
-                                {
-                                    'type': 'text',
-                                    'text': PROMPT_SOLUTION.format(assignment=text),
-                                },
-                            ],
-                        },
-                    ],
-                )
-                solution = next(
-                    block.text for block in solution_message.content if block.type == 'text'
-                ).strip()
-                state.update_solution(solution)
-                print('\n===\n')
-                print(state.assignment)
-                print('\n---\n')
-                print(state.solution)
-                print('\n---\n')
+                state.update_assignment(strip_xml_tags(text))
         except Exception as e:
-            print(f'Assignment worker error: {e}')
+            print(f'Distiller error: {e}')
+
+
+def solver_worker(
+    state: SessionState,
+    exit: threading.Event,
+    local_agent: anthropic.Anthropic,
+    solve_model: str,
+    interval: float = 0.5,
+) -> None:
+    previous_assignment = ''
+    while not exit.is_set():
+        _, _, assignment = state.snapshot()
+        if assignment == previous_assignment or not assignment:
+            time.sleep(interval)
+            continue
+        previous_assignment = assignment
+        try:
+            solution_message = local_agent.messages.create(
+                model=solve_model,
+                max_tokens=2048,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': PROMPT_SOLUTION.format(assignment=assignment),
+                            },
+                        ],
+                    },
+                ],
+            )
+            text = next(
+                block.text for block in solution_message.content if block.type == 'text'
+            ).strip()
+            state.update_solution(text)
+            print('\n===\n')
+            print(state.assignment)
+            print('\n---\n')
+            print(state.solution)
+            print('\n---\n')
+        except Exception as e:
+            print(f'Solver error: {e}')
 
 
 
@@ -594,10 +626,21 @@ def main(
         '--max-speech-ms',
         help='Maximum milliseconds of speech before forcing a speech segment boundary.',
     ),
-    model: Model = typer.Option(
+    transcribe_model: Model = typer.Option(
         Model.WHISPER,
-        '--model', '-m',
+        '--transcribe-model', '-m',
         help='Model used for transcription. Set HF_TOKEN if necessary.',
+    ),
+    distill_model: str = typer.Option(
+        'qwen3:8b',
+        '--distill-model',
+        help='Ollama model used for assignment distillation (default is qwen3:8b, other good ones are gemma3:4b, phi-4-mini).',
+    ),
+    # Other good candidates: phi-4:14b, gemma3:12b, mistral-small:22b
+    solve_model: str = typer.Option(
+        'qwen3:14b',
+        '--solve-model',
+        help='Ollama model used for solving assignments (default is qwen3:14b, heavier one is gemma4:26b, similarly light are phi-4:14b, gemma3:12b, and mistral-small:22b).',
     ),
 ) -> None:
     sources = pulse_sources()
@@ -608,7 +651,7 @@ def main(
     print('Loading model...')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-    model_type = model
+    model_type = transcribe_model
     model_id = MODEL_TO_HUGGINGFACE_ID[model_type]
     match model_type:
         case Model.WHISPER:
@@ -629,16 +672,14 @@ def main(
         base_url='http://localhost:11434',  # host.docker.internal
         api_key='ollama',
     )
-    remote_agent = anthropic.Anthropic()
 
-    transcriber = threading.Thread(
+    threads: list[threading.Thread] = []
+    transcriber_thread = threading.Thread(
         target=transcribe_worker,
         args=(pipe, multi_source, audio, exit, state),
         daemon=True,
     )
-    transcriber.start()
-
-    capture_threads: list[threading.Thread] = []
+    threads.append(transcriber_thread)
     if source in [Source.MICROPHONE, Source.AUDIO, Source.ALL]:
         device = default_microphone_device(sources, microphone_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
@@ -647,7 +688,7 @@ def main(
             args=(device, 'local', audio, exit, vad),
             daemon=True,
         )
-        capture_threads.append(capture_thread)
+        threads.append(capture_thread)
     if source in [Source.SPEAKER, Source.AUDIO, Source.ALL]:
         device = default_speaker_device(sources, speaker_device)
         vad = VadAccumulator(min_silence_ms=min_silence_ms, max_speech_ms=max_speech_ms)
@@ -656,34 +697,39 @@ def main(
             args=(device, 'remote', audio, exit, vad),
             daemon=True,
         )
-        capture_threads.append(capture_thread)
+        threads.append(capture_thread)
     if source in (Source.SCREEN, Source.ALL):
         capture_thread = threading.Thread(
             target=capture_screen_contents,
             args=(state, exit, local_agent),
             daemon=True,
         )
-        capture_threads.append(capture_thread)
-    assignment_thread = threading.Thread(
-        target=assignment_worker,
-        args=(state, exit, local_agent, remote_agent),
+        threads.append(capture_thread)
+    distiller_thread = threading.Thread(
+        target=distiller_worker,
+        args=(state, exit, local_agent, distill_model),
         daemon=True,
     )
-    capture_threads.append(assignment_thread)
-    for capture_thread in capture_threads:
-        capture_thread.start()
+    threads.append(distiller_thread)
+    solver_thread = threading.Thread(
+        target=solver_worker,
+        args=(state, exit, local_agent, solve_model),
+        daemon=True,
+    )
+    threads.append(solver_thread)
+    for thread in threads:
+        thread.start()
 
     try:
-        for capture_thread in capture_threads:
-            capture_thread.join()
+        for thread in threads:
+            thread.join()
     except KeyboardInterrupt:
         print('\nStopping...')
         exit.set()
-        for capture_thread in capture_threads:
-            capture_thread.join(timeout=1)
+        for thread in threads:
+            thread.join(timeout=1)
     finally:
         audio.put(None)
-        transcriber.join(timeout=1)
 
 
 if __name__ == '__main__':
