@@ -250,7 +250,7 @@ class VadAccumulator:
         self,
         frame_ms: int = 20,
         energy_threshold: float = 0.01,
-        min_silence_ms: int = 600,
+        min_silence_ms: int = 800,
         min_speech_ms: int = 300,
         max_speech_ms: int = 15000,
     ) -> None:
@@ -826,3 +826,10 @@ class TestVadAccumulator:
 
 
 # Frequently used: souffleur.py --distill-model qwen3:8b --solve-model qwen3:8b --source audio
+# Fast alternative (follows: https://www.datacamp.com/de/tutorial/run-bonsai-locally):
+# - curl -fsSL https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b8201-ba7e817/llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz -o llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz
+# - tar -xvzf llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz
+# - cd $(find . -name 'llama-prism-*' -type d)
+# - curl -fsSL https://huggingface.co/prism-ml/Bonsai-8B-gguf/resolve/main/Bonsai-8B.gguf -o Bonsai-8B.gguf
+# - ./llama-server -m Bonsai-8B.gguf -ngl 99 --host 127.0.0.1 --port 11434
+# - souffleur.py --distill-model Bonsai-8B --solve-model Bonsai-8B --source audio
