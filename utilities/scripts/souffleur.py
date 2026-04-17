@@ -404,6 +404,7 @@ def capture_screen_contents(
     state: SessionState,
     exit: threading.Event,
     local_agent: anthropic.Anthropic,
+    ocr_model: str,
     interval: float = 0.0,
 ) -> None:
     while not exit.is_set():
@@ -413,9 +414,7 @@ def capture_screen_contents(
             screenshot.save(buffer, format='PNG')
             png_base64 = base64.b64encode(buffer.getvalue()).decode()
             message = local_agent.messages.create(
-                # model='mistral-small3.1:24b',
-                # model='gemma4:26b',
-                model='gemma3:12b',
+                model=ocr_model,
                 max_tokens=4096,
                 messages=[
                     {
@@ -603,7 +602,7 @@ def main(
     ),
     source: Source = typer.Option(
         Source.ALL,
-        '--source', '-s',
+        '--source',
         help='Audio source to transcribe: mic, speaker (loopback), screen or all.',
     ),
     microphone_device: int | None = typer.Option(
@@ -628,8 +627,13 @@ def main(
     ),
     transcribe_model: Model = typer.Option(
         Model.WHISPER,
-        '--transcribe-model', '-m',
+        '--transcribe-model',
         help='Model used for transcription. Set HF_TOKEN if necessary.',
+    ),
+    ocr_model: str = typer.Option(
+        'gemma3:12b'
+        '--ocr-model',
+        help='Ollama model used for screen OCR (default is gemma3:12b, other good ones are gemma4:26b, mistral-small3.1:24b).',
     ),
     distill_model: str = typer.Option(
         'qwen3:8b',
@@ -701,7 +705,7 @@ def main(
     if source in (Source.SCREEN, Source.ALL):
         capture_thread = threading.Thread(
             target=capture_screen_contents,
-            args=(state, exit, local_agent),
+            args=(state, exit, local_agent, ocr_model),
             daemon=True,
         )
         threads.append(capture_thread)
@@ -817,3 +821,6 @@ class TestVadAccumulator:
     def test_flush_on_empty_returns_none(self):
         vad = VadAccumulator()
         assert vad.flush() is None
+
+
+# Frequently used: souffleur.py --distill-model qwen3:8b --solve-model qwen3:8b --source audio
