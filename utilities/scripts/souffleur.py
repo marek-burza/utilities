@@ -214,6 +214,8 @@ class SessionState:
     def add_transcript(self, text: str) -> None:
         with self.lock:
             self.transcript += text + '\n'
+            with open('transcript.txt', 'w') as handle:
+                handle.write(self.transcript)
 
     def update_screen(self, contents: str) -> None:
         with self.lock:
