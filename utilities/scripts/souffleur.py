@@ -833,3 +833,4 @@ class TestVadAccumulator:
 # - curl -fsSL https://huggingface.co/prism-ml/Bonsai-8B-gguf/resolve/main/Bonsai-8B.gguf -o Bonsai-8B.gguf
 # - ./llama-server -m Bonsai-8B.gguf -ngl 99 --host 127.0.0.1 --port 11434
 # - souffleur.py --distill-model Bonsai-8B --solve-model Bonsai-8B --source audio
+# Slow: qwen3.6:35b-a3b
