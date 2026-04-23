@@ -11,3 +11,10 @@
     path: /etc/containers/registries.conf
     line: 'unqualified-search-registries = ["docker.io"]'
     state: present
+
+- name: Podman - Prune
+  cron:
+    name: podman-prune
+    hour: "0"
+    minute: "0"
+    job: podman system prune -a -f --filter "until=48h" --volumes
