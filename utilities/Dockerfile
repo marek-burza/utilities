@@ -1,5 +1,5 @@
 # Sync NVIDIA Driver & CUDA versions (`nvidia-smi`)
-FROM nvidia/cuda:13.2.0-runtime-ubuntu24.04
+FROM nvidia/cuda:13.2.0-devel-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -65,6 +65,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | /bin/bash - && \
 
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/pdf_*.py
+
+RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp && \
+    cd /tmp/llama.cpp && \
+    cmake -B . . -DLLAMA_CUDA=ON && \
+    cmake --build . --config Release -j$(nproc) && \
+    cmake --install . --config Release && \
+    rm -rf /tmp/llama.cpp
 
 ENV USER=user
 ENV HOME=/home/$USER
