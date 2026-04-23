@@ -25,7 +25,6 @@
 - Skills: consult the [best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) and [examples](https://github.com/anthropics/skills/tree/main/skills)
 - Planning: Instruct to read in depth (provide specific path if known), understand how it works in great detail, and write a plan for X, then iterate on the written plan (review/annotate it and send back to address notes without implementing the plan yet), once the plan is okay ask to add a detailed "to do" list of tasks specific enough so that an agent can implement them without guessing, once that is in place instruct to execute it all while marking tasks as done and not finishing until all steps/phases are completed. Other tips: one may apply is cherry-picking from the plan to separate concerns, removing nice-to-haves from the plan, instructing to protect existing interfaces.
 - When properly sandboxed use [auto mode](https://claude.com/blog/auto-mode) to reduce interruptions: `claude --enable-auto-mode`
-- Use GitHub Copilot with Claude to be [charged per request rather than per token](https://stevehanov.ca/blog/how-i-run-multiple-10k-mrr-companies-on-a-20month-tech-stack) (and then use detailed prompts)
 - If hosted models are an option, you can use e.g. [MiniMax M2.7 to get most of performance for a fraction of the cost](https://blog.kilo.ai/p/we-tested-minimax-m27-against-claude)
 
 ## [Claude Code Cheat Sheet](https://cc.storyfox.cz/)
