@@ -244,6 +244,12 @@ it matches the typical time scale of a phoneme - short enough that speech/silenc
 are detected quickly, but long enough that the RMS energy measurement is stable
 and not fooled by individual waveform peaks.
 At 10 ms you get noisier energy estimates; at 40 ms you start missing fast transitions.
+
+For noisier environments (music, HVAC, keyboard) the RMS threshold false-triggers and
+sends non-speech segments to the ASR model. A drop-in replacement using `silero-vad`
+(~1.8 MB JIT model, sub-ms inference per 32 ms frame) keeps the same feed/flush
+contract (would need to fix the window to 512 samples (Silero's 16 kHz requirement) and replace
+the RMS check with model inference).
 """
 class VadAccumulator:
     def __init__(
