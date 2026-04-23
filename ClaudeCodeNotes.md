@@ -47,3 +47,14 @@ Tools:
 - `/memory` Edit CLAUDE.md files, toggle auto memory, view entries
 - `/agents` Manage agent configurations
 - `/add-dir <path>` Add working directory
+
+Running with local model:
+
+```shell
+llama-server -hf Qwen/Qwen3.6-35B-A3B --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.5 --min-p 0.0 --chat-template-kwargs '{"enable_thinking":true}' --host 127.0.0.1 --port 11434
+CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_BASE_URL=http://localhost:11434 claude --model qwen3.6:35b
+```
+
+Notes:
+
+- Presence penalty is a parameter to control the likelihood of the model repeating tokens it has already generated. A higher presence penalty encourages the model to introduce new topics or ideas. Conversely, a lower or negative value increases the chance of repetition, which can be useful for maintaining focus or coherence.
