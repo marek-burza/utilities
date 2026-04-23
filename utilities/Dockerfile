@@ -93,7 +93,7 @@ RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/b
     (curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | /bin/sh -s -- -y)
 ENV PATH="$PATH:$HOME/.local/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
 # Install an extension of Python debugger & deep inspection of Python objects
-RUN uv pip install --system pdbpp wat
+RUN uv tool install pdbpp wat
 
 ENTRYPOINT [ "/bin/bash" ]
 
