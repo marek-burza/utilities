@@ -42,10 +42,12 @@ import torch
 import typer
 from PIL import ImageGrab
 from transformers import (
+    AutoProcessor,
     CohereAsrForConditionalGeneration,
     CohereAsrProcessor,
     Gemma4ForConditionalGeneration,
     Gemma4Processor,
+    Qwen2VLForConditionalGeneration,
     VoxtralForConditionalGeneration,
     VoxtralProcessor,
     WhisperForConditionalGeneration,
@@ -79,6 +81,11 @@ class Model(str, enum.Enum):
     COHERE = 'cohere'
     VOXTRAL = 'voxtral'
     GEMMA = 'gemma'
+
+
+class OcrMode(str, enum.Enum):
+    GENERIC = 'generic'
+    NANONETS = 'nanonets'
 
 
 MODEL_TO_HUGGINGFACE_ID = {
@@ -186,6 +193,31 @@ class GemmaPipeline:
             outputs = self.model.generate(**inputs, max_new_tokens=500, do_sample=False)
             text = self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
             return {'text': text}
+
+
+PROMPT_OCR_NANONETS = 'Extract all text, preserving code structure and formatting.'
+
+
+class NanonetsPipeline:
+    MODEL_ID = 'nanonets/Nanonets-OCR-s'
+
+    def __init__(self, device: str, dtype: torch.dtype) -> None:
+        self.device = device
+        self.processor = AutoProcessor.from_pretrained(self.MODEL_ID)
+        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+            self.MODEL_ID, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
+
+    def __call__(self, image) -> str:
+        messages = [{'role': 'user', 'content': [
+            {'type': 'image'},
+            {'type': 'text', 'text': PROMPT_OCR_NANONETS},
+        ]}]
+        text = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        inputs = self.processor(text=[text], images=[image], return_tensors='pt').to(self.device)
+        prompt_len = inputs['input_ids'].shape[1]
+        outputs = self.model.generate(**inputs, max_new_tokens=2048)
+        return self.processor.decode(outputs[0][prompt_len:], skip_special_tokens=True)
 
 
 @dataclasses.dataclass
@@ -413,37 +445,48 @@ def capture_screen_contents(
     exit: threading.Event,
     local_agent: anthropic.Anthropic,
     ocr_model: str,
+    ocr_mode: OcrMode,
     interval: float = 0.0,
 ) -> None:
+    nanonets_pipe: NanonetsPipeline | None = None
+    if ocr_mode == OcrMode.NANONETS:
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        print('Loading Nanonets OCR model...')
+        nanonets_pipe = NanonetsPipeline(device, dtype)
+        print('Nanonets OCR model loaded.')
     while not exit.is_set():
         try:
             screenshot = ImageGrab.grab()
-            buffer = BytesIO()
-            screenshot.save(buffer, format='PNG')
-            png_base64 = base64.b64encode(buffer.getvalue()).decode()
-            message = local_agent.messages.create(
-                model=ocr_model,
-                max_tokens=4096,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': [
-                            {
-                                'type': 'image',
-                                'source': {
-                                    'type': 'base64',
-                                    'media_type': 'image/png',
-                                    'data': png_base64,
+            if nanonets_pipe is not None:
+                text = nanonets_pipe(screenshot)
+            else:
+                buffer = BytesIO()
+                screenshot.save(buffer, format='PNG')
+                png_base64 = base64.b64encode(buffer.getvalue()).decode()
+                message = local_agent.messages.create(
+                    model=ocr_model,
+                    max_tokens=4096,
+                    messages=[
+                        {
+                            'role': 'user',
+                            'content': [
+                                {
+                                    'type': 'image',
+                                    'source': {
+                                        'type': 'base64',
+                                        'media_type': 'image/png',
+                                        'data': png_base64,
+                                    },
                                 },
-                            },
-                            {'type': 'text', 'text': PROMPT_OCR},
-                        ],
-                    }
-                ],
-            )
-            text = next(
-                block.text for block in message.content if block.type == 'text'
-            )
+                                {'type': 'text', 'text': PROMPT_OCR},
+                            ],
+                        }
+                    ],
+                )
+                text = next(
+                    block.text for block in message.content if block.type == 'text'
+                )
             state.update_screen(text)
         except Exception as e:
             print(f'Error: {e}')
@@ -638,17 +681,21 @@ def main(
         '--transcribe-model',
         help='Model used for transcription. Set HF_TOKEN if necessary.',
     ),
+    ocr_mode: OcrMode = typer.Option(
+        OcrMode.GENERIC,
+        '--ocr-mode',
+        help='Screen OCR mode: generic (VLM via Ollama) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
+    ),
     ocr_model: str = typer.Option(
-        'gemma3:12b'
+        'qwen2.5-vl:7b',
         '--ocr-model',
-        help='Ollama model used for screen OCR (default is gemma3:12b, other good ones are gemma4:26b, mistral-small3.1:24b).',
+        help='Ollama model used for screen OCR when --ocr-mode=generic (default is qwen2.5-vl:7b, other good ones are gemma4:26b, mistral-small3.1:24b, gemma3:12b).',
     ),
     distill_model: str = typer.Option(
         'qwen3:8b',
         '--distill-model',
         help='Ollama model used for assignment distillation (default is qwen3:8b, other good ones are gemma3:4b, phi-4-mini).',
     ),
-    # Other good candidates: phi-4:14b, gemma3:12b, mistral-small:22b
     solve_model: str = typer.Option(
         'qwen3:14b',
         '--solve-model',
@@ -713,7 +760,7 @@ def main(
     if source in (Source.SCREEN, Source.ALL):
         capture_thread = threading.Thread(
             target=capture_screen_contents,
-            args=(state, exit, local_agent, ocr_model),
+            args=(state, exit, local_agent, ocr_model, ocr_mode),
             daemon=True,
         )
         threads.append(capture_thread)
