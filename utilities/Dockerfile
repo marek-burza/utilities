@@ -20,6 +20,7 @@ RUN apt-get -yq update && \
     libfreetype-dev \
     libhdf5-dev \
     libjpeg-dev \
+    libasound2-plugins \
     libnvidia-compute-595-server \
     libopenblas-dev \
     ncurses-bin \
@@ -47,6 +48,7 @@ RUN apt-get -yq update && \
 # libfreetype-dev - matplotlib (older, non-wheel version)
 # libhdf5-dev - Keras
 # libjpeg-dev - Pillow (older, non-wheel version)
+# libasound2-plugins - Claude Code voice (ALSA → PulseAudio routing)
 # libnvidia-compute-595-server - lightgbm
 # libopenblas-dev - N/A
 # ncurses-bin - Claude Code
@@ -81,6 +83,9 @@ RUN useradd -m -s /bin/bash -u 1000 $USER && \
     chown -R $USER:$USER $HOME && \
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USER
+
+# Route ALSA default device through PulseAudio (Claude Code voice mode)
+RUN echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc
 
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm config set prefix "$HOME/.npm-global"
