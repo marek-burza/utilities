@@ -85,7 +85,7 @@ RUN useradd -m -s /bin/bash -u 1000 $USER && \
 USER $USER
 
 # Route ALSA default device through PulseAudio (Claude Code voice mode)
-RUN echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc
+RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc"
 
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm config set prefix "$HOME/.npm-global"
