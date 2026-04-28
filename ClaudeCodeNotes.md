@@ -51,8 +51,8 @@ Tools:
 Running with local model:
 
 ```shell
-llama-server -hf Qwen/Qwen3.6-35B-A3B --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.5 --min-p 0.0 --chat-template-kwargs '{"enable_thinking":true}' --host 127.0.0.1 --port 11434
-CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_BASE_URL=http://localhost:11434 claude --model qwen3.6:35b
+llama-server -hf unsloth/Qwen3.6-35B-A3B-GGUF --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.5 --min-p 0.0 --reasoning on --host 0.0.0.0 --port 11434 > /tmp/llama.out 2> /tmp/llama.err &
+CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_BASE_URL=http://localhost:11434 claude --model unsloth/Qwen3.6-35B-A3B-GGUF
 ```
 
 Notes:

@@ -3,7 +3,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#     "anthropic",
+#     "langchain-openai",
 #     "accelerate",
 #     "librosa",
 #     "mistral-common",
@@ -35,7 +35,8 @@ import time
 import warnings
 from io import BytesIO
 
-import anthropic
+from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
 import numpy as np
 import soundfile as sf
 import torch
@@ -443,8 +444,7 @@ and take a separate note of any partial solutions."
 def capture_screen_contents(
     state: SessionState,
     exit: threading.Event,
-    local_agent: anthropic.Anthropic,
-    ocr_model: str,
+    client: ChatOpenAI | None,
     ocr_mode: OcrMode,
     interval: float = 0.0,
 ) -> None:
@@ -464,29 +464,11 @@ def capture_screen_contents(
                 buffer = BytesIO()
                 screenshot.save(buffer, format='PNG')
                 png_base64 = base64.b64encode(buffer.getvalue()).decode()
-                message = local_agent.messages.create(
-                    model=ocr_model,
-                    max_tokens=4096,
-                    messages=[
-                        {
-                            'role': 'user',
-                            'content': [
-                                {
-                                    'type': 'image',
-                                    'source': {
-                                        'type': 'base64',
-                                        'media_type': 'image/png',
-                                        'data': png_base64,
-                                    },
-                                },
-                                {'type': 'text', 'text': PROMPT_OCR},
-                            ],
-                        }
-                    ],
-                )
-                text = next(
-                    block.text for block in message.content if block.type == 'text'
-                )
+                response = client.invoke([HumanMessage(content=[
+                    {'type': 'image_url', 'image_url': {'url': f'data:image/png;base64,{png_base64}'}},
+                    {'type': 'text', 'text': PROMPT_OCR},
+                ])])
+                text = response.content
             state.update_screen(text)
         except Exception as e:
             print(f'Error: {e}')
@@ -559,8 +541,7 @@ def strip_xml_tags(text: str) -> str:
 def distiller_worker(
     state: SessionState,
     exit: threading.Event,
-    local_agent: anthropic.Anthropic,
-    distill_model: str,
+    client: ChatOpenAI,
     interval: float = 0.5,
 ) -> None:
     previous_transcript = ''
@@ -573,28 +554,12 @@ def distiller_worker(
         previous_transcript = transcript
         previous_screen_contents = screen_contents
         try:
-            message = local_agent.messages.create(
-                model=distill_model,
-                max_tokens=4096,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': [
-                            {
-                                'type': 'text',
-                                'text': PROMPT_ASSIGNMENT.format(
-                                    assignment=assignment or '(none yet)',
-                                    transcript=transcript or '(empty)',
-                                    screen_contents=screen_contents or '(empty)',
-                                ),
-                            },
-                        ],
-                    },
-                ],
-            )
-            text = next(
-                block.text for block in message.content if block.type == 'text'
-            ).strip()
+            response = client.invoke([HumanMessage(content=PROMPT_ASSIGNMENT.format(
+                assignment=assignment or '(none yet)',
+                transcript=transcript or '(empty)',
+                screen_contents=screen_contents or '(empty)',
+            ))])
+            text = response.content.strip()
             if text != 'NO_CHANGE':
                 state.update_assignment(strip_xml_tags(text))
         except Exception as e:
@@ -604,8 +569,7 @@ def distiller_worker(
 def solver_worker(
     state: SessionState,
     exit: threading.Event,
-    local_agent: anthropic.Anthropic,
-    solve_model: str,
+    client: ChatOpenAI,
     interval: float = 0.5,
 ) -> None:
     previous_assignment = ''
@@ -616,24 +580,8 @@ def solver_worker(
             continue
         previous_assignment = assignment
         try:
-            solution_message = local_agent.messages.create(
-                model=solve_model,
-                max_tokens=2048,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': [
-                            {
-                                'type': 'text',
-                                'text': PROMPT_SOLUTION.format(assignment=assignment),
-                            },
-                        ],
-                    },
-                ],
-            )
-            text = next(
-                block.text for block in solution_message.content if block.type == 'text'
-            ).strip()
+            response = client.invoke([HumanMessage(content=PROMPT_SOLUTION.format(assignment=assignment))])
+            text = response.content.strip()
             state.update_solution(text)
             print('\n===\n')
             print(state.assignment)
@@ -684,7 +632,7 @@ def main(
     ocr_mode: OcrMode = typer.Option(
         OcrMode.GENERIC,
         '--ocr-mode',
-        help='Screen OCR mode: generic (VLM via Ollama) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
+        help='Screen OCR mode: generic (VLM via LangChain/OpenAI-compatible endpoint) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
     ),
     ocr_model: str = typer.Option(
         'qwen2.5-vl:7b',
@@ -727,10 +675,13 @@ def main(
     multi_source = source == Source.ALL or source == Source.AUDIO
     exit = threading.Event()
     state = SessionState()
-    local_agent = anthropic.Anthropic(
-        base_url='http://localhost:11434',  # host.docker.internal
-        api_key='ollama',
+    base_url = 'http://localhost:11434/v1'
+    distill_client = ChatOpenAI(base_url=base_url, api_key='ollama', model=distill_model)
+    solve_client = (
+        distill_client if solve_model == distill_model
+        else ChatOpenAI(base_url=base_url, api_key='ollama', model=solve_model)
     )
+    ocr_client = ChatOpenAI(base_url=base_url, api_key='ollama', model=ocr_model)
 
     threads: list[threading.Thread] = []
     transcriber_thread = threading.Thread(
@@ -760,19 +711,19 @@ def main(
     if source in (Source.SCREEN, Source.ALL):
         capture_thread = threading.Thread(
             target=capture_screen_contents,
-            args=(state, exit, local_agent, ocr_model, ocr_mode),
+            args=(state, exit, ocr_client, ocr_mode),
             daemon=True,
         )
         threads.append(capture_thread)
     distiller_thread = threading.Thread(
         target=distiller_worker,
-        args=(state, exit, local_agent, distill_model),
+        args=(state, exit, distill_client),
         daemon=True,
     )
     threads.append(distiller_thread)
     solver_thread = threading.Thread(
         target=solver_worker,
-        args=(state, exit, local_agent, solve_model),
+        args=(state, exit, solve_client),
         daemon=True,
     )
     threads.append(solver_thread)
@@ -885,5 +836,6 @@ class TestVadAccumulator:
 # - cd $(find . -name 'llama-prism-*' -type d)
 # - curl -fsSL https://huggingface.co/prism-ml/Bonsai-8B-gguf/resolve/main/Bonsai-8B.gguf -o Bonsai-8B.gguf
 # - ./llama-server -m Bonsai-8B.gguf -ngl 99 --host 127.0.0.1 --port 11434
+# - llama-server -hf prism-ml/Bonsai-8B-gguf -ngl 99 --host 127.0.0.1 --port 11434 > /tmp/llama.cpp.out 2> /tmp/llama.cpp.err &
 # - souffleur.py --distill-model Bonsai-8B --solve-model Bonsai-8B --source audio
 # Slow: qwen3.6:35b-a3b
