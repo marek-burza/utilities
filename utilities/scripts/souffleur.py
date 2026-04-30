@@ -196,6 +196,97 @@ class GemmaPipeline:
             return {'text': text}
 
 
+LLAMA_SERVER_BASE_PORT = 8080
+
+# Extra CLI args passed to llama-server per model URI.
+# -fa (flash attention) is required when using KV cache quantization and recommended for all GPU use.
+# --cache-type-k/v q8_0 halves KV VRAM vs fp16 default with negligible quality loss; requires -fa.
+# Qwen3/Gemma4 have thinking/CoT mode ON by default — --reasoning off disables it (no benefit here, wastes tokens).
+# --jinja is now implicit in recent llama.cpp builds; --reasoning off supersedes --chat-template-kwargs enable_thinking.
+# --no-context-shift prevents silent token rotation on Qwen3; generation halts at limit instead.
+# phi-4 has a hard 16K context ceiling — do not set -c above 16384.
+LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
+    # --- OCR models (vision, screen capture → extract text/diagrams/questions) ---
+    'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF': [
+        '-c', '8192', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--temp', '0.1',
+    ],
+    'ggml-org/Mistral-Small-3.1-24B-Instruct-2503-GGUF': [
+        '-c', '16384', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--temp', '0.15',
+    ],
+    # gemma-3-12b also used for solving; 12K covers both roles
+    'ggml-org/gemma-3-12b-it-GGUF': [
+        '-c', '12288', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+    ],
+    # gemma-4 also used for solving; 16K covers both roles; thinking disabled
+    'unsloth/gemma-4-E4B-it-GGUF': [
+        '-c', '16384', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--reasoning', 'off',
+    ],
+    # --- Distillation models (long rolling transcript → identify most recent question) ---
+    # 32K for transcript growth; thinking disabled; no-context-shift for pipeline safety
+    'Qwen/Qwen3-8B-GGUF': [
+        '-c', '32768', '-fa', '--no-context-shift',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--reasoning', 'off',
+    ],
+    # Qwen3-8B fine-tune (Q1_0, ~1.15 GB); requires PrismML fork: github.com/PrismML-Eng/llama.cpp
+    # --cache-reuse 256 lets repeated transcript prefix tokens hit the prompt cache across calls
+    'prism-ml/Bonsai-8B-gguf': [
+        '-c', '32768', '-fa', '--no-context-shift',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--cache-reuse', '256',
+        '--reasoning', 'off',
+    ],
+    # QAT-quantized — q8_0 KV is fine; text-only (no mmproj shipped)
+    'google/gemma-3-4b-it-qat-q4_0-gguf': [
+        '-c', '32768', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+    ],
+    # phi-4 also used for solving; 16K is the hard ceiling for both roles
+    'microsoft/phi-4-gguf': [
+        '-c', '16384', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+    ],
+    # --- Solving models (short assignment → concise bullet-point answer) ---
+    # 8K is ample for solve; thinking disabled for speed; no-context-shift for pipeline safety
+    'Qwen/Qwen3-14B-GGUF': [
+        '-c', '8192', '-fa', '--no-context-shift',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--reasoning', 'off',
+    ],
+    'bartowski/Mistral-Small-Instruct-2409-GGUF': [
+        '-c', '8192', '-fa',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--temp', '0.3',
+    ],
+    # Qwen3.6-35B-A3B: MoE+SSM hybrid (qwen35moe arch), 3B active of 35B total.
+    # Requires llama.cpp b4000+ for qwen35moe support. Avoid CUDA 13.2 (produces garbled output; use 12.x).
+    'bartowski/Qwen_Qwen3.6-35B-A3B-GGUF': [
+        '-c', '32768', '-fa', '--no-context-shift',
+        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+        '--reasoning', 'off',
+    ],
+}
+
+
+def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> None:
+    extra = LLAMA_SERVER_EXTRA_PARAMS.get(model_uri, [])
+    cmd = [
+        'llama-server', '-hf', model_uri, '-ngl', '99',
+        '--host', '127.0.0.1', '--port', str(port),
+    ] + extra
+    with subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) as process:
+        exit.wait()
+        process.terminate()
+        process.wait()
+
+
 PROMPT_OCR_NANONETS = 'Extract all text, preserving code structure and formatting.'
 
 
@@ -635,19 +726,19 @@ def main(
         help='Screen OCR mode: generic (VLM via LangChain/OpenAI-compatible endpoint) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
     ),
     ocr_model: str = typer.Option(
-        'qwen2.5-vl:7b',
+        'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF',
         '--ocr-model',
-        help='Ollama model used for screen OCR when --ocr-mode=generic (default is qwen2.5-vl:7b, other good ones are gemma4:26b, mistral-small3.1:24b, gemma3:12b).',
+        help='HuggingFace model URI for llama-server used for screen OCR when --ocr-mode=generic (default is ggml-org/Qwen2.5-VL-7B-Instruct-GGUF, other good ones are unsloth/gemma-4-E4B-it-GGUF, ggml-org/Mistral-Small-3.1-24B-Instruct-2503-GGUF, ggml-org/gemma-3-12b-it-GGUF).',
     ),
     distill_model: str = typer.Option(
-        'qwen3:8b',
+        'Qwen/Qwen3-8B-GGUF',
         '--distill-model',
-        help='Ollama model used for assignment distillation (default is qwen3:8b, other good ones are gemma3:4b, phi-4-mini).',
+        help='HuggingFace model URI for llama-server used for assignment distillation (default is Qwen/Qwen3-8B-GGUF, other good ones are google/gemma-3-4b-it-qat-q4_0-gguf, microsoft/phi-4-gguf).',
     ),
     solve_model: str = typer.Option(
-        'qwen3:14b',
+        'Qwen/Qwen3-14B-GGUF',
         '--solve-model',
-        help='Ollama model used for solving assignments (default is qwen3:14b, heavier one is gemma4:26b, similarly light are phi-4:14b, gemma3:12b, and mistral-small:22b).',
+        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, bartowski/Mistral-Small-Instruct-2409-GGUF).',
     ),
 ) -> None:
     sources = pulse_sources()
@@ -675,15 +766,25 @@ def main(
     multi_source = source == Source.ALL or source == Source.AUDIO
     exit = threading.Event()
     state = SessionState()
-    base_url = 'http://localhost:11434/v1'
-    distill_client = ChatOpenAI(base_url=base_url, api_key='ollama', model=distill_model)
-    solve_client = (
-        distill_client if solve_model == distill_model
-        else ChatOpenAI(base_url=base_url, api_key='ollama', model=solve_model)
-    )
-    ocr_client = ChatOpenAI(base_url=base_url, api_key='ollama', model=ocr_model)
+
+    unique_models = list(dict.fromkeys([ocr_model, distill_model, solve_model]))
+    model_to_port = {uri: LLAMA_SERVER_BASE_PORT + i for i, uri in enumerate(unique_models)}
+
+    def make_client(uri: str) -> ChatOpenAI:
+        port = model_to_port[uri]
+        return ChatOpenAI(base_url=f'http://127.0.0.1:{port}/v1', api_key='llama.cpp', model=uri)
+
+    distill_client = make_client(distill_model)
+    solve_client = make_client(solve_model)
+    ocr_client = make_client(ocr_model)
 
     threads: list[threading.Thread] = []
+    for uri, port in model_to_port.items():
+        threads.append(threading.Thread(
+            target=llama_server_worker,
+            args=(uri, port, exit),
+            daemon=True,
+        ))
     transcriber_thread = threading.Thread(
         target=transcribe_worker,
         args=(pipe, multi_source, audio, exit, state),
@@ -829,13 +930,6 @@ class TestVadAccumulator:
         assert vad.flush() is None
 
 
-# Frequently used: souffleur.py --distill-model qwen3:8b --solve-model qwen3:8b --source audio
-# Fast alternative (follows: https://www.datacamp.com/de/tutorial/run-bonsai-locally):
-# - curl -fsSL https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b8201-ba7e817/llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz -o llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz
-# - tar -xvzf llama-prism-b8201-ba7e817-bin-linux-cuda-13.1-x64.tar.gz
-# - cd $(find . -name 'llama-prism-*' -type d)
-# - curl -fsSL https://huggingface.co/prism-ml/Bonsai-8B-gguf/resolve/main/Bonsai-8B.gguf -o Bonsai-8B.gguf
-# - ./llama-server -m Bonsai-8B.gguf -ngl 99 --host 127.0.0.1 --port 11434
-# - llama-server -hf prism-ml/Bonsai-8B-gguf -ngl 99 --host 127.0.0.1 --port 11434 > /tmp/llama.cpp.out 2> /tmp/llama.cpp.err &
-# - souffleur.py --distill-model Bonsai-8B --solve-model Bonsai-8B --source audio
-# Slow: qwen3.6:35b-a3b
+# Frequently used: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio
+# Fast alternative: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
+# Slow: bartowski/Qwen_Qwen3.6-35B-A3B-GGUF
