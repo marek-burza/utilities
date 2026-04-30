@@ -48,7 +48,7 @@ from transformers import (
     CohereAsrProcessor,
     Gemma4ForConditionalGeneration,
     Gemma4Processor,
-    Qwen2VLForConditionalGeneration,
+    Qwen2_5_VLForConditionalGeneration,
     VoxtralForConditionalGeneration,
     VoxtralProcessor,
     WhisperForConditionalGeneration,
@@ -205,7 +205,7 @@ class NanonetsPipeline:
     def __init__(self, device: str, dtype: torch.dtype) -> None:
         self.device = device
         self.processor = AutoProcessor.from_pretrained(self.MODEL_ID)
-        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.MODEL_ID, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True
         ).to(device)
 
