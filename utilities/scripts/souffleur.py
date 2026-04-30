@@ -208,67 +208,67 @@ LLAMA_SERVER_BASE_PORT = 8080
 LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
     # --- OCR models (vision, screen capture → extract text/diagrams/questions) ---
     'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF': [
-        '-c', '8192', '-fa',
+        '-c', '8192', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--temp', '0.1',
     ],
     'ggml-org/Mistral-Small-3.1-24B-Instruct-2503-GGUF': [
-        '-c', '16384', '-fa',
+        '-c', '16384', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--temp', '0.15',
     ],
     # gemma-3-12b also used for solving; 12K covers both roles
     'ggml-org/gemma-3-12b-it-GGUF': [
-        '-c', '12288', '-fa',
+        '-c', '12288', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
     ],
     # gemma-4 also used for solving; 16K covers both roles; thinking disabled
     'unsloth/gemma-4-E4B-it-GGUF': [
-        '-c', '16384', '-fa',
+        '-c', '16384', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
     ],
     # --- Distillation models (long rolling transcript → identify most recent question) ---
     # 32K for transcript growth; thinking disabled; no-context-shift for pipeline safety
     'Qwen/Qwen3-8B-GGUF': [
-        '-c', '32768', '-fa', '--no-context-shift',
+        '-c', '32768', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
     ],
     # Qwen3-8B fine-tune (Q1_0, ~1.15 GB); requires PrismML fork: github.com/PrismML-Eng/llama.cpp
     # --cache-reuse 256 lets repeated transcript prefix tokens hit the prompt cache across calls
     'prism-ml/Bonsai-8B-gguf': [
-        '-c', '32768', '-fa', '--no-context-shift',
+        '-c', '32768', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--cache-reuse', '256',
         '--reasoning', 'off',
     ],
     # QAT-quantized — q8_0 KV is fine; text-only (no mmproj shipped)
     'google/gemma-3-4b-it-qat-q4_0-gguf': [
-        '-c', '32768', '-fa',
+        '-c', '32768', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
     ],
     # phi-4 also used for solving; 16K is the hard ceiling for both roles
     'microsoft/phi-4-gguf': [
-        '-c', '16384', '-fa',
+        '-c', '16384', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
     ],
     # --- Solving models (short assignment → concise bullet-point answer) ---
     # 8K is ample for solve; thinking disabled for speed; no-context-shift for pipeline safety
     'Qwen/Qwen3-14B-GGUF': [
-        '-c', '8192', '-fa', '--no-context-shift',
+        '-c', '8192', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
     ],
     'bartowski/Mistral-Small-Instruct-2409-GGUF': [
-        '-c', '8192', '-fa',
+        '-c', '8192', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--temp', '0.3',
     ],
     # Qwen3.6-35B-A3B: MoE+SSM hybrid (qwen35moe arch), 3B active of 35B total.
     # Requires llama.cpp b4000+ for qwen35moe support. Avoid CUDA 13.2 (produces garbled output; use 12.x).
     'bartowski/Qwen_Qwen3.6-35B-A3B-GGUF': [
-        '-c', '32768', '-fa', '--no-context-shift',
+        '-c', '32768', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
     ],
@@ -281,10 +281,16 @@ def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> Non
         'llama-server', '-hf', model_uri, '-ngl', '99',
         '--host', '127.0.0.1', '--port', str(port),
     ] + extra
-    with subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) as process:
-        exit.wait()
-        process.terminate()
-        process.wait()
+
+    model_name_alphanumeric = re.sub(r'[^a-zA-Z0-9]', '_', model_uri)
+    out_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.out.log'
+    err_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.err.log'
+
+    with open(out_path, 'w') as out_f, open(err_path, 'w') as err_f:
+        with subprocess.Popen(cmd, stdout=out_f, stderr=err_f) as process:
+            exit.wait()
+            process.terminate()
+            process.wait()
 
 
 PROMPT_OCR_NANONETS = 'Extract all text, preserving code structure and formatting.'
