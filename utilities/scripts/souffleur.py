@@ -5,6 +5,7 @@
 # dependencies = [
 #     "langchain-openai",
 #     "accelerate",
+#     "huggingface-hub",
 #     "librosa",
 #     "mistral-common",
 #     "numpy",
@@ -276,6 +277,14 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
 
 
 def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> None:
+    # Explicit download via huggingface-cli
+    if ':' in model_uri:
+        repo_id, filename = model_uri.split(':', 1)
+        download_cmd = ['hf', 'download', repo_id, filename]
+    else:
+        download_cmd = ['hf', 'download', model_uri]
+    subprocess.run(download_cmd, check=True)
+
     extra = LLAMA_SERVER_EXTRA_PARAMS.get(model_uri, [])
     cmd = [
         'llama-server', '-hf', model_uri, '-ngl', '99',
