@@ -276,15 +276,14 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
 }
 
 
-def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> None:
-    # Explicit download via huggingface-cli
-    if ':' in model_uri:
-        repo_id, filename = model_uri.split(':', 1)
-        download_cmd = ['hf', 'download', repo_id, filename]
-    else:
-        download_cmd = ['hf', 'download', model_uri]
-    subprocess.run(download_cmd, check=True)
+def llama_server_download(model_uri: str) -> None:
+    with subprocess.Popen(['llama-cli', '-hf', model_uri, '-n', '0'], stdin=subprocess.PIPE, text=True) as process:
+        process.stdin.write('/exit\n')
+        process.stdin.close()
+        process.wait()
 
+
+def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> None:
     extra = LLAMA_SERVER_EXTRA_PARAMS.get(model_uri, [])
     cmd = [
         'llama-server', '-hf', model_uri, '-ngl', '99',
@@ -795,6 +794,7 @@ def main(
 
     threads: list[threading.Thread] = []
     for uri, port in model_to_port.items():
+        llama_server_download(uri)
         threads.append(threading.Thread(
             target=llama_server_worker,
             args=(uri, port, exit),
