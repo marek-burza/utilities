@@ -65,7 +65,7 @@ def llama_server_download(model_uri: str) -> None:
         process.wait()
 
 
-def ensure_opencode_config(model_uri: str) -> None:
+def ensure_opencode_config() -> None:
     config_dir = Path('~/.config/opencode').expanduser()
     config_path = config_dir / 'opencode.json'
     config_dir.mkdir(parents=True, exist_ok=True)
@@ -149,7 +149,7 @@ def main(
     llama_server_thread.start()
 
     if agent == 'opencode':
-        ensure_opencode_config(model)
+        ensure_opencode_config()
     else:
         os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
         os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
