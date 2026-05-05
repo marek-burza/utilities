@@ -7,21 +7,91 @@
 # ///
 
 import os
+import re
+import subprocess
+import threading
+import time
+import urllib.request
 
 import typer
 
 
+DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
+LLAMA_SERVER_PORT = 8080
+LLAMA_SERVER_URL = f'http://127.0.0.1:{LLAMA_SERVER_PORT}'
+LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
+    DEFAULT_MODEL: [
+        '-c', '262144',
+        '-fa', 'on',
+        '--no-context-shift',
+        '--cache-type-k', 'q4_0',
+        '--cache-type-v', 'q4_0',
+        '--reasoning', 'on',
+        '--temp', '0.6',
+        '--top-p', '0.95',
+        '--top-k', '20',
+        '--min-p', '0',
+        '--presence-penalty', '0',
+    ],
+}
+
+
+def llama_server_download(model_uri: str) -> None:
+    with subprocess.Popen(['llama-cli', '-hf', model_uri, '-n', '0'], stdin=subprocess.PIPE, text=True) as process:
+        process.stdin.write('/exit\n')
+        process.stdin.close()
+        process.wait()
+
+
+def llama_server_worker(model_uri: str, exit: threading.Event) -> None:
+    extra = LLAMA_SERVER_EXTRA_PARAMS.get(model_uri, [])
+    cmd = [
+        'llama-server', '-hf', model_uri, '-ngl', '99',
+        '--host', '127.0.0.1', '--port', str(LLAMA_SERVER_PORT),
+    ] + extra
+    model_name_alphanumeric = re.sub(r'[^a-zA-Z0-9]', '_', model_uri)
+    log_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.log'
+    with open(log_path, 'w') as log:
+        with subprocess.Popen(cmd, stdout=log, stderr=log) as process:
+            exit.wait()
+            process.terminate()
+            process.wait()
+
+
+def llama_server_wait(timeout: float = 120.0) -> None:
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            urllib.request.urlopen(f'{LLAMA_SERVER_URL}/health', timeout=1)
+            return
+        except Exception:
+            time.sleep(1)
+    raise RuntimeError(f'llama-server did not become ready within {timeout}s')
+
+
 def main(
     model: str = typer.Option(
-        'qwen3.5:35b',
+        DEFAULT_MODEL,
         '--model',
-        help='Model name to pass to coding agent.',
+        help='HuggingFace model URI for llama-server.',
     ),
 ) -> None:
-    os.environ['ANTHROPIC_AUTH_TOKEN'] = 'ollama'
-    os.environ['ANTHROPIC_API_KEY'] = ''
-    os.environ['ANTHROPIC_BASE_URL'] = 'http://host.docker.internal:11434'
+    exit_event = threading.Event()
+    llama_server_download(model)
+    llama_server_thread = threading.Thread(
+        target=llama_server_worker,
+        args=(model, exit_event),
+        daemon=True,
+    )
+    llama_server_thread.start()
+    llama_server_wait()
+
+    os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
+    os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
     os.system(f'claude --model {model}')
+
+    exit_event.set()
+    llama_server_thread.join(timeout=1)
 
 
 if __name__ == '__main__':
