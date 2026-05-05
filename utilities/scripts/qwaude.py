@@ -65,6 +65,33 @@ def llama_server_download(model_uri: str) -> None:
         process.wait()
 
 
+def ensure_opencode_config(model_uri: str) -> None:
+    config_dir = Path('~/.config/opencode').expanduser()
+    config_path = config_dir / 'opencode.json'
+    config_dir.mkdir(parents=True, exist_ok=True)
+    models = {}
+    for uri in LLAMA_SERVER_EXTRA_PARAMS:
+        models[uri] = {
+            'name': uri,
+            'tool_call': True,
+            'attachment': True,
+            'reasoning': True,
+        }
+    config = {
+        'provider': {
+            'openai': {
+                'options': {
+                    'baseURL': f'{LLAMA_SERVER_URL}/v1',
+                    'apiKey': 'llama.cpp',
+                },
+                'models': models,
+            },
+        },
+    }
+    with config_path.open('w') as handle:
+        json.dump(config, handle, indent=2)
+
+
 def ensure_attribution_header_disabled() -> None:
     settings_path = Path('~/.claude/settings.json').expanduser()
     settings = {}
@@ -121,8 +148,11 @@ def main(
     )
     llama_server_thread.start()
 
-    os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
-    os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
+    if agent == 'opencode':
+        ensure_opencode_config(model)
+    else:
+        os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
+        os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
 
     cmd = f'{agent} --model {model}'
     if extra:
