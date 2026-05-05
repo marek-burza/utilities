@@ -1,4 +1,6 @@
-## Claude Code Notes
+# Coding Agents Notes
+
+## Claude Code
 
 - `Shift + TAB, Shift TAB` - cycle through modes to enter planning mode
 - `/memory` - with this prefix, the instruction will be memorized in `CLAUDE.md` ([AGENTS.md](https://agents.md))
