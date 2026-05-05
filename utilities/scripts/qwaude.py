@@ -56,6 +56,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
     ],
 }
+DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
 
 
 def llama_server_download(model_uri: str) -> None:
@@ -65,7 +66,7 @@ def llama_server_download(model_uri: str) -> None:
         process.wait()
 
 
-def ensure_opencode_config() -> None:
+def ensure_opencode_config(model: str) -> None:
     config_dir = Path('~/.config/opencode').expanduser()
     config_path = config_dir / 'opencode.json'
     config_dir.mkdir(parents=True, exist_ok=True)
@@ -78,15 +79,18 @@ def ensure_opencode_config() -> None:
             'reasoning': True,
         }
     config = {
+        '$schema': 'https://opencode.ai/config.json',
         'provider': {
-            'openai': {
+            'llama.cpp': {
+                'npm': '@ai-sdk/openai-compatible',
+                'name': 'llama.cpp',
                 'options': {
                     'baseURL': f'{LLAMA_SERVER_URL}/v1',
-                    'apiKey': 'llama.cpp',
                 },
                 'models': models,
             },
         },
+        'model': f'llama.cpp/{model}',
     }
     with config_path.open('w') as handle:
         json.dump(config, handle, indent=2)
@@ -127,7 +131,7 @@ def llama_server_worker(model_uri: str, exit: threading.Event) -> None:
 
 def main(
     model: str = typer.Option(
-        'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL',
+        DEFAULT_MODEL,
         '--model',
         help='HuggingFace model URI for llama-server.',
     ),
@@ -149,7 +153,7 @@ def main(
     llama_server_thread.start()
 
     if agent == 'opencode':
-        ensure_opencode_config()
+        ensure_opencode_config(model)
     else:
         os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
         os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
