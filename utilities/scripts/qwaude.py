@@ -66,7 +66,7 @@ def llama_server_download(model_uri: str) -> None:
         process.wait()
 
 
-def ensure_opencode_config(model: str) -> None:
+def ensure_opencode_config(model: str, web: bool) -> None:
     config_dir = Path('~/.config/opencode').expanduser()
     config_path = config_dir / 'opencode.json'
     config_dir.mkdir(parents=True, exist_ok=True)
@@ -92,6 +92,8 @@ def ensure_opencode_config(model: str) -> None:
         },
         'model': f'llama.cpp/{model}',
     }
+    if web:
+        config['server'] = {'port': 4096}
     with config_path.open('w') as handle:
         json.dump(config, handle, indent=2)
 
@@ -140,6 +142,11 @@ def main(
         '--agent',
         help='Agent to run (claude or opencode).',
     ),
+    web: bool = typer.Option(
+        False,
+        '--web',
+        help='Use web mode.',
+    ),
     extra: list[str] = typer.Argument(None),
 ) -> None:
     ensure_attribution_header_disabled()
@@ -153,12 +160,15 @@ def main(
     llama_server_thread.start()
 
     if agent == 'opencode':
-        ensure_opencode_config(model)
+        ensure_opencode_config(model, web)
     else:
         os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
         os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
 
-    cmd = f'{agent} --model {model}'
+    if web and agent == 'opencode':
+        cmd = f'{agent} web --port 4096'
+    else:
+        cmd = f'{agent} --model {model}'
     if extra:
         cmd += f' {" ".join(extra)}'
     os.system(cmd)
