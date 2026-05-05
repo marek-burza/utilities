@@ -104,6 +104,12 @@ def main(
         '--model',
         help='HuggingFace model URI for llama-server.',
     ),
+    agent: str = typer.Option(
+        'claude',
+        '--agent',
+        help='Agent to run (claude or opencode).',
+    ),
+    extra: list[str] = typer.Argument(None),
 ) -> None:
     ensure_attribution_header_disabled()
     exit_event = threading.Event()
@@ -117,7 +123,11 @@ def main(
 
     os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
     os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
-    os.system(f'claude --model {model}')
+
+    cmd = f'{agent} --model {model}'
+    if extra:
+        cmd += f' {" ".join(extra)}'
+    os.system(cmd)
 
     exit_event.set()
     llama_server_thread.join(timeout=1)
