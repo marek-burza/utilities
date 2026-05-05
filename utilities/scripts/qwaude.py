@@ -56,7 +56,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
     ],
 }
-DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
+DEFAULT_MODEL = 'unsloth/gemma-4-31B-it-GGUF:IQ4_XS'
 
 
 def llama_server_download(model_uri: str) -> None:
@@ -138,7 +138,7 @@ def main(
         help='HuggingFace model URI for llama-server.',
     ),
     agent: str = typer.Option(
-        'claude',
+        'opencode',
         '--agent',
         help='Agent to run (claude or opencode).',
     ),
