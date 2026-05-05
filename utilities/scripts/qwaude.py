@@ -82,17 +82,6 @@ def llama_server_worker(model_uri: str, exit: threading.Event) -> None:
             process.wait()
 
 
-def llama_server_wait(timeout: float = 120.0) -> None:
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        try:
-            urllib.request.urlopen(f'{LLAMA_SERVER_URL}/health', timeout=1)
-            return
-        except Exception:
-            time.sleep(1)
-    raise RuntimeError(f'llama-server did not become ready within {timeout}s')
-
-
 def main(
     model: str = typer.Option(
         DEFAULT_MODEL,
@@ -108,7 +97,6 @@ def main(
         daemon=True,
     )
     llama_server_thread.start()
-    llama_server_wait()
 
     os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
     os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
