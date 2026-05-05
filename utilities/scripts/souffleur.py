@@ -291,11 +291,9 @@ def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> Non
     ] + extra
 
     model_name_alphanumeric = re.sub(r'[^a-zA-Z0-9]', '_', model_uri)
-    out_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.out.log'
-    err_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.err.log'
-
-    with open(out_path, 'w') as out_f, open(err_path, 'w') as err_f:
-        with subprocess.Popen(cmd, stdout=out_f, stderr=err_f) as process:
+    log_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.log'
+    with open(log_path, 'w') as log:
+        with subprocess.Popen(cmd, stdout=log, stderr=log) as process:
             exit.wait()
             process.terminate()
             process.wait()
