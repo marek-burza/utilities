@@ -66,7 +66,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | /bin/bash - && \
     rm -rf /var/lib/apt/lists/*
 
 ADD scripts/* /usr/local/bin/
-RUN chmod +x /usr/local/bin/pdf_*.py
+RUN chmod +x /usr/local/bin/*.py
 
 RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp && \
     cd /tmp/llama.cpp && \
