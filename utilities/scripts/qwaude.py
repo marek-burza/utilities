@@ -10,19 +10,18 @@ import os
 import re
 import subprocess
 import threading
-import time
-import urllib.request
+import json
+from pathlib import Path
 
 import typer
 
 
-DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
 LLAMA_SERVER_PORT = 8080
 LLAMA_SERVER_URL = f'http://127.0.0.1:{LLAMA_SERVER_PORT}'
 LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
-    DEFAULT_MODEL: [
+    'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL': [
         '-ngl', '99',
-        '-c', '262144',
+        '-c', '131072',
         '-fa', 'on',
         '--no-context-shift',
         '--cache-type-k', 'q4_0',
@@ -34,9 +33,9 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
         '--presence-penalty', '0',
     ],
-    'unsloth/gemma-4-31B-it-GGUF:UD-Q5_K_XL': [
+    'unsloth/gemma-4-31B-it-GGUF:IQ4_XS': [
         '-ngl', '99',
-        '-c', '262144',
+        '-c', '131072',
         '-fa', 'on',
         '--no-context-shift',
         '--cache-type-k', 'q4_0',
@@ -54,6 +53,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--temp', '1.0',
         '--top-p', '0.95',
         '--top-k', '40',
+        '--min-p', '0',
     ],
 }
 
@@ -63,6 +63,22 @@ def llama_server_download(model_uri: str) -> None:
         process.stdin.write('/exit\n')
         process.stdin.close()
         process.wait()
+
+
+def ensure_attribution_header_disabled() -> None:
+    settings_path = Path('~/.claude/settings.json').expanduser()
+    settings = {}
+    if settings_path.exists():
+        try:
+            with settings_path.open('r') as f:
+                settings = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+
+    settings.setdefault('env', {}).update({'CLAUDE_CODE_ATTRIBUTION_HEADER': '0'})
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
+    with settings_path.open('w') as f:
+        json.dump(settings, f, indent=2)
 
 
 def llama_server_worker(model_uri: str, exit: threading.Event) -> None:
@@ -84,11 +100,12 @@ def llama_server_worker(model_uri: str, exit: threading.Event) -> None:
 
 def main(
     model: str = typer.Option(
-        DEFAULT_MODEL,
+        'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL',
         '--model',
         help='HuggingFace model URI for llama-server.',
     ),
 ) -> None:
+    ensure_attribution_header_disabled()
     exit_event = threading.Event()
     llama_server_download(model)
     llama_server_thread = threading.Thread(
