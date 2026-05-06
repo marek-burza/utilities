@@ -276,14 +276,14 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
     ],
-    'bartowski/Mistral-Small-Instruct-2409-GGUF': [
+    'unsloth/Mistral-Small-Instruct-2409': [
         '-c', '8192', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--temp', '0.3',
     ],
     # Qwen3.6-35B-A3B: MoE+SSM hybrid (qwen35moe arch), 3B active of 35B total.
     # Requires llama.cpp b4000+ for qwen35moe support. Avoid CUDA 13.2 (produces garbled output; use 12.x).
-    'bartowski/Qwen_Qwen3.6-35B-A3B-GGUF': [
+    'unsloth/Qwen3.6-35B-A3B-GGUF': [
         '-c', '32768', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--reasoning', 'off',
@@ -364,7 +364,7 @@ def load_chunks(paths: list[str]) -> list[Chunk]:
         text = pathlib.Path(path).read_text()
         for raw in text.split('\n---\n'):
             lines = raw.strip().splitlines()
-            title_idx = next((i for i, l in enumerate(lines) if l.startswith('# ')), None)
+            title_idx = next((i for i, l in enumerate(lines) if l.startswith('### ')), None)
             if title_idx is None:
                 continue
             title = lines[title_idx][2:].strip()
@@ -976,7 +976,7 @@ def main(
     solve_content: list[str] = typer.Option(
         [],
         '--solve-content',
-        help='Paths to text files used as the RAG corpus. Used when --solve-mode=rag. Each file is chunked on "---" lines; each chunk needs a "# Title" line as its retrieval key.',
+        help='Paths to text files used as the RAG corpus. Used when --solve-mode=rag. Each file is chunked on "---" lines; each chunk needs a "### Title" line as its retrieval key.',
     ),
     embed_model: str = typer.Option(
         'Qwen/Qwen3-Embedding-0.6B',
