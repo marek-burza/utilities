@@ -11,6 +11,8 @@
 #     "numpy",
 #     "pillow",
 #     "pytest",
+#     "rank-bm25",
+#     "sentence-transformers",
 #     "soundfile",
 #     "torch",
 #     "torchvision",
@@ -27,6 +29,7 @@ import dataclasses
 import enum
 import logging
 import os
+import pathlib
 import queue
 import re
 import subprocess
@@ -39,6 +42,8 @@ from io import BytesIO
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 import numpy as np
+from rank_bm25 import BM25Okapi
+from sentence_transformers import SentenceTransformer
 import soundfile as sf
 import torch
 import typer
@@ -93,6 +98,11 @@ class OcrMode(str, enum.Enum):
 class Mode(str, enum.Enum):
     ASSIGNMENT = 'assignment'
     QUESTIONS = 'questions'
+
+
+class SolveMode(str, enum.Enum):
+    LLM = 'llm'
+    RAG = 'rag'
 
 
 MODEL_TO_HUGGINGFACE_ID = {
@@ -337,9 +347,94 @@ class Device:
 
 
 @dataclasses.dataclass
-class Chunk:
+class AudioChunk:
     origin: str
     data: np.ndarray
+
+
+@dataclasses.dataclass
+class Chunk:
+    title: str
+    content: str
+
+
+def load_chunks(paths: list[str]) -> list[Chunk]:
+    chunks: list[Chunk] = []
+    for path in paths:
+        text = pathlib.Path(path).read_text()
+        for raw in text.split('\n---\n'):
+            lines = raw.strip().splitlines()
+            title_idx = next((i for i, l in enumerate(lines) if l.startswith('# ')), None)
+            if title_idx is None:
+                continue
+            title = lines[title_idx][2:].strip()
+            content = '\n'.join(lines[:title_idx] + lines[title_idx + 1:]).strip()
+            if title and content:
+                chunks.append(Chunk(title, content))
+            elif title_idx is not None:
+                print(f'Warning: skipping chunk with title "{lines[title_idx]}" in {path} (empty content)')
+    return chunks
+
+
+class DenseIndex:
+    def __init__(self, model_id: str, chunks: list[Chunk]) -> None:
+        self.model = SentenceTransformer(model_id)
+        self.embeddings = self.model.encode(
+            [chunk.title for chunk in chunks], normalize_embeddings=True, convert_to_numpy=True,
+        )
+
+    def scores(self, query: str) -> np.ndarray:
+        query_embedding = self.model.encode(
+            [query], prompt_name='query', normalize_embeddings=True, convert_to_numpy=True,
+        )
+        # Cosine similarity per chunk (vectors are unit-normalized)
+        return self.embeddings @ query_embedding[0]
+
+    def rank(self, query: str) -> np.ndarray:
+        return np.argsort(-self.scores(query))
+
+
+class BM25Index:
+    def __init__(self, chunks: list[Chunk]) -> None:
+        self.bm25 = BM25Okapi([self._tokenize(c.title) for c in chunks])
+
+    @staticmethod
+    def _tokenize(s: str) -> list[str]:
+        # Split the text into lowercase words by extracting all sequences of word characters
+        # (letters, digits, underscores), discarding punctuation and whitespace
+        return re.findall(r'\w+', s.lower())
+
+    def rank(self, query: str) -> np.ndarray:
+        scores = self.bm25.get_scores(self._tokenize(query))
+        return np.argsort(-scores)
+
+
+def reciprocal_rank_fusion(rank_lists: list[np.ndarray], k: int = 60) -> np.ndarray:
+    n = len(rank_lists[0])
+    scores = np.zeros(n)
+    for ranks in rank_lists:
+        for r, idx in enumerate(ranks):
+            scores[idx] += 1.0 / (k + r)
+    return np.argsort(-scores)
+
+
+class Retriever:
+    def __init__(self, chunks: list[Chunk], embed_model: str) -> None:
+        self.chunks = chunks
+        self.dense = DenseIndex(embed_model, chunks)
+        self.bm25 = BM25Index(chunks)
+
+    def _retrieve(self, query: str) -> tuple[np.ndarray, np.ndarray]:
+        dense_scores = self.dense.scores(query)
+        fused = reciprocal_rank_fusion([np.argsort(-dense_scores), self.bm25.rank(query)])
+        return dense_scores, fused
+
+    def top1_with_confidence_without_margin(
+        self, query: str, min_score: float
+    ) -> tuple[Chunk, bool, float]:
+        dense_scores, fused = self._retrieve(query)
+        top_score = float(dense_scores[fused[0]])
+        return self.chunks[fused[0]], top_score >= min_score, top_score
 
 
 @dataclasses.dataclass
@@ -496,7 +591,7 @@ def default_speaker_device(sources: list[Device], override: int | None) -> str:
 def transcribe_worker(
     pipe: pipeline,
     multi_source: bool,
-    audio: queue.Queue[Chunk | None],
+    audio: queue.Queue[AudioChunk | None],
     exit: threading.Event,
     state: SessionState,
 ) -> None:
@@ -514,7 +609,7 @@ def transcribe_worker(
 def capture_worker(
     device: str,
     origin: str,
-    audio: queue.Queue[Chunk | None],
+    audio: queue.Queue[AudioChunk | None],
     exit: threading.Event,
     vad: VadAccumulator,
 ) -> None:
@@ -534,7 +629,7 @@ def capture_worker(
                 frame = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
                 segment = vad.feed(frame)
                 if segment is not None:
-                    audio.put(Chunk(origin, segment))
+                    audio.put(AudioChunk(origin, segment))
             remainder = vad.flush()
             if remainder is not None:
                 audio.put(Chunk(origin, remainder))
@@ -696,9 +791,9 @@ def strip_xml_tags(text: str) -> str:
 def extract_last_question(markdown_list: str) -> str | None:
     last = None
     for line in markdown_list.splitlines():
-        m = re.match(r'^\s*(?:\d+[.)]|[-*])\s+(.*)', line)
-        if m:
-            last = m.group(1).strip()
+        match = re.match(r'^\s*(?:\d+[.)]|[-*])\s+(.*)', line)
+        if match:
+            last = match.group(1).strip()
     return last or None
 
 
@@ -743,7 +838,7 @@ def distiller_worker(
             print(f'Distiller error: {e}')
 
 
-def solver_worker(
+def solver_worker_llm(
     state: SessionState,
     exit: threading.Event,
     client: ChatOpenAI,
@@ -762,12 +857,54 @@ def solver_worker(
             state.update_solution(text)
             print('\n===\n')
             print(state.assignment)
-            print('\n---\n')
+            print('\n--- [LLM] ---\n')
             print(state.solution)
             print('\n---\n')
         except Exception as e:
             print(f'Solver error: {e}')
 
+
+def solver_worker_rag(
+    state: SessionState,
+    exit: threading.Event,
+    retriever: Retriever,
+    fallback_client: ChatOpenAI,
+    min_score: float,
+    min_margin: float,
+    interval: float = 0.5,
+) -> None:
+    previous_assignment = ''
+    while not exit.is_set():
+        _, _, assignment = state.snapshot()
+        if assignment == previous_assignment or not assignment:
+            time.sleep(interval)
+            continue
+        previous_assignment = assignment
+        try:
+            chunk, confident, top_score = retriever.top1_with_confidence_without_margin(assignment, min_score)
+            if confident:
+                state.update_solution(chunk.content)
+                print('\n===\n')
+                print(state.assignment)
+                print(f'\n--- [RAG score {top_score:.3f}] ---\n')
+                print(state.solution)
+                print('\n---\n')
+            else:
+                response = fallback_client.invoke([HumanMessage(content=PROMPT_SOLUTION.format(assignment=assignment))])
+                text = response.content.strip()
+                state.update_solution(text)
+                print('\n===\n')
+                print(state.assignment)
+                print(f'\n--- [LLM (RAG score {top_score:.3f})] ---\n')
+                print(state.solution)
+                print('\n---\n')
+        except Exception as e:
+            print(f'RAG solver error: {e}')
+
+
+def make_client(uri: str, model_to_port: dict[str, int]) -> ChatOpenAI:
+    port = model_to_port[uri]
+    return ChatOpenAI(base_url=f'http://127.0.0.1:{port}/v1', api_key='llama.cpp', model=uri)
 
 
 def main(
@@ -829,7 +966,32 @@ def main(
     solve_model: str = typer.Option(
         'Qwen/Qwen3-14B-GGUF',
         '--solve-model',
-        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, bartowski/Mistral-Small-Instruct-2409-GGUF).',
+        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, bartowski/Mistral-Small-Instruct-2409-GGUF). In --solve-mode=rag, also used as LLM fallback when retrieval confidence is low.',
+    ),
+    solve_mode: SolveMode = typer.Option(
+        SolveMode.LLM,
+        '--solve-mode',
+        help='How the solver produces answers: "llm" (generate via LLM, default) or "rag" (retrieve from --solve-content files, with LLM fallback when confidence is low).',
+    ),
+    solve_content: list[str] = typer.Option(
+        [],
+        '--solve-content',
+        help='Paths to text files used as the RAG corpus. Used when --solve-mode=rag. Each file is chunked on "---" lines; each chunk needs a "# Title" line as its retrieval key.',
+    ),
+    embed_model: str = typer.Option(
+        'Qwen/Qwen3-Embedding-0.6B',
+        '--embed-model',
+        help='SentenceTransformer model for RAG embeddings. Default is Qwen/Qwen3-Embedding-0.6B (best quality <1B). CPU-friendly alternative: google/embeddinggemma-300m-qat-q8.',
+    ),
+    rag_min_score: float = typer.Option(
+        0.5,
+        '--rag-min-score',
+        help='Minimum dense cosine similarity for the RAG top match to be considered confident. Below this threshold, falls back to LLM if available.',
+    ),
+    rag_min_margin: float = typer.Option(
+        0.05,
+        '--rag-min-margin',
+        help='Minimum gap between top-1 and top-2 dense scores for RAG to be considered confident.',
     ),
 ) -> None:
     sources = pulse_sources()
@@ -853,21 +1015,33 @@ def main(
             pipe = GemmaPipeline(model_id, device, dtype)
     print('Model loaded. Listening... (Ctrl+C to exit)')
 
-    audio: queue.Queue[Chunk | None] = queue.Queue()
+    audio: queue.Queue[AudioChunk | None] = queue.Queue()
     multi_source = source == Source.ALL or source == Source.AUDIO
     exit = threading.Event()
     state = SessionState()
 
-    unique_models = list(dict.fromkeys([ocr_model, distill_model, solve_model]))
-    model_to_port = {uri: LLAMA_SERVER_BASE_PORT + i for i, uri in enumerate(unique_models)}
+    if solve_mode == SolveMode.RAG:
+        if not solve_content:
+            print('No --solve-content provided, falling back to --solve-mode=llm')
+            solve_mode = SolveMode.LLM
+    llm_models = [distill_model, solve_model]
+    if source in (Source.SCREEN, Source.ALL):
+        llm_models.append(ocr_model)
+    model_to_port: dict[str, int] = {uri: LLAMA_SERVER_BASE_PORT + i for i, uri in enumerate(set(llm_models))}
 
-    def make_client(uri: str) -> ChatOpenAI:
-        port = model_to_port[uri]
-        return ChatOpenAI(base_url=f'http://127.0.0.1:{port}/v1', api_key='llama.cpp', model=uri)
+    distill_client = make_client(distill_model, model_to_port)
+    solve_client = make_client(solve_model, model_to_port)
 
-    distill_client = make_client(distill_model)
-    solve_client = make_client(solve_model)
-    ocr_client = make_client(ocr_model)
+    retriever: Retriever | None = None
+    if solve_mode == SolveMode.RAG:
+        print('Loading embedder and indexing corpus...')
+        chunks = load_chunks(solve_content)
+        if not chunks:
+            print('No valid chunks found in --solve-content files, falling back to --solve-mode=llm')
+            solve_mode = SolveMode.LLM
+        else:
+            retriever = Retriever(chunks, embed_model)
+            print(f'Indexed {len(chunks)} chunks.')
 
     threads: list[threading.Thread] = []
     for uri, port in model_to_port.items():
@@ -902,6 +1076,7 @@ def main(
         )
         threads.append(capture_thread)
     if source in (Source.SCREEN, Source.ALL):
+        ocr_client = make_client(ocr_model, model_to_port)
         capture_thread = threading.Thread(
             target=capture_screen_contents,
             args=(state, exit, ocr_client, ocr_mode),
@@ -914,11 +1089,19 @@ def main(
         daemon=True,
     )
     threads.append(distiller_thread)
-    solver_thread = threading.Thread(
-        target=solver_worker,
-        args=(state, exit, solve_client),
-        daemon=True,
-    )
+    match solve_mode:
+        case SolveMode.LLM:
+            solver_thread = threading.Thread(
+                target=solver_worker_llm,
+                args=(state, exit, solve_client),
+                daemon=True,
+            )
+        case SolveMode.RAG:
+            solver_thread = threading.Thread(
+                target=solver_worker_rag,
+                args=(state, exit, retriever, solve_client, rag_min_score, rag_min_margin),
+                daemon=True,
+            )
     threads.append(solver_thread)
     for thread in threads:
         thread.start()
@@ -1024,4 +1207,5 @@ class TestVadAccumulator:
 
 # Frequently used: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio
 # Fast alternative: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
-# Slow: bartowski/Qwen_Qwen3.6-35B-A3B-GGUF
+# RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something.md
+# Slow: unsloth/Qwen3.6-35B-A3B-GGUF
