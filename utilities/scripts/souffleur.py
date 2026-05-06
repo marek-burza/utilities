@@ -90,6 +90,11 @@ class OcrMode(str, enum.Enum):
     NANONETS = 'nanonets'
 
 
+class Mode(str, enum.Enum):
+    ASSIGNMENT = 'assignment'
+    QUESTIONS = 'questions'
+
+
 MODEL_TO_HUGGINGFACE_ID = {
     Model.WHISPER: 'openai/whisper-large-v3',
     Model.COHERE: 'CohereLabs/cohere-transcribe-03-2026',  # https://cohere.com/blog/transcribe
@@ -594,6 +599,51 @@ prefer bullet points over a block of text>
 """
 
 
+PROMPT_QUESTIONS = """
+You are monitoring a live transcript and screen capture for someone who is being examined.
+Your job is to extract every question that has been posed so far, in the order they appeared.
+
+Each transcript line may be prefixed with a source tag such as [local] or [remote].
+IMPORTANT: these tags are metadata only. Remove every occurrence of [local], [remote],
+or any other bracketed tag from every line before doing anything else. They must never
+appear anywhere in your output.
+
+The transcript is raw ASR output: a single spoken sentence is often split across several
+consecutive lines. Before identifying questions, reconstruct the original spoken sentences
+by joining lines that form a single continuous utterance. Only then decide whether a
+reconstructed sentence is a question.
+
+<transcript>
+{transcript}
+</transcript>
+
+<screen_contents>
+{screen_contents}
+</screen_contents>
+
+Produce a Markdown numbered list. Each item is a single line containing the question
+itself (original wording, split lines rejoined, absolutely no [local]/[remote] tags),
+followed inline by any substantive details that were stated BEFORE or AS PART OF that
+question to establish its context: constraints, given values, definitions, setup
+information. Omit filler words, hesitations, repetitions, and noise (e.g. "uh", "um", incomplete restarts).
+Do not use sub-bullets or nested lists.
+
+Rules:
+  - Only include genuine questions: direct questions, rhetorical questions, and
+    follow-ups like "what do you mean by X?", "can you explain Y?", "why?".
+    Exclude filler, coughs, incomplete fragments, affirmations, and statements
+    that do not ask anything.
+  - A question split across multiple lines is ONE item, not multiple.
+  - Maintain order of appearance. Do not deduplicate or merge distinct questions.
+  - Details for a question come only from content that PRECEDES it in the transcript,
+    not from responses or content that comes after it. Never attach post-question
+    content (answers, elaborations, follow-up exchanges) as details to an earlier question.
+  - Output ONLY the Markdown numbered list. No preamble, no headings,
+    no code fences, no trailing commentary, no source tags.
+  - If no questions are present at all, output exactly: NO_QUESTIONS
+"""
+
+
 PROMPT_ASSIGNMENT = """
 You are monitoring a live transcript and screen capture for someone who is being examined.
 Your job is to identify and summarize the most recent task or assignment.
@@ -643,10 +693,20 @@ def strip_xml_tags(text: str) -> str:
     return re.sub(r'</?[a-zA-Z_][a-zA-Z0-9_]*>', '', text).strip()
 
 
+def extract_last_question(markdown_list: str) -> str | None:
+    last = None
+    for line in markdown_list.splitlines():
+        m = re.match(r'^\s*(?:\d+[.)]|[-*])\s+(.*)', line)
+        if m:
+            last = m.group(1).strip()
+    return last or None
+
+
 def distiller_worker(
     state: SessionState,
     exit: threading.Event,
     client: ChatOpenAI,
+    mode: Mode = Mode.ASSIGNMENT,
     interval: float = 0.5,
 ) -> None:
     previous_transcript = ''
@@ -659,14 +719,26 @@ def distiller_worker(
         previous_transcript = transcript
         previous_screen_contents = screen_contents
         try:
-            response = client.invoke([HumanMessage(content=PROMPT_ASSIGNMENT.format(
-                assignment=assignment or '(none yet)',
-                transcript=transcript or '(empty)',
-                screen_contents=screen_contents or '(empty)',
-            ))])
-            text = response.content.strip()
-            if 'NO_ASSIGNMENT_CHANGE' not in text:
-                state.update_assignment(strip_xml_tags(text))
+            match mode:
+                case Mode.ASSIGNMENT:
+                    response = client.invoke([HumanMessage(content=PROMPT_ASSIGNMENT.format(
+                        assignment=assignment or '(none yet)',
+                        transcript=transcript or '(empty)',
+                        screen_contents=screen_contents or '(empty)',
+                    ))])
+                    text = response.content.strip()
+                    if 'NO_ASSIGNMENT_CHANGE' not in text:
+                        state.update_assignment(strip_xml_tags(text))
+                case Mode.QUESTIONS:
+                    response = client.invoke([HumanMessage(content=PROMPT_QUESTIONS.format(
+                        transcript=transcript or '(empty)',
+                        screen_contents=screen_contents or '(empty)',
+                    ))])
+                    text = response.content.strip()
+                    if 'NO_QUESTIONS' not in text:
+                        last = extract_last_question(text)
+                        if last:
+                            state.update_assignment(last)
         except Exception as e:
             print(f'Distiller error: {e}')
 
@@ -748,6 +820,11 @@ def main(
         'Qwen/Qwen3-8B-GGUF',
         '--distill-model',
         help='HuggingFace model URI for llama-server used for assignment distillation (default is Qwen/Qwen3-8B-GGUF, other good ones are google/gemma-3-4b-it-qat-q4_0-gguf, microsoft/phi-4-gguf).',
+    ),
+    distill_mode: Mode = typer.Option(
+        Mode.QUESTIONS,
+        '--distill-mode',
+        help='Distiller behavior: "assignment" (summarize most recent task) or "questions" (extract ordered list of questions, feed last one to the solver).',
     ),
     solve_model: str = typer.Option(
         'Qwen/Qwen3-14B-GGUF',
@@ -833,7 +910,7 @@ def main(
         threads.append(capture_thread)
     distiller_thread = threading.Thread(
         target=distiller_worker,
-        args=(state, exit, distill_client),
+        args=(state, exit, distill_client, distill_mode),
         daemon=True,
     )
     threads.append(distiller_thread)
