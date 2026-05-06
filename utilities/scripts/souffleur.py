@@ -90,6 +90,7 @@ class Model(str, enum.Enum):
     GEMMA = 'gemma'
 
 
+# TODO: Consider adding CDP (or Chrome Dev Tools MCP)
 class OcrMode(str, enum.Enum):
     GENERIC = 'generic'
     NANONETS = 'nanonets'
@@ -870,7 +871,6 @@ def solver_worker_rag(
     retriever: Retriever,
     fallback_client: ChatOpenAI,
     min_score: float,
-    min_margin: float,
     interval: float = 0.5,
 ) -> None:
     previous_assignment = ''
@@ -988,11 +988,6 @@ def main(
         '--rag-min-score',
         help='Minimum dense cosine similarity for the RAG top match to be considered confident. Below this threshold, falls back to LLM if available.',
     ),
-    rag_min_margin: float = typer.Option(
-        0.05,
-        '--rag-min-margin',
-        help='Minimum gap between top-1 and top-2 dense scores for RAG to be considered confident.',
-    ),
 ) -> None:
     sources = pulse_sources()
     if list_devices:
@@ -1099,7 +1094,7 @@ def main(
         case SolveMode.RAG:
             solver_thread = threading.Thread(
                 target=solver_worker_rag,
-                args=(state, exit, retriever, solve_client, rag_min_score, rag_min_margin),
+                args=(state, exit, retriever, solve_client, rag_min_score),
                 daemon=True,
             )
     threads.append(solver_thread)
