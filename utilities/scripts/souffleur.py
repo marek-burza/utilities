@@ -365,7 +365,7 @@ def load_chunks(paths: list[str]) -> list[Chunk]:
         text = pathlib.Path(path).read_text()
         for raw in text.split('\n---\n'):
             lines = raw.strip().splitlines()
-            title_idx = next((i for i, l in enumerate(lines) if l.startswith('### ')), None)
+            title_idx = next((i for i, l in enumerate(lines) if l.startswith('## ')), None)
             if title_idx is None:
                 continue
             title = lines[title_idx][2:].strip()
@@ -976,7 +976,7 @@ def main(
     solve_content: list[str] = typer.Option(
         [],
         '--solve-content',
-        help='Paths to text files used as the RAG corpus. Used when --solve-mode=rag. Each file is chunked on "---" lines; each chunk needs a "### Title" line as its retrieval key.',
+        help='Paths to text files used as the RAG corpus. Used when --solve-mode=rag. Each file is chunked on "---" lines; each chunk needs a "## Title" line as its retrieval key.',
     ),
     embed_model: str = typer.Option(
         'Qwen/Qwen3-Embedding-0.6B',
