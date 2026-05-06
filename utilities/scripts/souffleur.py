@@ -595,11 +595,12 @@ prefer bullet points over a block of text>
 
 
 PROMPT_ASSIGNMENT = """
-You are monitoring a live transcript and screen capture for a student.
-Your job is to identify the most recent question or task — the "assignment".
+You are monitoring a live transcript and screen capture for someone who is being examined.
+Your job is to identify and summarize the most recent task or assignment.
 
-Below are the latest transcript and screen contents. Pay closest attention to
-the END of the transcript — that is where the most recent question appears.
+Below are the latest transcript and screen contents. Pay more attention to
+the END part of the transcript - that is where the most question appears,
+but the details relevant to its solution may be spread across the transcript.
 
 <transcript>
 {transcript}
@@ -615,25 +616,26 @@ For reference, here is the previous assignment (may be empty):
 {assignment}
 </previous_assignment>
 
-Step 1 — Classify. Decide which case applies:
-  A) A NEW question or task appears in the transcript or screen that is different
-     from the previous assignment. This includes follow-up questions like
-     "what do you mean by X?", "can you explain Y?", "why?" — these are NEW
-     questions even if topically related.
-  B) No new question, but there is new information (constraint, hint, correction)
-     that refines the SAME task in the previous assignment.
-  C) Nothing meaningful has changed.
+Step 1 - Classify. Decide which case applies:
+  Case A: A NEW question or task or assignment appears in the transcript or screen that is different
+    from the previous assignment. This includes follow-up questions like
+    "what do you mean by X?", "can you explain Y?", "why?" - these are NEW
+    questions even if topically related.
+  Case B: No new question, but there is new information (constraint, hint, correction)
+    that refines the SAME task in the previous assignment.
+  Case C: Nothing meaningful has changed.
 
-Step 2 — Respond:
-  Case A: Write a NEW assignment from scratch based ONLY on the new question.
-          Do NOT include, merge, or reference any details from the previous
-          assignment. Pretend the previous assignment does not exist.
+Step 2 - Respond:
+  Case A: Write a NEW assignment from scratch based ONLY on the new question
+    and all the details relevant to its solution.
+    Do NOT include, merge, or reference any details from the previous
+    assignment. Pretend the previous assignment does not exist.
   Case B: Write an updated version of the previous assignment incorporating
-          the new details.
-  Case C: Respond with exactly: NO_CHANGE
+    the new details.
+  Case C: Respond with exactly: NO_ASSIGNMENT_CHANGE
 
-Your response must contain ONLY the assignment text (cases A/B) or NO_CHANGE
-(case C). No preamble, no labels, no XML tags, no "Case A:" prefix.
+Your response must contain ONLY the assignment text (cases A/B) or NO_ASSIGNMENT_CHANGE (case C).
+No preamble, no labels, no XML tag.
 """
 
 
@@ -663,7 +665,7 @@ def distiller_worker(
                 screen_contents=screen_contents or '(empty)',
             ))])
             text = response.content.strip()
-            if text != 'NO_CHANGE':
+            if 'NO_ASSIGNMENT_CHANGE' not in text:
                 state.update_assignment(strip_xml_tags(text))
         except Exception as e:
             print(f'Distiller error: {e}')
