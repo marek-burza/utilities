@@ -4,14 +4,10 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "langchain-openai",
-#     "accelerate",
-#     "huggingface-hub",
-#     "librosa",
-#     "mistral-common",
 #     "numpy",
 #     "pillow",
 #     "pytest",
-#     "rank-bm25",
+#     "bm25s",
 #     "sentence-transformers",
 #     "soundfile",
 #     "torch",
@@ -23,6 +19,7 @@
 # Transcribes live audio from microphone and/or speaker playback (loopback).
 # Captures audio via ffmpeg using PulseAudio sources.
 # Run with --list-devices to find available source names.
+# TODO: These dependencies seemed to have been unused: accelerate, huggingface-hub, librosa, mistral-common
 
 import base64
 import dataclasses
@@ -39,15 +36,15 @@ import time
 import warnings
 from io import BytesIO
 
-from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
+import bm25s
 import numpy as np
-from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
 import soundfile as sf
 import torch
 import typer
 from PIL import ImageGrab
+from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
+from sentence_transformers import SentenceTransformer
 from transformers import (
     AutoProcessor,
     CohereAsrForConditionalGeneration,
@@ -397,16 +394,14 @@ class DenseIndex:
 
 class BM25Index:
     def __init__(self, chunks: list[Chunk]) -> None:
-        self.bm25 = BM25Okapi([self._tokenize(c.title) for c in chunks])
-
-    @staticmethod
-    def _tokenize(s: str) -> list[str]:
-        # Split the text into lowercase words by extracting all sequences of word characters
-        # (letters, digits, underscores), discarding punctuation and whitespace
-        return re.findall(r'\w+', s.lower())
+        self.tokenizer = bm25s.tokenization.Tokenizer(lower=True, stopwords=None)
+        corpus_tokens = self.tokenizer.tokenize([c.title for c in chunks], return_as="tuple")
+        self.retriever = bm25s.BM25()
+        self.retriever.index(corpus_tokens)
 
     def rank(self, query: str) -> np.ndarray:
-        scores = self.bm25.get_scores(self._tokenize(query))
+        query_tokens = self.tokenizer.tokenize([query], return_as="string", update_vocab=False)[0]
+        scores = self.retriever.get_scores(query_tokens)
         return np.argsort(-scores)
 
 
@@ -966,7 +961,7 @@ def main(
     solve_model: str = typer.Option(
         'Qwen/Qwen3-14B-GGUF',
         '--solve-model',
-        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, bartowski/Mistral-Small-Instruct-2409-GGUF). In --solve-mode=rag, also used as LLM fallback when retrieval confidence is low.',
+        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, unsloth/Mistral-Small-Instruct-2409). In --solve-mode=rag, also used as LLM fallback when retrieval confidence is low.',
     ),
     solve_mode: SolveMode = typer.Option(
         SolveMode.LLM,
@@ -1202,5 +1197,5 @@ class TestVadAccumulator:
 
 # Frequently used: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio
 # Fast alternative: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
-# RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something.md
+# RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something1.md --solve-content something2.md
 # Slow: unsloth/Qwen3.6-35B-A3B-GGUF
