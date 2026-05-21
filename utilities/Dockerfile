@@ -87,11 +87,6 @@ USER $USER
 # Route ALSA default device through PulseAudio (Claude Code voice mode)
 RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc"
 
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-RUN npm config set prefix "$HOME/.npm-global"
-ENV PATH="$PATH:$HOME/.npm-global/bin"
-RUN npm install -g @google/gemini-cli
-
 RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://opencode.ai/install | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://astral.sh/uv/install.sh | /bin/sh) && \
