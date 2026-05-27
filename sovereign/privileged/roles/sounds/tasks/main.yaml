@@ -3,4 +3,3 @@
   command:
     cmd: mv /usr/share/sounds/freedesktop/stereo/screen-capture.oga /usr/share/sounds/freedesktop/stereo/screen-capture.oga.disabled
     removes: /usr/share/sounds/freedesktop/stereo/screen-capture.oga
-  become: true
