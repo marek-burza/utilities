@@ -1,0 +1,7 @@
+- hosts: localhost
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  gather_facts: False
+  roles:
+    - role: autokey
+    - role: git
