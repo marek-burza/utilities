@@ -166,12 +166,12 @@ def main(
         os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
 
     if web and agent == 'opencode':
-        cmd = f'{agent} web --port 4096'
+        cmd = [agent, 'web', '--port', '4096']
     else:
-        cmd = f'{agent} --model {model}'
+        cmd = [agent, '--model', model]
     if extra:
-        cmd += f' {" ".join(extra)}'
-    os.system(cmd)
+        cmd += extra
+    subprocess.run(cmd, check=False)
 
     exit_event.set()
     llama_server_thread.join(timeout=1)
