@@ -21,7 +21,7 @@
 # - https://github.com/ictnlp/LLaMA-Omni - LLaMA-based speech interaction
 # - https://github.com/kyutai-labs/moshi - speech interaction foundation model
 
-import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -77,7 +77,11 @@ def audio_soundfile(audio: Any, rate: Any, path: Path) -> None:
 
 
 def silence():
-    os.system('ffmpeg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 1 -y silence.flac')
+    subprocess.run([
+        'ffmpeg', '-f', 'lavfi',
+        '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+        '-t', '1', '-y', 'silence.flac',
+    ], check=False)
 
 
 def what() -> str:
@@ -109,22 +113,28 @@ def speech(prefix: str, tts: Any, lines: list[str], index: int) -> None:
 def flac(prefix: str, index: int) -> None:
     name_wav = f'{prefix}.{index:02d}.wav'
     name_flac = f'{prefix}.{index:02d}.flac'
-    command = f'ffmpeg -i {name_wav} -ar 44100 -ac 2 -sample_fmt s16 -y {name_flac}'
-    os.system(command)
+    subprocess.run([
+        'ffmpeg', '-i', name_wav, '-ar', '44100', '-ac', '2',
+        '-sample_fmt', 's16', '-y', name_flac,
+    ], check=False)
 
 
 def prepend(prefix: str, index: int) -> None:
     name_flac = f'{prefix}.{index:02d}.flac'
     name_ok = f'{prefix}.{index:02d}.ok.flac'
-    command = f'ffmpeg -i concat:"silence.flac|{name_flac}" -y {name_ok}'
-    os.system(command)
+    subprocess.run([
+        'ffmpeg', '-i', f'concat:silence.flac|{name_flac}', '-y', name_ok,
+    ], check=False)
 
 
 def mix(prefix: str, index: int) -> None:
     name_png = f'{prefix}.{index:02d}.png'
     name_ok = f'{prefix}.{index:02d}.ok.flac'
-    command = f'ffmpeg -loop 1 -i {name_png} -i {name_ok} -crf 25 -c:v libx264 -tune stillimage -pix_fmt yuv420p -shortest -y {prefix}.{index:02d}.mp4'
-    os.system(command)
+    subprocess.run([
+        'ffmpeg', '-loop', '1', '-i', name_png, '-i', name_ok,
+        '-crf', '25', '-c:v', 'libx264', '-tune', 'stillimage',
+        '-pix_fmt', 'yuv420p', '-shortest', '-y', f'{prefix}.{index:02d}.mp4',
+    ], check=False)
 
 
 def main() -> None:
