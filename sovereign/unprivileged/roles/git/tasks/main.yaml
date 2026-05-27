@@ -1,13 +1,4 @@
 ---
-- name: git - Installation
-  apt:
-    pkg:
-      - git
-      - git-lfs
-    state: latest
-    update_cache: yes
-  become: yes
-
 - name: git - Scheduled git prefetch
   command: git maintenance start
 

@@ -1,0 +1,8 @@
+---
+- name: git - Installation
+  apt:
+    pkg:
+      - git
+      - git-lfs
+    state: latest
+    update_cache: yes

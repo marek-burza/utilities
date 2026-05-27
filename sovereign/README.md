@@ -23,7 +23,11 @@ install -m 0700 -d $HOME/.ansible/tmp
 ## Installation
 
 ```shell
-ansible-playbook -i "localhost," --connection=local --ask-become-pass playbook.yaml
+cd privileged
+sudo ansible-playbook -i "localhost," --connection=local playbook.yaml
+cd -
+cd unprivileged
+ansible-playbook -i "localhost," --connection=local playbook.yaml
 ```
 
 ## To Do
