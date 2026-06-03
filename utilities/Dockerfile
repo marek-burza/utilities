@@ -64,6 +64,19 @@ RUN apt-get -yq update && \
 # unzip - N/A
 # zlib - Pillow (older, non-wheel version)
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+ENV UV_LINK_MODE=copy \
+    UV_NO_CACHE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_HTTP_TIMEOUT=60 \
+    UV_PYTHON=python3.13 \
+    UV_PYTHON_INSTALL_DIR=/app/python \
+    VIRTUAL_ENV=/app/venv
+# TensorRT is quite noisy
+ENV PYTHONWARNINGS="ignore::SyntaxWarning"
+# Install an extension of Python debugger & deep inspection of Python objects
+RUN /bin/uv venv && /bin/uv pip install pdbpp wat
+# Install utilities
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.py
 
@@ -89,9 +102,6 @@ RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asou
 RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://antigravity.google/cli/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://opencode.ai/install | /bin/bash) && \
-    (curl --proto '=https' --tlsv1.2 -fsSL https://astral.sh/uv/install.sh | /bin/sh) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://go.dev/dl/$(curl -sL https://golang.org/dl/ | grep -oP 'go[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1).linux-amd64.tar.gz | /usr/bin/tar -C $HOME/.local -xzf -) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | /bin/sh -s -- -y)
-ENV PATH="$PATH:$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
-# Install an extension of Python debugger & deep inspection of Python objects
-RUN uv venv && uv pip install pdbpp wat
+ENV PATH="$PATH:$VIRTUAL_ENV/bin:$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
