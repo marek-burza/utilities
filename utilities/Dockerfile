@@ -5,34 +5,37 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get -yq update && \
     apt-get -yq remove python && \
-    apt-get -yq install \
-    build-essential \
-    cmake \
-    curl \
-    enscript \
-    ffmpeg \
-    git \
-    git-lfs \
-    imagemagick \
-    jq \
-    libatlas3-base \
-    libblas-dev \
-    libfreetype-dev \
-    libhdf5-dev \
-    libjpeg-dev \
-    libasound2-plugins \
-    libnvidia-compute-595-server \
-    libopenblas-dev \
-    ncurses-bin \
-    pipewire-bin \
-    pkg-config \
-    poppler-utils \
-    qpdf \
-    ripgrep \
-    software-properties-common \
-    sudo \
-    unzip \
-    zlib1g-dev && \
+    apt-get -yyq install \
+        -o APT::Install-Recommends=false \
+        -o APT::Install-Suggests=false \
+        build-essential \
+        cmake \
+        curl \
+        enscript \
+        ffmpeg \
+        git \
+        git-lfs \
+        imagemagick \
+        jq \
+        libatlas3-base \
+        libblas-dev \
+        libfreetype-dev \
+        libhdf5-dev \
+        libjpeg-dev \
+        libasound2-plugins \
+        libnvidia-compute-595-server \
+        libopenblas-dev \
+        ncurses-bin \
+        pipewire-bin \
+        pkg-config \
+        poppler-utils \
+        qpdf \
+        ripgrep \
+        software-properties-common \
+        sudo \
+        unzip \
+        zlib1g-dev && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 # build-essential - N/A
 # cmake - lightgbm (older, non-wheel version)
@@ -60,10 +63,6 @@ RUN apt-get -yq update && \
 # software-properties-common - Python
 # unzip - N/A
 # zlib - Pillow (older, non-wheel version)
-
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | /bin/bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
 
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.py
