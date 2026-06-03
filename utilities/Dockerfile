@@ -96,5 +96,3 @@ RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/b
 ENV PATH="$PATH:$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
 # Install an extension of Python debugger & deep inspection of Python objects
 RUN uv venv && uv pip install pdbpp wat
-
-ENTRYPOINT [ "/bin/bash" ]
