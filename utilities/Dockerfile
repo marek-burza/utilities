@@ -98,5 +98,3 @@ ENV PATH="$PATH:$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.local/go/bin:$HOME/g
 RUN uv venv && uv pip install pdbpp wat
 
 ENTRYPOINT [ "/bin/bash" ]
-
-# TODO: Follow the best practices listed at https://docs.astral.sh/uv/guides/integration/docker/ and switch to regular user
