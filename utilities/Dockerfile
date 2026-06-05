@@ -66,7 +66,6 @@ RUN apt-get -yq update && \
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 ENV UV_LINK_MODE=copy \
-    UV_NO_CACHE=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_HTTP_TIMEOUT=60 \
     UV_PYTHON=python3.13 \
@@ -74,6 +73,7 @@ ENV UV_LINK_MODE=copy \
     VIRTUAL_ENV=/app/venv
 # TensorRT is quite noisy
 ENV PYTHONWARNINGS="ignore::SyntaxWarning"
+# Initiate Virtual Environment
 # Install an extension of Python debugger & deep inspection of Python objects
 RUN /bin/uv venv && /bin/uv pip install pdbpp wat
 # Install utilities
@@ -89,10 +89,9 @@ RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp
 
 ENV USER=user
 ENV HOME=/home/$USER
-WORKDIR $HOME
 RUN userdel -r ubuntu 2> /dev/null || true
 RUN useradd -m -s /bin/bash -u 1000 $USER && \
-    chown -R $USER:$USER $HOME && \
+    chown -R $USER:$USER $HOME /app && \
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USER
 
