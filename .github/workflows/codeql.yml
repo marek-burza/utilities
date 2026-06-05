@@ -1,8 +1,6 @@
 ---
 name: GitHub CodeQL
-
 on: [push]
-
 jobs:
   pipeline:
     name: Pipeline
