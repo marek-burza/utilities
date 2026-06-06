@@ -16,15 +16,12 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Dependabot PR - Approve
-        run: gh pr review "$PR_URL" --approve
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Dependabot PR - Auto-merge
+      - name: Dependabot PR - Approve and Auto-merge
         if: steps.metadata.outputs.package-ecosystem == 'github_actions'
         # Note Go to Settings → General → Pull Requests and check "Allow auto-merge"
-        run: gh pr merge "$PR_URL" --auto --squash --delete-branch
+        run: |
+          gh pr review "$PR_URL" --approve
+          gh pr merge "$PR_URL" --auto --squash --delete-branch
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
