@@ -13,6 +13,7 @@ RUN apt-get -yq update && \
         curl \
         enscript \
         ffmpeg \
+        ghostscript \
         git \
         git-lfs \
         imagemagick \
@@ -42,6 +43,7 @@ RUN apt-get -yq update && \
 # curl - N/A
 # enscript - N/A
 # ffmpeg - N/A
+# ghostscript - pdf_optimize
 # git - N/A
 # git-lfs - N/A
 # imagemagick - N/A
