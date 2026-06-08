@@ -94,6 +94,7 @@ RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp
 ENV USER=user
 ENV HOME=/home/$USER
 RUN userdel -r ubuntu 2> /dev/null || true
+RUN getent group 1000 > /dev/null 2>&1 || groupadd -g 1000 user
 RUN useradd -m -s /bin/bash -u 1000 $USER && \
     chown -R $USER:$USER $HOME /app && \
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
