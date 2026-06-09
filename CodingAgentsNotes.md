@@ -50,7 +50,7 @@ Tools:
 - `/agents` Manage agent configurations
 - `/add-dir <path>` Add working directory
 
-Running with local model:
+## Running Claude with llama.cpp
 
 ```shell
 llama-server -hf unsloth/Qwen3.6-35B-A3B-GGUF --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.5 --min-p 0.0 --reasoning on --host 0.0.0.0 --port 11434 > /tmp/llama.out 2> /tmp/llama.err &
@@ -60,3 +60,21 @@ CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_BASE_URL=http://localhost:11434 claud
 Notes:
 
 - Presence penalty is a parameter to control the likelihood of the model repeating tokens it has already generated. A higher presence penalty encourages the model to introduce new topics or ideas. Conversely, a lower or negative value increases the chance of repetition, which can be useful for maintaining focus or coherence.
+
+## Running Claude with Ollama
+
+To run with Qwen:
+```bash
+export ANTHROPIC_AUTH_TOKEN="ollama"
+export ANTHROPIC_API_KEY=""
+export ANTHROPIC_BASE_URL="http://host.docker.internal:11434"
+claude --model qwen3.5:35b
+```
+
+To switch back run:
+```bash
+unset ANTHROPIC_AUTH_TOKEN
+unset ANTHROPIC_API_KEY
+unset ANTHROPIC_BASE_URL
+claude
+```
