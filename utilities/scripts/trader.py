@@ -185,64 +185,69 @@ def risk_decomposition(reg: dict) -> dict:
 # Main
 # ----------------------------------------------------------------------
 def main(
-    asset: str = typer.Option(default=ASSET, help='Asset ticker (e.g. QCI.DE)'),
+    assets: list[str] = typer.Option(default=[ASSET], help='Asset ticker(s) (e.g. QCI.DE NVD.DE)'),
     market: str = typer.Option(default=MARKET, help='Market index ticker (e.g. ^GDAXI)'),
     begin: int = typer.Option(default=BEGIN, help='Begin year (inclusive)'),
     end: int = typer.Option(default=END, help='End year (inclusive)'),
     var_confidence: float = typer.Option(default=VAR_CONFIDENCE, help='VaR confidence level (e.g. 0.99 for 99%)'),
     portfolio_value: float = typer.Option(default=PORTFOLIO_VALUE, help='Portfolio value in currency units'),
 ):
-    print(f'Downloading {asset} (asset) and {market} (market)...')
-    prices = load_prices([asset, market], f'{begin}-01-01', f'{end}-12-31', INTERVAL)
+    print(f'Downloading {assets} and {market} (market)...')
+    prices = load_prices([*assets, market], f'{begin}-01-01', f'{end}-12-31', INTERVAL)
     if prices.empty or prices.shape[1] < 2:
         raise SystemExit('No data returned. Check tickers/dates.')
 
     returns = prices_to_returns(prices)
-    asset_returns  = returns[asset]
     market_returns = returns[market]
 
     print(f'\nSample: {prices.index[0].date()} -> {prices.index[-1].date()}  '
           f'({len(returns)} return obs)\n')
 
-    # ---- VaR ----
-    hvar = historical_var(asset_returns, var_confidence)
-    pvar = parametric_var(asset_returns, var_confidence)
-    print(f'=== {int(var_confidence*100)}% 1-day VaR for {asset} ===')
-    print(f'=== (On any day there is {100-int(var_confidence*100)}% probability that position of {portfolio_value:,.0f} in {asset} loses more than...) ===')
-    print(f'  Historical: {hvar:7.4%}  -> {hvar*portfolio_value:,.0f} EUR '
-          f'on {portfolio_value:,.0f}  (based on what actually happened)')
-    print(f'  Parametric: {pvar:7.4%}  -> {pvar*portfolio_value:,.0f} EUR '
-          f'on {portfolio_value:,.0f}  (based on a normal distribution fitted to the data)')
-    print(f'  Gap: a much larger historical VaR indicates fat tails  '
-          f'(extreme losses more frequent than the Gaussian predicts), '
-          f'which is common for equities during crises.')
+    for asset in assets:
+        asset_returns = returns[asset]
+        print(f'\n{"="*70}')
+        print(f'Asset: {asset}')
+        print(f'{"="*70}')
 
-    # ---- Beta / CAPM ----
-    reg = regression_stats(asset_returns, market_returns)
-    print(f'\n=== Beta & CAPM ({asset} vs {market}) ===')
-    print(f'  Beta (slope)        : {reg['beta']:.3f}  (measures an asset\'s sensitivity to market moves)')
-    print(f'  Alpha (annualised)  : {reg['alpha_per_period']*PERIODS_PER_YEAR:.4%}  (return above what CAPM predicts; positive = outperformed)')
-    print(f'  R^2                 : {reg['r_squared']:.3f}  (fraction of asset variance explained by the market)')
-    print(f'  p-value (beta)      : {reg['p_value']:.2e}'
-          f'  (probability that beta is zero by chance; low value e.g. <0.05 means the market relationship is statistically significant)')
+        # ---- VaR ----
+        hvar = historical_var(asset_returns, var_confidence)
+        pvar = parametric_var(asset_returns, var_confidence)
+        print(f'=== {int(var_confidence*100)}% 1-day VaR for {asset} ===')
+        print(f'=== (On any day there is {100-int(var_confidence*100)}% probability that position of {portfolio_value:,.0f} in {asset} loses more than...) ===')
+        print(f'  Historical: {hvar:7.4%}  -> {hvar*portfolio_value:,.0f} EUR '
+              f'on {portfolio_value:,.0f}  (based on what actually happened)')
+        print(f'  Parametric: {pvar:7.4%}  -> {pvar*portfolio_value:,.0f} EUR '
+              f'on {portfolio_value:,.0f}  (based on a normal distribution fitted to the data)')
+        print(f'  Gap: a much larger historical VaR indicates fat tails  '
+              f'(extreme losses more frequent than the Gaussian predicts), '
+              f'which is common for equities during crises.')
 
-    capm = capm_expected_return(reg['beta'], market_returns)
-    print(f'  CAPM E[R] (annual)  : {capm:.4%}  (CAPM - Capital Asset Pricing Model - expected return)')
+        # ---- Beta / CAPM ----
+        reg = regression_stats(asset_returns, market_returns)
+        print(f'\n=== Beta & CAPM ({asset} vs {market}) ===')
+        print(f'  Beta (slope)        : {reg['beta']:.3f}  (measures an asset\'s sensitivity to market moves)')
+        print(f'  Alpha (annualised)  : {reg['alpha_per_period']*PERIODS_PER_YEAR:.4%}  (return above what CAPM predicts; positive = outperformed)')
+        print(f'  R^2                 : {reg['r_squared']:.3f}  (fraction of asset variance explained by the market)')
+        print(f'  p-value (beta)      : {reg['p_value']:.2e}'
+              f'  (probability that beta is zero by chance; low value e.g. <0.05 means the market relationship is statistically significant)')
 
-    # ---- Risk decomposition ----
-    dec = risk_decomposition(reg)
-    print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(epsilon) ===')
-    print(f'  Total variance            : {dec['variance_total']:.3e}')
-    print(f'  Systematic (market)       : {dec['variance_systematic']:.3e} '
-          f'({dec['systematic_fraction']:.1%})'
-          f'  (market-driven risk; cannot be diversified away)')
-    print(f'  Idiosyncratic (residual)  : {dec['variance_idiosyncratic']:.3e} '
-          f'({1-dec['systematic_fraction']:.1%})'
-          f'  (asset-specific risk; diversifiable in a large portfolio)')
-    print(f'  Reconstructed total       : {dec['reconstructed_total']:.3e}  '
-          f'(should match total by definition)')
-    print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
-          f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
+        capm = capm_expected_return(reg['beta'], market_returns)
+        print(f'  CAPM E[R] (annual)  : {capm:.4%}  (CAPM - Capital Asset Pricing Model - expected return)')
+
+        # ---- Risk decomposition ----
+        dec = risk_decomposition(reg)
+        print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(epsilon) ===')
+        print(f'  Total variance            : {dec['variance_total']:.3e}')
+        print(f'  Systematic (market)       : {dec['variance_systematic']:.3e} '
+              f'({dec['systematic_fraction']:.1%})'
+              f'  (market-driven risk; cannot be diversified away)')
+        print(f'  Idiosyncratic (residual)  : {dec['variance_idiosyncratic']:.3e} '
+              f'({1-dec['systematic_fraction']:.1%})'
+              f'  (asset-specific risk; diversifiable in a large portfolio)')
+        print(f'  Reconstructed total       : {dec['reconstructed_total']:.3e}  '
+              f'(should match total by definition)')
+        print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
+              f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
 
 
 # ----------------------------------------------------------------------
