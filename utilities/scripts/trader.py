@@ -3,6 +3,8 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "pandas",
+#     "pytest",
+#     "quantstats",
 #     "scipy",
 #     "typer",
 #     "yfinance",
@@ -30,6 +32,8 @@ import datetime
 import typer
 import numpy as np
 import pandas as pd
+import pytest
+import quantstats as qs  # For technical analysis (RSI, MACD, etc.) see `pandas-ta`
 import yfinance as yf
 from scipy import stats
 
@@ -246,6 +250,80 @@ def main(
           f'(should match total by definition)')
     print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
           f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
+
+
+# ----------------------------------------------------------------------
+# Tests - run with: `cd utilities/scripts && uv run --with pytest --with quantstats --with pandas --with scipy --with numpy --with typer --with yfinance pytest trader.py -v && cd -`
+# Verifies metrics against QuantStats equivalents.
+#
+# Convention difference: trader.py uses log returns; QuantStats uses simple
+# (percentage) returns. For daily data the two are very close
+# (log(1+r) ≈ r for small r), so comparisons use a 1e-3 absolute tolerance.
+# ----------------------------------------------------------------------
+
+_ATOL = 1e-3  # tolerance for log vs simple return approximation
+_RNG = np.random.default_rng(42)
+
+
+def _make_prices(n: int = 500, beta: float = 1.2, noise: float = 0.01) -> pd.DataFrame:
+    """Synthetic daily prices with a known market beta."""
+    dates = pd.bdate_range('2020-01-01', periods=n)
+    market_returns = _RNG.normal(0.0004, 0.01, n)
+    asset_returns = beta * market_returns + _RNG.normal(0, noise, n)
+    market_prices = 100 * np.exp(np.cumsum(market_returns))
+    asset_prices = 100 * np.exp(np.cumsum(asset_returns))
+    return pd.DataFrame({'asset': asset_prices, 'market': market_prices}, index=dates)
+
+
+@pytest.fixture(scope='module')
+def _sample() -> dict[str, pd.Series]:
+    prices = _make_prices()
+    log_returns = prices_to_returns(prices)
+    simple_returns = prices.pct_change().dropna()
+    return {
+        'log_asset': log_returns['asset'],
+        'log_market': log_returns['market'],
+        'simple_asset': simple_returns['asset'],
+        'simple_market': simple_returns['market'],
+    }
+
+
+def test_historical_var(_sample: dict[str, pd.Series]) -> None:
+    # QuantStats does not expose historical VaR directly; equivalent is the
+    # empirical quantile of losses.
+    ours = historical_var(_sample['simple_asset'], VAR_CONFIDENCE)
+    qs_var = -_sample['simple_asset'].quantile(1 - VAR_CONFIDENCE)
+    assert abs(ours - qs_var) < _ATOL
+
+
+def test_parametric_var(_sample: dict[str, pd.Series]) -> None:
+    # qs.stats.value_at_risk returns the return at the cutoff (negative = loss),
+    # while our parametric_var returns a positive loss fraction, so we negate.
+    ours = parametric_var(_sample['simple_asset'], VAR_CONFIDENCE)
+    qs_var = -qs.stats.value_at_risk(_sample['simple_asset'], confidence=VAR_CONFIDENCE)
+    assert abs(ours - qs_var) < _ATOL
+
+
+def test_beta(_sample: dict[str, pd.Series]) -> None:
+    # qs.stats.greeks returns alpha and beta; uses simple returns internally.
+    reg = regression_stats(_sample['log_asset'], _sample['log_market'])
+    qs_beta = qs.stats.greeks(_sample['simple_asset'], _sample['simple_market'])['beta']
+    assert abs(reg['beta'] - qs_beta) < _ATOL
+
+
+def test_annualised_volatility(_sample: dict[str, pd.Series]) -> None:
+    # qs.stats.volatility annualises using sqrt(252) on simple returns.
+    ours = _sample['log_asset'].std(ddof=1) * np.sqrt(PERIODS_PER_YEAR)
+    qs_vol = qs.stats.volatility(_sample['simple_asset'], periods=PERIODS_PER_YEAR)
+    assert abs(ours - qs_vol) < _ATOL
+
+
+def test_risk_decomposition_identity(_sample: dict[str, pd.Series]) -> None:
+    # Mathematical identity: systematic + idiosyncratic must equal total variance.
+    # Independent of any external package.
+    reg = regression_stats(_sample['log_asset'], _sample['log_market'])
+    dec = risk_decomposition(reg)
+    assert abs(dec['variance_total'] - dec['reconstructed_total']) < 1e-10
 
 
 if __name__ == '__main__':
