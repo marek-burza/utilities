@@ -268,7 +268,9 @@ def main(
         print(f'Portfolio ({", ".join(f"{asset} {weight:.0%}" for asset, weight in zip(assets, weights))})')
         print(f'{"="*70}')
         print(f'  Covariance matrix (annualised):\n{cov_matrix.to_string()}'
-              f'\n  (negative or low covariance between assets reduces portfolio variance below the weighted'
+              f'\n  (covariance measures how much two assets move together: positive = move in the same'
+              f' direction, negative = move in opposite directions, zero = independent.'
+              f' Negative or low covariance between assets reduces portfolio variance below the weighted'
               f' average of individual variances - the mathematical basis of diversification)')
         print(f'\n  Portfolio variance   : {portfolio_variance:.3e}')
         print(f'  Portfolio volatility : {portfolio_volatility:.2%}'
