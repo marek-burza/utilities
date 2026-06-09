@@ -186,12 +186,21 @@ def risk_decomposition(reg: dict) -> dict:
 # ----------------------------------------------------------------------
 def main(
     assets: list[str] = typer.Option(default=[ASSET], help='Asset ticker(s) (e.g. QCI.DE NVD.DE)'),
+    assets_fractions: list[float] = typer.Option(default=[], help='Portfolio weight per asset (e.g. 0.6 0.4); must sum to 1 and match number of assets. Omit for equal weights.'),
     market: str = typer.Option(default=MARKET, help='Market index ticker (e.g. ^GDAXI)'),
     begin: int = typer.Option(default=BEGIN, help='Begin year (inclusive)'),
     end: int = typer.Option(default=END, help='End year (inclusive)'),
     var_confidence: float = typer.Option(default=VAR_CONFIDENCE, help='VaR confidence level (e.g. 0.99 for 99%)'),
     portfolio_value: float = typer.Option(default=PORTFOLIO_VALUE, help='Portfolio value in currency units'),
 ):
+    if assets_fractions:
+        if len(assets_fractions) != len(assets):
+            raise SystemExit(f'assets_fractions length ({len(assets_fractions)}) must match assets length ({len(assets)}).')
+        if abs(sum(assets_fractions) - 1.0) > 1e-6:
+            raise SystemExit(f'assets_fractions must sum to 1 (got {sum(assets_fractions):.6f}).')
+        weights = np.array(assets_fractions)
+    else:
+        weights = np.full(len(assets), 1.0 / len(assets))
     print(f'Downloading {assets} and {market} (market)...')
     prices = load_prices([*assets, market], f'{begin}-01-01', f'{end}-12-31', INTERVAL)
     if prices.empty or prices.shape[1] < 2:
@@ -248,6 +257,20 @@ def main(
               f'(should match total by definition)')
         print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
               f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
+
+    # ---- Portfolio covariance ----
+    if len(assets) > 1:
+        assets_returns = returns[assets]
+        cov_matrix = assets_returns.cov() * PERIODS_PER_YEAR
+        portfolio_variance = weights @ cov_matrix.values @ weights
+        portfolio_volatility = np.sqrt(portfolio_variance)
+        print(f'\n{"="*70}')
+        print(f'Portfolio ({", ".join(f"{asset} {weight:.0%}" for asset, weight in zip(assets, weights))})')
+        print(f'{"="*70}')
+        print(f'  Covariance matrix (annualised):\n{cov_matrix.to_string()}')
+        print(f'\n  Portfolio variance   : {portfolio_variance:.3e}')
+        print(f'  Portfolio volatility : {portfolio_volatility:.2%}'
+              f'  (weighted combination of assets; lower than average of individual volatilities if assets are not perfectly correlated)')
 
 
 # ----------------------------------------------------------------------
