@@ -208,7 +208,7 @@ def main(
     hvar = historical_var(asset_returns, var_confidence)
     pvar = parametric_var(asset_returns, var_confidence)
     print(f'=== {int(var_confidence*100)}% 1-day VaR for {asset} ===')
-    print(f'=== (On any day there is {100-int(var_confidence*100)}% that position of {portfolio_value:,.0f} in {asset} loses more than...) ===')
+    print(f'=== (On any day there is {100-int(var_confidence*100)}% probability that position of {portfolio_value:,.0f} in {asset} loses more than...) ===')
     print(f'  Historical: {hvar:7.4%}  -> {hvar*portfolio_value:,.0f} EUR '
           f'on {portfolio_value:,.0f}  (based on what actually happened)')
     print(f'  Parametric: {pvar:7.4%}  -> {pvar*portfolio_value:,.0f} EUR '
@@ -232,14 +232,14 @@ def main(
     # ---- Risk decomposition ----
     dec = risk_decomposition(reg)
     print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(epsilon) ===')
-    print(f'  Total variance         : {dec['variance_total']:.3e}')
+    print(f'  Total variance            : {dec['variance_total']:.3e}')
     print(f'  Systematic (market)       : {dec['variance_systematic']:.3e} '
           f'({dec['systematic_fraction']:.1%})'
           f'  (market-driven risk; cannot be diversified away)')
     print(f'  Idiosyncratic (residual)  : {dec['variance_idiosyncratic']:.3e} '
           f'({1-dec['systematic_fraction']:.1%})'
           f'  (asset-specific risk; diversifiable in a large portfolio)')
-    print(f'  Reconstructed total    : {dec['reconstructed_total']:.3e}  '
+    print(f'  Reconstructed total       : {dec['reconstructed_total']:.3e}  '
           f'(should match total by definition)')
     print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
           f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
