@@ -1,0 +1,252 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pandas",
+#     "scipy",
+#     "typer",
+#     "yfinance",
+# ]
+# ///
+
+"""
+Qualcomm (Xetra, EUR) - Risk & CAPM (Capital Asset Pricing Model) analysis with yfinance
+===========================================================
+Implements the Yale 'Financial Markets' concepts:
+  - Value at Risk (VaR)            : historical + parametric
+  - Beta (regression slope)        : cov(asset, mkt) / var(mkt)
+  - CAPM expected return           : R_f + beta*(E[R_m]-R_f)
+  - Market vs idiosyncratic risk   : var(R) = beta^2*var(R_m) + var(eps)
+
+Run in an environment with normal internet access (yfinance reaches
+finance.yahoo.com). Not runnable inside the Claude sandbox, whose network
+is restricted to package registries.
+
+    pip install yfinance pandas numpy scipy
+    python qcom_germany_risk.py
+"""
+
+import datetime
+import typer
+import numpy as np
+import pandas as pd
+import yfinance as yf
+from scipy import stats
+
+# ----------------------------------------------------------------------
+# Defaults
+# ----------------------------------------------------------------------
+ASSET = 'QCI.DE'  # Qualcomm on Xetra (Xetra = Exchange Electronic Trading; the primary venue for DAX-listed stocks)
+MARKET = '^GDAXI'  # DAX index as the German market proxy.
+LAST_YEAR = datetime.date.today().year - 1
+SPAN = 5
+BEGIN   = LAST_YEAR - SPAN
+END     = LAST_YEAR
+INTERVAL = '1d'  # yfinance intraday (e.g. '60m','15m','1m') only goes back a little; daily for multi-year.
+
+# Annualisation factor (trading days). Use 252 for daily data.
+PERIODS_PER_YEAR = 252
+
+# Risk-free (annual) rate (expressed as a decimal).
+# It is the return you would get by doing low risk investment e.g. in government bonds.
+# It is the baseline to compare the asset against - investment should beat this rate,
+# otherwise why take the risk?
+RISK_FREE_ANNUAL = 0.03
+
+# VaR settings
+VAR_CONFIDENCE = 0.99  # 99% VaR
+PORTFOLIO_VALUE = 1_000_000  # currency units, to express VaR in EUR
+
+
+# ----------------------------------------------------------------------
+# 1. Data
+# ----------------------------------------------------------------------
+def load_prices(tickers: list[str], begin: str, end: str, interval: str) -> pd.DataFrame:
+    """Download Close prices, return a clean aligned DataFrame."""
+    raw = yf.download(
+        tickers, start=begin, end=end, interval=interval,
+        auto_adjust=True, progress=False,
+    )
+    # With multiple tickers yfinance returns a column MultiIndex; grab Close.
+    close = raw['Close'] if 'Close' in raw.columns.get_level_values(0) else raw
+    close = close.dropna(how='all').ffill().dropna()
+    return close
+
+
+def prices_to_returns(prices: pd.DataFrame) -> pd.DataFrame:
+    """Continuously compounded (log) returns: r = log(P_t / P_{t-1}).
+    Assumes gains are reinvested instantaneously rather than at discrete
+    intervals, equivalent to the rate r such that P_{t-1} * e^r = P_t.
+    Used because multi-day returns are a simple sum of daily returns, which
+    makes variance, regression, and VaR arithmetic straightforward."""
+    return np.log(prices / prices.shift(1)).dropna()
+
+
+# ----------------------------------------------------------------------
+# 2. Value at Risk
+# Two estimates are computed and printed side by side:
+#   historical_var: no distributional assumption - the actual 1st percentile
+#     of observed losses.
+#   parametric_var: assumes normally distributed returns, fitting a Gaussian
+#     from the mean and std of the return series.
+# Example: 1-day 99% VaR = $1M means P(loss > $1M) = 1% per day.
+# (where 99% is the confidence and returns prescribe distribution of losses)
+# ----------------------------------------------------------------------
+def historical_var(returns: pd.Series, confidence: float) -> float:
+    """Historical (empirical) VaR as a positive loss fraction.
+    VaR = the (1-confidence) quantile of the loss distribution."""
+    losses = -returns
+    return np.quantile(losses, confidence)
+
+
+def parametric_var(returns: pd.Series, confidence: float) -> float:
+    """Gaussian (variance-covariance) VaR as a positive loss fraction."""
+    mu, sigma = returns.mean(), returns.std(ddof=1)
+    # ppf (percent point function) is the inverse of the CDF (cumulative
+    # distribution function). The CDF answers "given a value x, what fraction
+    # of outcomes fall below x?"; ppf answers the reverse: "given a
+    # probability p, what value x has exactly p of outcomes below it?"
+    # So ppf(0.99) returns ~2.326, the z-score for the 99th percentile of a
+    # standard normal distribution.
+    z = stats.norm.ppf(confidence)
+    # mu - z*sigma is the return at the confidence-level cutoff (the point on
+    # the return distribution that separates the normal range from the tail)
+    # on the fitted Gaussian: the mean shifted left by z standard deviations. It is negative
+    # (a loss), so we negate it to return a positive loss fraction.
+    return -(mu - z * sigma)
+
+
+# ----------------------------------------------------------------------
+# 3. Beta, CAPM (Capital Asset Pricing Model), risk decomposition (OLS of asset on market)
+# - Beta (β) measures an asset's sensitivity to market moves: β = cov(asset_returns, market_returns) / var(market_returns),
+#   the slope of asset return regressed on market return ("regressed on" = fitted as a straight
+#   line with market return on the x-axis and asset return on the y-axis).
+#   Beta is the regression slope coefficient when the return on the ith asset is regressed on the return on the market.
+# - CAPM prices expected return as a linear function of beta: E[R_i] = R_f + β_i * (E[R_m] - R_f),
+#   where R_f is the risk-free rate and (E[R_m] - R_f) is the market risk premium.
+#   Intuition: investors are only compensated for non-diversifiable (market) risk, scaled by β.
+# - R² measures how much of the asset's return variation is explained by the market's movements
+#   (0 = no relation to market, 1 = moves in perfect lockstep). It is the square of the
+#   correlation coefficient r from the regression.
+# - Alpha (α) is the intercept of the regression line - the value of y (asset return) when
+#   x (market return) is zero. It represents the return the asset earns above or below what
+#   CAPM predicts given its beta: positive alpha means the asset outperformed the
+#   market-implied expectation; negative means it underperformed.
+# ----------------------------------------------------------------------
+def regression_stats(asset_returns: pd.Series, market_returns: pd.Series) -> dict:
+    """Regress asset excess return on market excess return.
+    Returns alpha, beta, residuals, and R^2 - beta is the slope, exactly
+    the 'regression slope coefficient' definition from the notes."""
+    # Align
+    df = pd.concat([asset_returns, market_returns], axis=1).dropna()
+    df.columns = ['asset', 'market']
+
+    rf_per_period = RISK_FREE_ANNUAL / PERIODS_PER_YEAR
+    x = df['market'] - rf_per_period  # market excess return
+    y = df['asset']  - rf_per_period  # asset excess return
+
+    slope, intercept, r, p, se = stats.linregress(x, y)
+    fitted = intercept + slope * x
+    resid = y - fitted
+    return {
+        'beta': slope,
+        'alpha_per_period': intercept,
+        'r_squared': r**2,
+        'p_value': p,
+        'std_err': se,
+        'resid': resid,
+        'asset_returns': df['asset'],
+        'market_returns': df['market'],
+    }
+
+
+def capm_expected_return(beta: float, market_returns: pd.Series) -> float:
+    """CAPM: E[R_i] = R_f + beta*(E[R_m]-R_f), annualised."""
+    rf = RISK_FREE_ANNUAL
+    mkt_annual = market_returns.mean() * PERIODS_PER_YEAR
+    return rf + beta * (mkt_annual - rf)
+
+
+def risk_decomposition(reg: dict) -> dict:
+    """var(R_i) = beta^2 * var(R_m) + var(eps).
+    Confirms the systematic + idiosyncratic split from the notes."""
+    beta = reg['beta']
+    variance_total = reg['asset_returns'].var(ddof=1)
+    variance_market = reg['market_returns'].var(ddof=1)
+    variance_systematic = beta**2 * variance_market
+    variance_idiosyncratic = reg['resid'].var(ddof=1)
+    return {
+        'variance_total': variance_total,
+        'variance_systematic': variance_systematic,
+        'variance_idiosyncratic': variance_idiosyncratic,
+        'reconstructed_total': variance_systematic + variance_idiosyncratic,
+        'systematic_fraction': variance_systematic / (variance_systematic + variance_idiosyncratic),
+    }
+
+
+# ----------------------------------------------------------------------
+# Main
+# ----------------------------------------------------------------------
+def main(
+    asset: str = typer.Option(default=ASSET, help='Asset ticker (e.g. QCI.DE)'),
+    market: str = typer.Option(default=MARKET, help='Market index ticker (e.g. ^GDAXI)'),
+    begin: int = typer.Option(default=BEGIN, help='Begin year (inclusive)'),
+    end: int = typer.Option(default=END, help='End year (inclusive)'),
+    var_confidence: float = typer.Option(default=VAR_CONFIDENCE, help='VaR confidence level (e.g. 0.99 for 99%)'),
+    portfolio_value: float = typer.Option(default=PORTFOLIO_VALUE, help='Portfolio value in currency units'),
+):
+    print(f'Downloading {asset} (asset) and {market} (market)...')
+    prices = load_prices([asset, market], f'{begin}-01-01', f'{end}-12-31', INTERVAL)
+    if prices.empty or prices.shape[1] < 2:
+        raise SystemExit('No data returned. Check tickers/dates.')
+
+    returns = prices_to_returns(prices)
+    asset_returns  = returns[asset]
+    market_returns = returns[market]
+
+    print(f'\nSample: {prices.index[0].date()} -> {prices.index[-1].date()}  '
+          f'({len(returns)} return obs)\n')
+
+    # ---- VaR ----
+    hvar = historical_var(asset_returns, var_confidence)
+    pvar = parametric_var(asset_returns, var_confidence)
+    print(f'=== {int(var_confidence*100)}% 1-day VaR for {asset} ===')
+    print(f'=== (On any day there is {100-int(var_confidence*100)}% that position of {portfolio_value:,.0f} in {asset} loses more than...) ===')
+    print(f'  Historical: {hvar:7.4%}  -> {hvar*portfolio_value:,.0f} EUR '
+          f'on {portfolio_value:,.0f}  (based on what actually happened)')
+    print(f'  Parametric: {pvar:7.4%}  -> {pvar*portfolio_value:,.0f} EUR '
+          f'on {portfolio_value:,.0f}  (based on a normal distribution fitted to the data)')
+    print(f'  Gap: a much larger historical VaR indicates fat tails  '
+          f'(extreme losses more frequent than the Gaussian predicts), '
+          f'which is common for equities during crises.')
+
+    # ---- Beta / CAPM ----
+    reg = regression_stats(asset_returns, market_returns)
+    print(f'\n=== Beta & CAPM ({asset} vs {market}) ===')
+    print(f'  Beta (slope)        : {reg['beta']:.3f}  (measures an asset\'s sensitivity to market moves)')
+    print(f'  Alpha (annualised)  : {reg['alpha_per_period']*PERIODS_PER_YEAR:.4%}  (return above what CAPM predicts; positive = outperformed)')
+    print(f'  R^2                 : {reg['r_squared']:.3f}  (fraction of asset variance explained by the market)')
+    print(f'  p-value (beta)      : {reg['p_value']:.2e}'
+          f'  (probability that beta is zero by chance; low value e.g. <0.05 means the market relationship is statistically significant)')
+
+    capm = capm_expected_return(reg['beta'], market_returns)
+    print(f'  CAPM E[R] (annual)  : {capm:.4%}  (CAPM - Capital Asset Pricing Model - expected return)')
+
+    # ---- Risk decomposition ----
+    dec = risk_decomposition(reg)
+    print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(eps) ===')
+    print(f'  Total variance         : {dec['variance_total']:.3e}')
+    print(f'  Systematic (market)       : {dec['variance_systematic']:.3e} '
+          f'({dec['systematic_fraction']:.1%})'
+          f'  (market-driven risk; cannot be diversified away)')
+    print(f'  Idiosyncratic (residual)  : {dec['variance_idiosyncratic']:.3e} '
+          f'({1-dec['systematic_fraction']:.1%})'
+          f'  (asset-specific risk; diversifiable in a large portfolio)')
+    print(f'  Reconstructed total    : {dec['reconstructed_total']:.3e}  '
+          f'(should match total by definition)')
+    print(f'\n  Annualised volatility  : {asset_returns.std(ddof=1)*np.sqrt(PERIODS_PER_YEAR):.2%}'
+          f'  (standard deviation of daily returns scaled to a full year; a common summary of total risk)')
+
+
+if __name__ == '__main__':
+    typer.run(main)
