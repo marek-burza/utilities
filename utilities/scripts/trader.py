@@ -157,6 +157,39 @@ def regression_stats(asset_returns: pd.Series, market_returns: pd.Series) -> dic
     }
 
 
+def regression_stats_alternative(asset_returns: pd.Series, market_returns: pd.Series) -> dict:
+    """Same as regression_stats but derives beta directly from the covariance
+    formula (β = cov(asset, market) / var(market)) instead of delegating to
+    scipy.linregress. Produces identical results."""
+    df = pd.concat([asset_returns, market_returns], axis=1).dropna()
+    df.columns = ['asset', 'market']
+
+    rf_per_period = RISK_FREE_ANNUAL / PERIODS_PER_YEAR
+    x = df['market'] - rf_per_period  # market excess return
+    y = df['asset']  - rf_per_period  # asset excess return
+
+    beta = x.cov(y) / x.var(ddof=1)
+    alpha = y.mean() - beta * x.mean()
+    resid = y - (alpha + beta * x)
+    r_squared = x.corr(y) ** 2
+
+    n = len(x)
+    se = np.sqrt(resid.var(ddof=1) / ((n - 2) * x.var(ddof=1)))
+    t = beta / se
+    p = 2 * (1 - stats.t.cdf(abs(t), df=n - 2))
+
+    return {
+        'beta': beta,
+        'alpha_per_period': alpha,
+        'r_squared': r_squared,
+        'p_value': p,
+        'std_err': se,
+        'resid': resid,
+        'asset_returns': df['asset'],
+        'market_returns': df['market'],
+    }
+
+
 def capm_expected_return(beta: float, market_returns: pd.Series) -> float:
     """CAPM: E[R_i] = R_f + beta*(E[R_m]-R_f), annualised."""
     rf = RISK_FREE_ANNUAL
@@ -286,7 +319,8 @@ def main(
 # (log(1+r) ≈ r for small r), so comparisons use a 1e-3 absolute tolerance.
 # ----------------------------------------------------------------------
 
-_ATOL = 1e-3  # tolerance for log vs simple return approximation
+_ATOL = 1e-3   # tolerance for log vs simple return approximation
+_EPS  = 1e-10  # tolerance for results that should be numerically identical
 _RNG = np.random.default_rng(42)
 
 
@@ -348,7 +382,19 @@ def test_risk_decomposition_identity(_sample: dict[str, pd.Series]) -> None:
     # Independent of any external package.
     reg = regression_stats(_sample['log_asset'], _sample['log_market'])
     dec = risk_decomposition(reg)
-    assert abs(dec['variance_total'] - dec['reconstructed_total']) < 1e-10
+    assert abs(dec['variance_total'] - dec['reconstructed_total']) < _EPS
+
+
+def test_regression_stats_alternative(_sample: dict[str, pd.Series]) -> None:
+    # Verifies that the covariance-formula implementation produces the same
+    # results as the linregress-based implementation.
+    reg = regression_stats(_sample['log_asset'], _sample['log_market'])
+    alt = regression_stats_alternative(_sample['log_asset'], _sample['log_market'])
+    assert abs(reg['beta']             - alt['beta'])             < _EPS
+    assert abs(reg['alpha_per_period'] - alt['alpha_per_period']) < _EPS
+    assert abs(reg['r_squared']        - alt['r_squared'])        < _EPS
+    assert abs(reg['p_value']          - alt['p_value'])          < _EPS
+    assert abs(reg['std_err']          - alt['std_err'])          < _EPS
 
 
 if __name__ == '__main__':
