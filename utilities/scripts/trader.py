@@ -12,20 +12,13 @@
 # ///
 
 """
-Qualcomm (Xetra, EUR) - Risk & CAPM (Capital Asset Pricing Model) analysis with yfinance
+Risk & CAPM (Capital Asset Pricing Model) analysis with yfinance
 ===========================================================
 Implements the Yale 'Financial Markets' concepts:
   - Value at Risk (VaR)            : historical + parametric
   - Beta (regression slope)        : cov(asset, mkt) / var(mkt)
   - CAPM expected return           : R_f + beta*(E[R_m]-R_f)
-  - Market vs idiosyncratic risk   : var(R) = beta^2*var(R_m) + var(eps)
-
-Run in an environment with normal internet access (yfinance reaches
-finance.yahoo.com). Not runnable inside the Claude sandbox, whose network
-is restricted to package registries.
-
-    pip install yfinance pandas numpy scipy
-    python qcom_germany_risk.py
+  - Market vs idiosyncratic risk   : var(R) = beta^2*var(R_m) + var(epsilon)
 """
 
 import datetime
@@ -172,7 +165,7 @@ def capm_expected_return(beta: float, market_returns: pd.Series) -> float:
 
 
 def risk_decomposition(reg: dict) -> dict:
-    """var(R_i) = beta^2 * var(R_m) + var(eps).
+    """var(R_i) = beta^2 * var(R_m) + var(epsilon).
     Confirms the systematic + idiosyncratic split from the notes."""
     beta = reg['beta']
     variance_total = reg['asset_returns'].var(ddof=1)
@@ -238,7 +231,7 @@ def main(
 
     # ---- Risk decomposition ----
     dec = risk_decomposition(reg)
-    print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(eps) ===')
+    print(f'\n=== Risk decomposition: var(R) = beta^2*var(R_m) + var(epsilon) ===')
     print(f'  Total variance         : {dec['variance_total']:.3e}')
     print(f'  Systematic (market)       : {dec['variance_systematic']:.3e} '
           f'({dec['systematic_fraction']:.1%})'
