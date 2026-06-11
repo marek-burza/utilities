@@ -68,6 +68,14 @@ RUN apt-get -yq update && \
 # unzip - N/A
 # zlib - Pillow (older, non-wheel version)
 
+RUN TAG=$(curl -fsSL https://api.github.com/repos/dejavu-fonts/dejavu-fonts/releases/latest | jq -r '.tag_name') && \
+    VER=$(echo "$TAG" | sed 's/version_//' | tr '_' '.') && \
+    curl -fsSL "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/${TAG}/dejavu-fonts-ttf-${VER}.tar.bz2" \
+    | tar -xj -C /usr/share/fonts/truetype/dejavu --strip-components=2 \
+        "dejavu-fonts-ttf-${VER}/ttf/DejaVuSans-Oblique.ttf" \
+        "dejavu-fonts-ttf-${VER}/ttf/DejaVuSans-BoldOblique.ttf" && \
+    fc-cache -f
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 ENV UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
