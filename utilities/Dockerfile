@@ -32,7 +32,7 @@ RUN apt-get -yq update && \
         pkg-config \
         poppler-utils \
         qpdf \
-        nodejs \
+        npm \
         ripgrep \
         software-properties-common \
         sudo \
@@ -64,7 +64,7 @@ RUN apt-get -yq update && \
 # pkg-config - matplotlib (older, non-wheel version)
 # poppler-utils - N/A
 # qpdf - N/A
-# nodejs - MCP
+# npm - MCP (provides node, npx)
 # ripgrep - Claude Code
 # software-properties-common - Python
 # unzip - N/A
