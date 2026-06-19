@@ -33,44 +33,6 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
         '--presence-penalty', '0',
     ],
-    'unsloth/gemma-4-31B-it-GGUF:IQ4_XS': [
-        '-ngl', '99',
-        '-c', '131072',
-        '-fa', 'on',
-        '--no-context-shift',
-        '--cache-type-k', 'q4_0',
-        '--cache-type-v', 'q4_0',
-        '--temp', '1.0',
-        '--top-p', '0.95',
-        '--top-k', '64',
-        '--min-p', '0',
-    ],
-    'google/gemma-4-31B-it-qat-q4_0-gguf': [
-        '-ngl', '99',
-        '-c', '262144',
-        '-fa', 'on',
-        '--no-context-shift',
-        '--cache-type-k', 'q4_0',
-        '--cache-type-v', 'q4_0',
-        '--temp', '1.0',
-        '--top-p', '0.95',
-        '--top-k', '64',
-        '--min-p', '0',
-    ],
-    # ~4B active params means much faster per-token speed,
-    # with only a modest coding quality drop (77% vs 80% LiveCodeBench v6)
-    'google/gemma-4-26B-A4B-it-qat-q4_0-gguf': [
-        '-ngl', '99',
-        '-c', '262144',
-        '-fa', 'on',
-        '--no-context-shift',
-        '--cache-type-k', 'q4_0',
-        '--cache-type-v', 'q4_0',
-        '--temp', '1.0',
-        '--top-p', '0.95',
-        '--top-k', '64',
-        '--min-p', '0',
-    ],
     'unsloth/MiniMax-M2.7-GGUF:UD-IQ4_XS': [
         '-ngl', '20',
         '-c', '65536',
@@ -82,7 +44,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
     ],
 }
-DEFAULT_MODEL = 'google/gemma-4-31B-it-qat-q4_0-gguf'
+DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
 
 
 def llama_server_download(model_uri: str) -> None:
