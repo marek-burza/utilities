@@ -257,10 +257,12 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--cache-reuse', '256',
         '--reasoning', 'off',
     ],
-    # gemma-4-12B: unified encoder-free multimodal (text+image+audio), 256K ctx; used for distill/solve/OCR
-    'google/gemma-4-12B-it-qat-q4_0-gguf': [
-        '-c', '32768', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
+    # gemma-4-26B-A4B: MoE (~4B active), multimodal (text+image+audio), 256K ctx; used for distill/solve/OCR
+    # sampling/cache/ctx carried over from qwaude.py; thinking disabled
+    'google/gemma-4-26B-A4B-it-qat-q4_0-gguf': [
+        '-c', '262144', '-fa', 'on', '--no-context-shift',
+        '--cache-type-k', 'q4_0', '--cache-type-v', 'q4_0',
+        '--temp', '1.0', '--top-p', '0.95', '--top-k', '64', '--min-p', '0',
         '--reasoning', 'off',
     ],
     # QAT-quantized — q8_0 KV is fine; text-only (no mmproj shipped)
@@ -1205,4 +1207,4 @@ class TestVadAccumulator:
 # Fast alternative: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
 # RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something1.md --solve-content something2.md
 # Slow: unsloth/Qwen3.6-35B-A3B-GGUF
-# Try this: uv run utilities/scripts/souffleur.py --distill-model google/gemma-4-12B-it-qat-q4_0-gguf --solve-model google/gemma-4-12B-it-qat-q4_0-gguf --ocr-model google/gemma-4-12B-it-qat-q4_0-gguf --source all
+# Try this: uv run utilities/scripts/souffleur.py --distill-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --solve-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --ocr-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --source all
