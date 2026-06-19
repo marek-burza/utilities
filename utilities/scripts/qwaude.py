@@ -33,16 +33,6 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--min-p', '0',
         '--presence-penalty', '0',
     ],
-    'unsloth/MiniMax-M2.7-GGUF:UD-IQ4_XS': [
-        '-ngl', '20',
-        '-c', '65536',
-        '--cache-type-k', 'q4_0',
-        '--cache-type-v', 'q4_0',
-        '--temp', '1.0',
-        '--top-p', '0.95',
-        '--top-k', '40',
-        '--min-p', '0',
-    ],
 }
 DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
 
