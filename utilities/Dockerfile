@@ -96,7 +96,7 @@ RUN chmod +x /usr/local/bin/*.py
 
 RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp && \
     cd /tmp/llama.cpp && \
-    cmake -B . . -DLLAMA_CUDA=ON && \
+    cmake -B . . -DDGGML_CUDA=ON -DLLAMA_BUILD_UI=OFF && \
     cmake --build . --config Release -j$(nproc) && \
     cmake --install . --config Release && \
     rm -rf /tmp/llama.cpp
