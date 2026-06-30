@@ -116,6 +116,7 @@ RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asou
 RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://antigravity.google/cli/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://opencode.ai/install | /bin/bash) && \
+    (curl --proto '=https' --tlsv1.2 -fsSL https://hermes-agent.nousresearch.com/install.sh | /bin/bash) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://go.dev/dl/$(curl -sL https://golang.org/dl/ | grep -oP 'go[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1).linux-amd64.tar.gz | /usr/bin/tar -C $HOME/.local -xzf -) && \
     (curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | /bin/sh -s -- -y)
 ENV PATH="$PATH:$VIRTUAL_ENV/bin:$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
