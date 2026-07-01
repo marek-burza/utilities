@@ -71,6 +71,13 @@ export ANTHROPIC_BASE_URL="http://host.docker.internal:11434"
 claude --model qwen3.5:35b
 ```
 
+Disposable `ollama` container:
+
+```shell
+podman run -it --rm --pull=always --name ollama --device nvidia.com/gpu=all --network host --userns=keep-id -e OLLAMA_HOME=/ollama ollama/ollama
+podman exec -it ollama ollama pull qwen3.5:35b
+```
+
 To switch back run:
 ```bash
 unset ANTHROPIC_AUTH_TOKEN
