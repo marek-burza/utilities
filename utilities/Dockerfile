@@ -89,7 +89,7 @@ ENV UV_LINK_MODE=copy \
 ENV PYTHONWARNINGS="ignore::SyntaxWarning"
 # Initiate Virtual Environment
 # Install an extension of Python debugger & deep inspection of Python objects
-RUN /bin/uv venv && /bin/uv pip install pdbpp wat
+RUN /bin/uv venv $VIRTUAL_ENV && /bin/uv pip install --python $VIRTUAL_ENV pdbpp wat
 # Install utilities
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.py
