@@ -7,7 +7,6 @@
     - role: cups
     - role: podman
     - role: nvidia
-    - role: slurm
     - role: swap
     - role: uv
     - role: fonts
