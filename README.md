@@ -1,1 +1,1 @@
-[🗺️](https://altermarkive.github.io/altermarkive/web/topography.html)
+[🗺️](https://marek-burza.github.io/utilities/web/topography.html)
