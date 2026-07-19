@@ -62,6 +62,40 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
         '--threads', str(cpu_count(logical=False)),
     ],
+    'unsloth/gemma-4-31B-it-GGUF:IQ4_XS': [
+        '-ngl', '99',
+        '-c', '131072',
+        '-fa', 'on',
+        '-np', '1',
+        '--no-context-shift',
+        '--cache-type-k', 'q4_0',
+        '--cache-type-v', 'q4_0',
+        '--jinja',  # Correct chat-template handling (Gemma turn markers)
+        '--temp', '1.0',
+        '--top-p', '0.95',
+        '--top-k', '64',
+        '--min-p', '0',
+        '-b', '4096',  # Batch tuning (max number of tokens llama.cpp accepts into one processing call)
+        '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
+        '--threads', str(cpu_count(logical=False)),
+    ],
+    'google/gemma-4-31B-it-qat-q4_0-gguf': [
+        '-ngl', '99',
+        '-c', '262144',
+        '-fa', 'on',
+        '-np', '1',
+        '--no-context-shift',
+        '--cache-type-k', 'q4_0',
+        '--cache-type-v', 'q4_0',
+        '--jinja',  # Correct chat-template handling (Gemma turn markers)
+        '--temp', '1.0',
+        '--top-p', '0.95',
+        '--top-k', '64',
+        '--min-p', '0',
+        '-b', '4096',  # Batch tuning (max number of tokens llama.cpp accepts into one processing call)
+        '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
+        '--threads', str(cpu_count(logical=False)),
+    ],
 }
 DEFAULT_MODEL = 'prism-ml/Bonsai-27B-gguf:Q1_0'
 
