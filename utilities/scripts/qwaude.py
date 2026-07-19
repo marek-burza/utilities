@@ -25,6 +25,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '-ngl', '99',
         '-c', '131072',
         '-fa', 'on',
+        '-np', '1',
         '--no-context-shift',
         '--cache-type-k', 'q4_0',  # Try q8_0 but might need to reduce context size
         '--cache-type-v', 'q4_0',
@@ -39,6 +40,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '-b', '4096',  # Batch tuning (max number of tokens llama.cpp accepts into one processing call)
         '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
         '--threads', str(cpu_count(logical=False)),
+        '--no-mmproj',
     ],
     'unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0': [
         '-ngl', '99',
@@ -59,6 +61,7 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '-b', '4096',  # Batch tuning (max number of tokens llama.cpp accepts into one processing call)
         '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
         '--threads', str(cpu_count(logical=False)),
+        '--no-mmproj',
     ],
 }
 DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
