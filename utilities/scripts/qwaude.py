@@ -42,18 +42,18 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--threads', str(cpu_count(logical=False)),
         '--no-mmproj',
     ],
-    'unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0': [
+    'prism-ml/Bonsai-27B-gguf:Q1_0': [
         '-ngl', '99',
-        '-c', '131072',  # 65536?
+        '-c', '262144',
         '-fa', 'on',
+        '-np', '1',
         '--no-context-shift',
-        '--cache-type-k', 'q8_0',
-        '--cache-type-v', 'q8_0',
+        '--cache-type-k', 'q4_0',  # Bonsai recommends 4-bit KV-cache quantization for on-device inference
+        '--cache-type-v', 'q4_0',
         '--jinja',  # Correct chat-template / reasoning handling
-        '--spec-type', 'draft-mtp',
         '--reasoning', 'on',
         '--reasoning-budget', '2048',  # Caps thinking, anti-loop guard
-        '--temp', '0.6',
+        '--temp', '0.7',  # Bonsai thinking-mode recommendation (Qwen3.6 uses 0.6)
         '--top-p', '0.95',
         '--top-k', '20',
         '--min-p', '0',
@@ -61,10 +61,9 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '-b', '4096',  # Batch tuning (max number of tokens llama.cpp accepts into one processing call)
         '-ub', '2048',  # Ubatch tuning (how many tokens are actually computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
         '--threads', str(cpu_count(logical=False)),
-        '--no-mmproj',
     ],
 }
-DEFAULT_MODEL = 'unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL'
+DEFAULT_MODEL = 'prism-ml/Bonsai-27B-gguf:Q1_0'
 
 
 def llama_server_download(model_uri: str) -> None:
