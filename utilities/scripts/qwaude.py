@@ -107,38 +107,6 @@ def llama_server_download(model_uri: str) -> None:
         process.wait()
 
 
-def ensure_opencode_config(model: str, web: bool) -> None:
-    config_dir = Path('~/.config/opencode').expanduser()
-    config_path = config_dir / 'opencode.json'
-    config_dir.mkdir(parents=True, exist_ok=True)
-    models = {}
-    for uri in LLAMA_SERVER_EXTRA_PARAMS:
-        models[uri] = {
-            'name': uri,
-            'tool_call': True,
-            'attachment': True,
-            'reasoning': True,
-        }
-    config = {
-        '$schema': 'https://opencode.ai/config.json',
-        'provider': {
-            'llama.cpp': {
-                'npm': '@ai-sdk/openai-compatible',
-                'name': 'llama.cpp',
-                'options': {
-                    'baseURL': f'{LLAMA_SERVER_URL}/v1',
-                },
-                'models': models,
-            },
-        },
-        'model': f'llama.cpp/{model}',
-    }
-    if web:
-        config['server'] = {'port': 4096}
-    with config_path.open('w') as handle:
-        json.dump(config, handle, indent=2)
-
-
 def ensure_attribution_header_disabled() -> None:
     settings_path = Path('~/.claude/settings.json').expanduser()
     settings = {}
@@ -178,16 +146,6 @@ def main(
         '--model',
         help='HuggingFace model URI for llama-server.',
     ),
-    agent: str = typer.Option(
-        'opencode',
-        '--agent',
-        help='Agent to run (claude or opencode).',
-    ),
-    web: bool = typer.Option(
-        False,
-        '--web',
-        help='Use web mode.',
-    ),
     extra: list[str] = typer.Argument(None),
 ) -> None:
     ensure_attribution_header_disabled()
@@ -200,16 +158,10 @@ def main(
     )
     llama_server_thread.start()
 
-    if agent == 'opencode':
-        ensure_opencode_config(model, web)
-    else:
-        os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
-        os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
+    os.environ['ANTHROPIC_AUTH_TOKEN'] = 'llama.cpp'
+    os.environ['ANTHROPIC_BASE_URL'] = LLAMA_SERVER_URL
 
-    if web and agent == 'opencode':
-        cmd = [agent, 'web', '--port', '4096']
-    else:
-        cmd = [agent, '--model', model]
+    cmd = ['claude', '--model', model]
     if extra:
         cmd += extra
     subprocess.run(cmd, check=False)
