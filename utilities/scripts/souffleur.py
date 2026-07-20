@@ -8,6 +8,7 @@
 #     "pillow",
 #     "pytest",
 #     "bm25s",
+#     "psutil",
 #     "sentence-transformers",
 #     "soundfile",
 #     "torch",
@@ -44,6 +45,7 @@ import typer
 from PIL import ImageGrab
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+from psutil import cpu_count
 from sentence_transformers import SentenceTransformer
 from transformers import (
     AutoProcessor,
@@ -215,10 +217,10 @@ LLAMA_SERVER_BASE_PORT = 8080
 # Extra CLI args passed to llama-server per model URI.
 # -fa (flash attention) is required when using KV cache quantization and recommended for all GPU use.
 # --cache-type-k/v q8_0 halves KV VRAM vs fp16 default with negligible quality loss; requires -fa.
-# Qwen3/Gemma4 have thinking/CoT mode ON by default — --reasoning off disables it (no benefit here, wastes tokens).
+# Qwen3/Gemma4 have thinking/CoT mode ON by default - --reasoning off disables it (no benefit here, wastes tokens).
 # --jinja is now implicit in recent llama.cpp builds; --reasoning off supersedes --chat-template-kwargs enable_thinking.
 # --no-context-shift prevents silent token rotation on Qwen3; generation halts at limit instead.
-# phi-4 has a hard 16K context ceiling — do not set -c above 16384.
+# phi-4 has a hard 16K context ceiling - do not set -c above 16384.
 LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
     # --- OCR models (vision, screen capture → extract text/diagrams/questions) ---
     'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF': [
@@ -258,14 +260,14 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--reasoning', 'off',
     ],
     # gemma-4-26B-A4B: MoE (~4B active), multimodal (text+image+audio), 256K ctx; used for distill/solve/OCR
-    # sampling/cache/ctx carried over from qwaude.py; thinking disabled
+    # thinking disabled
     'google/gemma-4-26B-A4B-it-qat-q4_0-gguf': [
         '-c', '262144', '-fa', 'on', '--no-context-shift',
         '--cache-type-k', 'q4_0', '--cache-type-v', 'q4_0',
         '--temp', '1.0', '--top-p', '0.95', '--top-k', '64', '--min-p', '0',
         '--reasoning', 'off',
     ],
-    # QAT-quantized — q8_0 KV is fine; text-only (no mmproj shipped)
+    # QAT-quantized - q8_0 KV is fine; text-only (no mmproj shipped)
     'google/gemma-3-4b-it-qat-q4_0-gguf': [
         '-c', '32768', '-fa', 'on',
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
@@ -287,15 +289,27 @@ LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
         '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
         '--temp', '0.3',
     ],
-    # Qwen3.6-35B-A3B: MoE+SSM hybrid (qwen35moe arch), 3B active of 35B total.
-    # Requires llama.cpp b4000+ for qwen35moe support. Avoid CUDA 13.2 (produces garbled output; use 12.x).
-    'unsloth/Qwen3.6-35B-A3B-GGUF': [
-        '-c', '32768', '-fa', 'on', '--no-context-shift',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--reasoning', 'off',
+    'prism-ml/Bonsai-27B-gguf:Q1_0': [
+        '-ngl', '99',
+        '-c', '262144',
+        '-fa', 'on',
+        '-np', '1',
+        '--no-context-shift',
+        '--cache-type-k', 'q4_0',
+        '--cache-type-v', 'q4_0',
+        '--jinja',
+        '--reasoning', 'on',
+        '--reasoning-budget', '2048',
+        '--temp', '0.7',
+        '--top-p', '0.95',
+        '--top-k', '20',
+        '--min-p', '0',
+        '--presence-penalty', '1.1',
+        '-b', '4096',
+        '-ub', '2048',
+        '--threads', str(cpu_count(logical=False)),
     ],
 }
-
 
 def llama_server_download(model_uri: str) -> None:
     with subprocess.Popen(['llama-cli', '-hf', model_uri, '-n', '0'], stdin=subprocess.PIPE, text=True) as process:
@@ -476,7 +490,7 @@ class SessionState:
 """
 Energy-envelope Voice Activity Detection (VAD).
 
-Note: A frame is a small fixed-size slice of audio samples — the unit the VAD processes
+Note: A frame is a small fixed-size slice of audio samples - the unit the VAD processes
 one at a time rather than all at once.
 At 16 kHz, 20 ms = 320 samples. Each call to vad.feed() receives exactly that array.
 We are using 20 ms as a default because it is a standard in speech processing because
@@ -693,7 +707,7 @@ Structure your response as:
 
 TL;DR: <one or two sentences summarising the answer>
 
-<detailed answer using bullet points — correct and complete, but no padding or repetition;
+<detailed answer using bullet points - correct and complete, but no padding or repetition;
 prefer bullet points over a block of text>
 """
 
@@ -1120,7 +1134,7 @@ if __name__ == '__main__':
     typer.run(main)
 
 
-# Tests — run with: uv run --with pytest --with numpy --with soundfile --with torch --with torchvision --with transformers --with typer --with accelerate --with librosa --with pillow --with mistral-common python -m pytest utilities/scripts/live.py -v
+# Tests - run with: uv run --with pytest --with numpy --with soundfile --with torch --with torchvision --with transformers --with typer --with accelerate --with librosa --with pillow --with mistral-common python -m pytest utilities/scripts/live.py -v
 class TestVadAccumulator:
     _FRAME_SAMPLES = SAMPLE_RATE * 20 // 1000  # 320 samples per 20ms frame
 
@@ -1203,8 +1217,6 @@ class TestVadAccumulator:
         assert vad.flush() is None
 
 
-# Frequently used: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio
-# Fast alternative: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
+# Frequently used: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
 # RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something1.md --solve-content something2.md
-# Slow: unsloth/Qwen3.6-35B-A3B-GGUF
 # Try this: uv run utilities/scripts/souffleur.py --distill-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --solve-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --ocr-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --source all

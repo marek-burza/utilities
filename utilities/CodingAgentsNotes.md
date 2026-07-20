@@ -70,38 +70,71 @@ Update specific marketplace skill on user level:
 claude plugin update huggingface-best@huggingface-skills --scope user
 ```
 
-## Running Claude with llama.cpp
+## Running Local Models
+
+### `llama.cpp`
+
+Pull `prism-ml/Bonsai-27B-gguf:Q1_0` model:
 
 ```shell
-llama-server -hf unsloth/Qwen3.6-35B-A3B-GGUF --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.5 --min-p 0.0 --reasoning on --host 0.0.0.0 --port 11434 > /tmp/llama.out 2> /tmp/llama.err &
-CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_BASE_URL=http://localhost:11434 claude --model unsloth/Qwen3.6-35B-A3B-GGUF
+echo /exit | llama-cli -hf prism-ml/Bonsai-27B-gguf:Q1_0 -n 0
+```
+
+```shell
+llama-server \
+  -hf prism-ml/Bonsai-27B-gguf:Q1_0 \
+  -ngl 99 \
+  -c 262144 \
+  -fa on \
+  -np 1 \
+  --no-context-shift \
+  --cache-type-k q4_0 \
+  --cache-type-v q4_0 \
+  --jinja \
+  --reasoning on \
+  --reasoning-budget 2048 \
+  --temp 0.7 \
+  --top-p 0.95 \
+  --top-k 20 \
+  --min-p 0 \
+  --presence-penalty 1.1 \
+  -b 4096 \
+  -ub 2048 \
+  --threads $(lscpu -p=core | grep -v '^#' | sort -u | wc -l)
 ```
 
 Notes:
 
-- Presence penalty is a parameter to control the likelihood of the model repeating tokens it has already generated. A higher presence penalty encourages the model to introduce new topics or ideas. Conversely, a lower or negative value increases the chance of repetition, which can be useful for maintaining focus or coherence.
+- `--cache-type-k` - Bonsai recommends 4-bit KV-cache quantization for on-device inference
+- `--jinja` - Correct chat-template / reasoning handling
+- `--reasoning-budget` - Caps thinking, anti-loop guard
+- `--temp` - Bonsai thinking-mode recommendation (Qwen3.6 uses 0.6)
+- `--presence-penalty` - Primary anti-looping lever - presence penalty is a parameter to control the likelihood of the model repeating tokens it has already generated. A higher presence penalty encourages the model to introduce new topics or ideas. Conversely, a lower or negative value increases the chance of repetition, which can be useful for maintaining focus or coherence.
+- `-b` - Batch tuning (max number of tokens llama.cpp accepts into one processing call)
+- `-ub` - Ubatch tuning (how many tokens are computed together in a single GPU pass, and the one that grows your VRAM compute buffer)
 
-## Running Claude with Ollama
-
-To run with Qwen:
-```bash
-export ANTHROPIC_AUTH_TOKEN="ollama"
-export ANTHROPIC_API_KEY=""
-export ANTHROPIC_BASE_URL="http://host.docker.internal:11434"
-claude --model qwen3.5:35b
-```
-
-Disposable `ollama` container:
+To run on `prism-ml/Bonsai-27B-gguf:Q1_0` with `llama.cpp`:
 
 ```shell
-podman run -it --rm --pull=always --name ollama --device nvidia.com/gpu=all --network host --userns=keep-id -e OLLAMA_HOME=/ollama ollama/ollama
-podman exec -it ollama ollama pull qwen3.5:35b
+CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_AUTH_TOKEN="local" ANTHROPIC_API_KEY="" ANTHROPIC_BASE_URL="http://localhost:11434" claude --model prism-ml/Ternary-Bonsai-27B-mlx-2bit
 ```
 
-To switch back run:
-```bash
-unset ANTHROPIC_AUTH_TOKEN
-unset ANTHROPIC_API_KEY
-unset ANTHROPIC_BASE_URL
-claude
+### `ollama`
+
+Run disposable `ollama` container:
+
+```shell
+podman run -d --rm --name ollama --device nvidia.com/gpu=all --network host --userns=keep-id -e OLLAMA_HOME=/tmp --pull=always ollama/ollama
+```
+
+Pull `qwen3.6:27b` model:
+
+```shell
+podman exec -it ollama ollama pull qwen3.6:27b
+```
+
+To run on `qwen3.6:27b` with `ollama`:
+
+```shell
+CLAUDE_CODE_ATTRIBUTION_HEADER=0 ANTHROPIC_AUTH_TOKEN="local" ANTHROPIC_API_KEY="" ANTHROPIC_BASE_URL="http://localhost:11434" claude --model qwen3.6:27b
 ```
