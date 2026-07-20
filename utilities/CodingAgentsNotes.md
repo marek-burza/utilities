@@ -50,6 +50,26 @@ Tools:
 - `/agents` Manage agent configurations
 - `/add-dir <path>` Add working directory
 
+## Claude Code Plugins
+
+Add marketplace skills:
+
+```shell
+claude plugin marketplace add huggingface/skills
+```
+
+Install specific marketplace skill on user level:
+
+```shell
+claude plugin install huggingface-best@huggingface-skills --scope user
+```
+
+Update specific marketplace skill on user level:
+
+```shell
+claude plugin update huggingface-best@huggingface-skills --scope user
+```
+
 ## Running Claude with llama.cpp
 
 ```shell
