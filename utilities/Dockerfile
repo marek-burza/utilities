@@ -21,7 +21,6 @@ RUN apt-get -yq update && \
         libatlas3-base \
         libblas-dev \
         libfreetype-dev \
-        libhdf5-dev \
         libjpeg-dev \
         libasound2-plugins \
         libnvidia-compute-595-server \
@@ -52,7 +51,6 @@ RUN apt-get -yq update && \
 # libatlas3-base - N/A
 # libblas-dev - N/A
 # libfreetype-dev - matplotlib (older, non-wheel version)
-# libhdf5-dev - Keras
 # libjpeg-dev - Pillow (older, non-wheel version)
 # libasound2-plugins - Claude Code voice (ALSA → PulseAudio routing)
 # libnvidia-compute-595-server - lightgbm
