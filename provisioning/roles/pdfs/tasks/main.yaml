@@ -1,0 +1,17 @@
+---
+- name: pdfs - Packages
+  apt:
+    pkg:
+      - enscript
+      - ghostscript
+      - imagemagick
+      - poppler-utils
+      - qpdf
+    state: latest
+    update_cache: yes
+
+- name: pdfs - Scripts
+  copy:
+    src: "{{ role_path }}/files/"
+    dest: /usr/local/bin/
+    mode: "0755"

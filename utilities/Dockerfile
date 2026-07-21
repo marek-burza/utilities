@@ -11,12 +11,9 @@ RUN apt-get -yq update && \
         build-essential \
         cmake \
         curl \
-        enscript \
         ffmpeg \
-        ghostscript \
         git \
         git-lfs \
-        imagemagick \
         jq \
         libatlas3-base \
         libblas-dev \
@@ -28,8 +25,6 @@ RUN apt-get -yq update && \
         ncurses-bin \
         pipewire-bin \
         pkg-config \
-        poppler-utils \
-        qpdf \
         npm \
         ripgrep \
         software-properties-common \
@@ -41,12 +36,9 @@ RUN apt-get -yq update && \
 # build-essential - N/A
 # cmake - lightgbm (older, non-wheel version)
 # curl - N/A
-# enscript - N/A
 # ffmpeg - N/A
-# ghostscript - pdf_optimize
 # git - N/A
 # git-lfs - N/A
-# imagemagick - N/A
 # jq - N/A
 # libatlas3-base - N/A
 # libblas-dev - N/A
@@ -58,8 +50,6 @@ RUN apt-get -yq update && \
 # ncurses-bin - Claude Code
 # pipewire-bin - Claude Code
 # pkg-config - matplotlib (older, non-wheel version)
-# poppler-utils - N/A
-# qpdf - N/A
 # npm - MCP (provides node, npx)
 # ripgrep - Claude Code
 # software-properties-common - Python

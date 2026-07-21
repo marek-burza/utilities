@@ -12,3 +12,4 @@
     - role: fonts
     - role: sounds
     - role: git
+    - role: pdfs
