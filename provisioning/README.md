@@ -22,7 +22,6 @@ install -m 0700 -d $HOME/.ansible/tmp
 ## Installation
 
 ```shell
-cd privileged
 sudo ansible-playbook -i "localhost," --connection=local playbook.yaml
 ```
 
