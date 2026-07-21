@@ -11,5 +11,4 @@
     - role: uv
     - role: fonts
     - role: sounds
-    - role: autokey
     - role: git

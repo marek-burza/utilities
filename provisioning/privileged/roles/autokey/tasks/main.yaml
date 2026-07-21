@@ -1,7 +1,0 @@
----
-- name: autokey - Package
-  apt:
-    pkg:
-      - autokey-gtk
-    state: latest
-    update_cache: yes

@@ -10,7 +10,6 @@ This is a set of Ansible scripts to automate:
 - Removal of insecure CUPS
 - Installation of Slurm
 - Disabling swap
-- Configuration of AutoKey
 
 ## Prerequisites
 
@@ -25,9 +24,6 @@ install -m 0700 -d $HOME/.ansible/tmp
 ```shell
 cd privileged
 sudo ansible-playbook -i "localhost," --connection=local playbook.yaml
-cd -
-cd unprivileged
-ansible-playbook -i "localhost," --connection=local playbook.yaml
 ```
 
 ## To Do
