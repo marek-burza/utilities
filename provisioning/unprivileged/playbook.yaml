@@ -4,4 +4,3 @@
   gather_facts: False
   roles:
     - role: autokey
-    - role: git
