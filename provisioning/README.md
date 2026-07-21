@@ -27,6 +27,4 @@ sudo ansible-playbook -i "localhost," --connection=local playbook.yaml
 
 ## To Do
 
-- Cluster Security
-  - How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
-  - Resolve handling of temporary files in Ansible
+- How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
