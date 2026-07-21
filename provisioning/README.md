@@ -27,7 +27,6 @@ sudo ansible-playbook -i "localhost," --connection=local playbook.yaml
 
 ## To Do
 
-- Consider switching from `Ansible` to [`pyinfra-dev/pyinfra`](https://github.com/pyinfra-dev/pyinfra)
 - Cluster Security
   - How to secure anything - https://github.com/veeral-patel/how-to-secure-anything
   - Resolve handling of temporary files in Ansible
