@@ -103,7 +103,5 @@ USER $USER
 # Route ALSA default device through PulseAudio (Claude Code voice mode)
 RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc"
 
-RUN (curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash) && \
-    (curl --proto '=https' --tlsv1.2 -fsSL https://go.dev/dl/$(curl -sL https://golang.org/dl/ | grep -oP 'go[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1).linux-amd64.tar.gz | /usr/bin/tar -C $HOME/.local -xzf -) && \
-    (curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | /bin/sh -s -- -y)
+RUN curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | /bin/bash
 ENV PATH="$PATH:$VIRTUAL_ENV/bin:$HOME/.local/bin:$HOME/.local/go/bin:$HOME/go/bin:$HOME/.cargo/bin"
