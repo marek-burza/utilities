@@ -63,11 +63,8 @@ ENV UV_LINK_MODE=copy \
     UV_PYTHON=python3.13 \
     UV_PYTHON_INSTALL_DIR=/app/python \
     VIRTUAL_ENV=/app/venv
-# TensorRT is quite noisy
-ENV PYTHONWARNINGS="ignore::SyntaxWarning"
 # Initiate Virtual Environment
-# Install an extension of Python debugger & deep inspection of Python objects
-RUN /bin/uv venv $VIRTUAL_ENV && /bin/uv pip install --python $VIRTUAL_ENV pdbpp wat
+RUN /bin/uv venv $VIRTUAL_ENV
 # Install utilities
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.py
