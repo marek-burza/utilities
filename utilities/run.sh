@@ -6,6 +6,8 @@ podman run \
   --pull=always \
   -e ANTHROPIC_API_KEY \
   -e HF_TOKEN \
+  -e DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
   --network host \
   --userns=keep-id \
   --device nvidia.com/gpu=all \
