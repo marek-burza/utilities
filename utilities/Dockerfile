@@ -17,20 +17,16 @@ RUN apt-get -yq update && \
         jq \
         libatlas3-base \
         libblas-dev \
-        libfreetype-dev \
-        libjpeg-dev \
         libasound2-plugins \
         libnvidia-compute-595-server \
         libopenblas-dev \
         ncurses-bin \
         pipewire-bin \
-        pkg-config \
         npm \
         ripgrep \
         software-properties-common \
         sudo \
-        unzip \
-        zlib1g-dev && \
+        unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 # build-essential - N/A
@@ -42,19 +38,15 @@ RUN apt-get -yq update && \
 # jq - N/A
 # libatlas3-base - N/A
 # libblas-dev - N/A
-# libfreetype-dev - matplotlib (older, non-wheel version)
-# libjpeg-dev - Pillow (older, non-wheel version)
 # libasound2-plugins - Claude Code voice (ALSA → PulseAudio routing)
 # libnvidia-compute-595-server - lightgbm
 # libopenblas-dev - N/A
 # ncurses-bin - Claude Code
 # pipewire-bin - Claude Code
-# pkg-config - matplotlib (older, non-wheel version)
 # npm - MCP (provides node, npx)
 # ripgrep - Claude Code
 # software-properties-common - Python
 # unzip - N/A
-# zlib - Pillow (older, non-wheel version)
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 ENV UV_LINK_MODE=copy \
