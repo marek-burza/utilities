@@ -74,6 +74,17 @@ claude plugin update huggingface-best@huggingface-skills --scope user
 
 ### `llama.cpp`
 
+Build `llama.cpp`:
+
+```shell
+git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp && \
+cd /tmp/llama.cpp && \
+cmake -B . . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86 -DLLAMA_BUILD_UI=OFF && \
+cmake --build . --config Release -j$(nproc) && \
+cmake --install . --config Release && \
+rm -rf /tmp/llama.cpp
+```
+
 Pull `prism-ml/Bonsai-27B-gguf:Q1_0` model:
 
 ```shell

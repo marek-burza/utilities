@@ -61,13 +61,6 @@ RUN /bin/uv venv $VIRTUAL_ENV
 ADD scripts/* /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.py
 
-RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git /tmp/llama.cpp && \
-    cd /tmp/llama.cpp && \
-    cmake -B . . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86 -DLLAMA_BUILD_UI=OFF && \
-    cmake --build . --config Release -j$(nproc) && \
-    cmake --install . --config Release && \
-    rm -rf /tmp/llama.cpp
-
 ENV USER=user
 ENV HOME=/home/$USER
 RUN userdel -r ubuntu 2> /dev/null || true
@@ -77,6 +70,7 @@ RUN useradd -m -s /bin/bash -u 1000 -g 1000 $USER && \
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USER
 
+ENV TERM=xterm-256color
 # Route ALSA default device through PulseAudio (Claude Code voice mode)
 RUN /bin/bash -c "echo -e 'pcm.!default pulse\nctl.!default pulse' > $HOME/.asoundrc"
 

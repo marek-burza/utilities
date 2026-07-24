@@ -4,7 +4,7 @@ podman run \
   -it \
   --rm \
   --pull=always \
-  -e TERM=xterm-256color \
+  -e ANTHROPIC_API_KEY \
   -e HF_TOKEN \
   --network host \
   --userns=keep-id \

@@ -3,12 +3,11 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#     "langchain-openai",
+#     "langchain-anthropic",
 #     "numpy",
 #     "pillow",
 #     "pytest",
 #     "bm25s",
-#     "psutil",
 #     "sentence-transformers",
 #     "soundfile",
 #     "torch",
@@ -43,9 +42,8 @@ import soundfile as sf
 import torch
 import typer
 from PIL import ImageGrab
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
-from psutil import cpu_count
 from sentence_transformers import SentenceTransformer
 from transformers import (
     AutoProcessor,
@@ -212,126 +210,20 @@ class GemmaPipeline:
             return {'text': text}
 
 
-LLAMA_SERVER_BASE_PORT = 8080
-
-# Extra CLI args passed to llama-server per model URI.
-# -fa (flash attention) is required when using KV cache quantization and recommended for all GPU use.
-# --cache-type-k/v q8_0 halves KV VRAM vs fp16 default with negligible quality loss; requires -fa.
-# Qwen3/Gemma4 have thinking/CoT mode ON by default - --reasoning off disables it (no benefit here, wastes tokens).
-# --jinja is now implicit in recent llama.cpp builds; --reasoning off supersedes --chat-template-kwargs enable_thinking.
-# --no-context-shift prevents silent token rotation on Qwen3; generation halts at limit instead.
-# phi-4 has a hard 16K context ceiling - do not set -c above 16384.
-LLAMA_SERVER_EXTRA_PARAMS: dict[str, list[str]] = {
-    # --- OCR models (vision, screen capture → extract text/diagrams/questions) ---
-    'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF': [
-        '-c', '8192', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--temp', '0.1',
-    ],
-    'ggml-org/Mistral-Small-3.1-24B-Instruct-2503-GGUF': [
-        '-c', '16384', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--temp', '0.15',
-    ],
-    # gemma-3-12b also used for solving; 12K covers both roles
-    'ggml-org/gemma-3-12b-it-GGUF': [
-        '-c', '12288', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-    ],
-    # gemma-4 also used for solving; 16K covers both roles; thinking disabled
-    'unsloth/gemma-4-E4B-it-GGUF': [
-        '-c', '16384', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--reasoning', 'off',
-    ],
-    # --- Distillation models (long rolling transcript → identify most recent question) ---
-    # 32K for transcript growth; thinking disabled; no-context-shift for pipeline safety
-    'Qwen/Qwen3-8B-GGUF': [
-        '-c', '32768', '-fa', 'on', '--no-context-shift',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--reasoning', 'off',
-    ],
-    # Qwen3-8B fine-tune (Q1_0, ~1.15 GB); requires PrismML fork: github.com/PrismML-Eng/llama.cpp
-    # --cache-reuse 256 lets repeated transcript prefix tokens hit the prompt cache across calls
-    'prism-ml/Bonsai-8B-gguf': [
-        '-c', '32768', '-fa', 'on', '--no-context-shift',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--cache-reuse', '256',
-        '--reasoning', 'off',
-    ],
-    # gemma-4-26B-A4B: MoE (~4B active), multimodal (text+image+audio), 256K ctx; used for distill/solve/OCR
-    # thinking disabled
-    'google/gemma-4-26B-A4B-it-qat-q4_0-gguf': [
-        '-c', '262144', '-fa', 'on', '--no-context-shift',
-        '--cache-type-k', 'q4_0', '--cache-type-v', 'q4_0',
-        '--temp', '1.0', '--top-p', '0.95', '--top-k', '64', '--min-p', '0',
-        '--reasoning', 'off',
-    ],
-    # QAT-quantized - q8_0 KV is fine; text-only (no mmproj shipped)
-    'google/gemma-3-4b-it-qat-q4_0-gguf': [
-        '-c', '32768', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-    ],
-    # phi-4 also used for solving; 16K is the hard ceiling for both roles
-    'microsoft/phi-4-gguf': [
-        '-c', '16384', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-    ],
-    # --- Solving models (short assignment → concise bullet-point answer) ---
-    # 8K is ample for solve; thinking disabled for speed; no-context-shift for pipeline safety
-    'Qwen/Qwen3-14B-GGUF': [
-        '-c', '8192', '-fa', 'on', '--no-context-shift',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--reasoning', 'off',
-    ],
-    'unsloth/Mistral-Small-Instruct-2409': [
-        '-c', '8192', '-fa', 'on',
-        '--cache-type-k', 'q8_0', '--cache-type-v', 'q8_0',
-        '--temp', '0.3',
-    ],
-    'prism-ml/Bonsai-27B-gguf:Q1_0': [
-        '-ngl', '99',
-        '-c', '262144',
-        '-fa', 'on',
-        '-np', '1',
-        '--no-context-shift',
-        '--cache-type-k', 'q4_0',
-        '--cache-type-v', 'q4_0',
-        '--jinja',
-        '--reasoning', 'on',
-        '--reasoning-budget', '2048',
-        '--temp', '0.7',
-        '--top-p', '0.95',
-        '--top-k', '20',
-        '--min-p', '0',
-        '--presence-penalty', '1.1',
-        '-b', '4096',
-        '-ub', '2048',
-        '--threads', str(cpu_count(logical=False)),
-    ],
-}
-
-def llama_server_download(model_uri: str) -> None:
-    with subprocess.Popen(['llama-cli', '-hf', model_uri, '-n', '0'], stdin=subprocess.PIPE, text=True) as process:
-        process.stdin.write('/exit\n')
-        process.stdin.close()
-        process.wait()
-
-
-def llama_server_worker(model_uri: str, port: int, exit: threading.Event) -> None:
-    extra = LLAMA_SERVER_EXTRA_PARAMS.get(model_uri, [])
-    cmd = [
-        'llama-server', '-hf', model_uri, '-ngl', '99',
-        '--host', '127.0.0.1', '--port', str(port),
-    ] + extra
-
-    model_name_alphanumeric = re.sub(r'[^a-zA-Z0-9]', '_', model_uri)
-    log_path = f'/tmp/llama.cpp.{model_name_alphanumeric}.log'
-    with open(log_path, 'w') as log:
-        with subprocess.Popen(cmd, stdout=log, stderr=log) as process:
-            exit.wait()
-            process.terminate()
-            process.wait()
+ANTHROPIC_BASE_URL = 'https://api.anthropic.com'
+ANTHROPIC_API_KEY_ENV = 'ANTHROPIC_API_KEY'
+DEFAULT_MODEL = 'claude-sonnet-5'
+# Ceiling per response. OCR of a dense screen is the largest consumer here.
+MAX_TOKENS = 4096
+# The solver is the one role where answer quality beats latency, so it gets
+# adaptive thinking; low effort keeps the extra turnaround affordable on the
+# live path. OCR and distillation stay thinking-off - both are extraction, not
+# reasoning, and every millisecond there delays the solver behind them.
+SOLVE_EFFORT = 'low'
+# Thinking tokens are drawn from the same budget as the answer, so the solver
+# needs headroom the other roles do not - without it a long deliberation eats
+# the budget and the answer is truncated mid-sentence.
+SOLVE_MAX_TOKENS = 8192
 
 
 PROMPT_OCR_NANONETS = 'Extract all text, preserving code structure and formatting.'
@@ -665,7 +557,7 @@ and take a separate note of any partial solutions."
 def capture_screen_contents(
     state: SessionState,
     exit: threading.Event,
-    client: ChatOpenAI | None,
+    client: ChatAnthropic | None,
     ocr_mode: OcrMode,
     interval: float = 0.0,
 ) -> None:
@@ -818,7 +710,7 @@ def extract_last_question(markdown_list: str) -> str | None:
 def distiller_worker(
     state: SessionState,
     exit: threading.Event,
-    client: ChatOpenAI,
+    client: ChatAnthropic,
     mode: Mode = Mode.ASSIGNMENT,
     interval: float = 0.5,
 ) -> None:
@@ -859,7 +751,7 @@ def distiller_worker(
 def solver_worker_llm(
     state: SessionState,
     exit: threading.Event,
-    client: ChatOpenAI,
+    client: ChatAnthropic,
     interval: float = 0.5,
 ) -> None:
     previous_assignment = ''
@@ -886,7 +778,7 @@ def solver_worker_rag(
     state: SessionState,
     exit: threading.Event,
     retriever: Retriever,
-    fallback_client: ChatOpenAI,
+    fallback_client: ChatAnthropic,
     min_score: float,
     interval: float = 0.5,
 ) -> None:
@@ -919,9 +811,25 @@ def solver_worker_rag(
             print(f'RAG solver error: {e}')
 
 
-def make_client(uri: str, model_to_port: dict[str, int]) -> ChatOpenAI:
-    port = model_to_port[uri]
-    return ChatOpenAI(base_url=f'http://127.0.0.1:{port}/v1', api_key='llama.cpp', model=uri)
+def make_client(model: str, effort: str | None = None, max_tokens: int = MAX_TOKENS) -> ChatAnthropic:
+    """Adaptive thinking at `effort` when one is given, thinking off otherwise."""
+    api_key = os.environ.get(ANTHROPIC_API_KEY_ENV)
+    if not api_key:
+        raise RuntimeError(f'{ANTHROPIC_API_KEY_ENV} is not set.')
+    extra = {}
+    if effort is None:
+        thinking = {'type': 'disabled'}
+    else:
+        thinking = {'type': 'adaptive'}
+        extra['output_config'] = {'effort': effort}
+    return ChatAnthropic(
+        base_url=ANTHROPIC_BASE_URL,
+        api_key=api_key,
+        model=model,
+        max_tokens=max_tokens,
+        thinking=thinking,
+        **extra,
+    )
 
 
 def main(
@@ -963,17 +871,17 @@ def main(
     ocr_mode: OcrMode = typer.Option(
         OcrMode.GENERIC,
         '--ocr-mode',
-        help='Screen OCR mode: generic (VLM via LangChain/OpenAI-compatible endpoint) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
+        help='Screen OCR mode: generic (Claude vision via the Anthropic API) or nanonets (local Nanonets-OCR-s, best for code/text screens).',
     ),
     ocr_model: str = typer.Option(
-        'ggml-org/Qwen2.5-VL-7B-Instruct-GGUF',
+        DEFAULT_MODEL,
         '--ocr-model',
-        help='HuggingFace model URI for llama-server used for screen OCR when --ocr-mode=generic (default is ggml-org/Qwen2.5-VL-7B-Instruct-GGUF, other good ones are unsloth/gemma-4-E4B-it-GGUF, ggml-org/Mistral-Small-3.1-24B-Instruct-2503-GGUF, ggml-org/gemma-3-12b-it-GGUF).',
+        help='Anthropic model used for screen OCR when --ocr-mode=generic. Set ANTHROPIC_API_KEY.',
     ),
     distill_model: str = typer.Option(
-        'Qwen/Qwen3-8B-GGUF',
+        DEFAULT_MODEL,
         '--distill-model',
-        help='HuggingFace model URI for llama-server used for assignment distillation (default is Qwen/Qwen3-8B-GGUF, other good ones are google/gemma-3-4b-it-qat-q4_0-gguf, microsoft/phi-4-gguf).',
+        help='Anthropic model used for assignment distillation. Set ANTHROPIC_API_KEY.',
     ),
     distill_mode: Mode = typer.Option(
         Mode.QUESTIONS,
@@ -981,9 +889,9 @@ def main(
         help='Distiller behavior: "assignment" (summarize most recent task) or "questions" (extract ordered list of questions, feed last one to the solver).',
     ),
     solve_model: str = typer.Option(
-        'Qwen/Qwen3-14B-GGUF',
+        DEFAULT_MODEL,
         '--solve-model',
-        help='HuggingFace model URI for llama-server used for solving assignments (default is Qwen/Qwen3-14B-GGUF, heavier one is unsloth/gemma-4-E4B-it-GGUF, similarly light are microsoft/phi-4-gguf, ggml-org/gemma-3-12b-it-GGUF, unsloth/Mistral-Small-Instruct-2409). In --solve-mode=rag, also used as LLM fallback when retrieval confidence is low.',
+        help='Anthropic model used for solving assignments. In --solve-mode=rag, also used as LLM fallback when retrieval confidence is low. Set ANTHROPIC_API_KEY.',
     ),
     solve_mode: SolveMode = typer.Option(
         SolveMode.LLM,
@@ -1011,6 +919,10 @@ def main(
         print('\n'.join([f'{i}. {source.name}' for i, source in enumerate(sources)]))
         return
 
+    # Fail before the multi-second ASR model load rather than after it.
+    if not os.environ.get(ANTHROPIC_API_KEY_ENV):
+        raise RuntimeError(f'{ANTHROPIC_API_KEY_ENV} is not set.')
+
     print('Loading model...')
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -1036,13 +948,8 @@ def main(
         if not solve_content:
             print('No --solve-content provided, falling back to --solve-mode=llm')
             solve_mode = SolveMode.LLM
-    llm_models = [distill_model, solve_model]
-    if source in (Source.SCREEN, Source.ALL):
-        llm_models.append(ocr_model)
-    model_to_port: dict[str, int] = {uri: LLAMA_SERVER_BASE_PORT + i for i, uri in enumerate(set(llm_models))}
-
-    distill_client = make_client(distill_model, model_to_port)
-    solve_client = make_client(solve_model, model_to_port)
+    distill_client = make_client(distill_model)
+    solve_client = make_client(solve_model, effort=SOLVE_EFFORT, max_tokens=SOLVE_MAX_TOKENS)
 
     retriever: Retriever | None = None
     if solve_mode == SolveMode.RAG:
@@ -1056,13 +963,6 @@ def main(
             print(f'Indexed {len(chunks)} chunks.')
 
     threads: list[threading.Thread] = []
-    for uri, port in model_to_port.items():
-        llama_server_download(uri)
-        threads.append(threading.Thread(
-            target=llama_server_worker,
-            args=(uri, port, exit),
-            daemon=True,
-        ))
     transcriber_thread = threading.Thread(
         target=transcribe_worker,
         args=(pipe, multi_source, audio, exit, state),
@@ -1088,7 +988,7 @@ def main(
         )
         threads.append(capture_thread)
     if source in (Source.SCREEN, Source.ALL):
-        ocr_client = make_client(ocr_model, model_to_port)
+        ocr_client = make_client(ocr_model)
         capture_thread = threading.Thread(
             target=capture_screen_contents,
             args=(state, exit, ocr_client, ocr_mode),
@@ -1217,6 +1117,7 @@ class TestVadAccumulator:
         assert vad.flush() is None
 
 
-# Frequently used: uv run utilities/scripts/souffleur.py --distill-model prism-ml/Bonsai-8B-gguf --solve-model prism-ml/Bonsai-8B-gguf --source audio
-# RAG: uv run utilities/scripts/souffleur.py --distill-model Qwen/Qwen3-8B-GGUF --solve-model Qwen/Qwen3-8B-GGUF --source audio --solve-mode rag --solve-content something1.md --solve-content something2.md
-# Try this: uv run utilities/scripts/souffleur.py --distill-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --solve-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --ocr-model google/gemma-4-26B-A4B-it-qat-q4_0-gguf --source all
+# All LLM roles hit the Anthropic API - export ANTHROPIC_API_KEY first.
+# Frequently used: uv run utilities/scripts/souffleur.py --source audio
+# RAG: uv run utilities/scripts/souffleur.py --source audio --solve-mode rag --solve-content something1.md --solve-content something2.md
+# Cheaper distillation: uv run utilities/scripts/souffleur.py --distill-model claude-haiku-4-5 --source all
