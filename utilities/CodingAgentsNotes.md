@@ -56,18 +56,21 @@ Add marketplace skills:
 
 ```shell
 claude plugin marketplace add huggingface/skills
+claude plugin marketplace add anthropics/claude-plugins-official
 ```
 
 Install specific marketplace skill on user level:
 
 ```shell
 claude plugin install huggingface-best@huggingface-skills --scope user
+claude plugin install pyright-lsp@claude-plugins-official
 ```
 
 Update specific marketplace skill on user level:
 
 ```shell
 claude plugin update huggingface-best@huggingface-skills --scope user
+claude plugin update pyright-lsp@claude-plugins-official --scope user
 ```
 
 ## Running Local Models
